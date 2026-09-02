@@ -111,7 +111,7 @@
           </button>
           <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            <span>Parties</span>
+            <span>Parties (217)</span>
           </button>
           <button onclick="switchTab('catalog')" id="tab-catalog-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
@@ -193,7 +193,7 @@
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </span>
-            <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search by Salesperson, Party, City, Order #, or Items..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition-all">
+            <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search by Salesperson, Party, GST, City, Order #..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition-all">
           </div>
 
           <select id="order-status-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
@@ -213,7 +213,7 @@
             <option value="Office Counter">Office Counter</option>
           </select>
 
-          <select id="order-party-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <select id="order-party-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none max-w-xs truncate">
             <option value="ALL">All Parties</option>
           </select>
         </div>
@@ -246,11 +246,8 @@
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </div>
           <h3 class="text-base font-semibold text-slate-700">No Orders Recorded Yet</h3>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Your Airen Pipe order desk is ready. Add parties and punch orders.</p>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Select from 217 pre-loaded parties and punch your first order.</p>
           <div class="mt-4 flex justify-center gap-2">
-            <button onclick="openPartyModal()" class="inline-flex items-center px-3.5 py-2 bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-200">
-              + Add First Party
-            </button>
             <button onclick="quickOpenNewOrder()" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
               Punch First Order
             </button>
@@ -267,7 +264,7 @@
           <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
             <div>
               <h2 id="order-form-title" class="text-lg font-bold text-slate-900">Record Airen Pipe & Fittings Order</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Select salesperson, party, sizes, class/pressure rating (kg), and quantities.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Select salesperson, choose party, sizes, class/pressure rating (kg), and quantities.</p>
             </div>
             <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -289,20 +286,21 @@
                 <option value="Abhishek Agrawal">Abhishek Agrawal</option>
                 <option value="Office Counter">Office / Counter</option>
               </select>
-              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this device</span>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this phone</span>
             </div>
 
             <div>
               <div class="flex justify-between items-center mb-1">
                 <label class="block text-xs font-bold text-slate-700 uppercase">Party / Dealer Name <span class="text-red-500">*</span></label>
                 <button type="button" onclick="openPartyModal()" class="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
-                  <span>+ New Party</span>
+                  <span>+ Add New</span>
                 </button>
               </div>
-              <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
-                <option value="">-- Select Registered Party --</option>
+              <input type="text" id="party-search-box" oninput="filterPartyDropdown(this.value)" placeholder="🔍 Type name / city / GST to filter..." class="w-full mb-1 px-3 py-1 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500">
+              <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+                <option value="">-- Select Party (217 Available) --</option>
               </select>
-              <p id="party-quick-info" class="text-xs text-slate-500 mt-1 italic hidden"></p>
+              <div id="party-quick-info" class="text-xs text-slate-600 mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200 hidden leading-relaxed"></div>
             </div>
 
             <div>
@@ -422,11 +420,11 @@
           <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </span>
-          <input type="text" id="party-search-input" oninput="renderPartiesList()" placeholder="Search party by name, phone, city, or firm name..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+          <input type="text" id="party-search-input" oninput="renderPartiesList()" placeholder="Search from 217 parties by name, GST, city, address..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
         </div>
         <button onclick="openPartyModal()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm flex items-center justify-center space-x-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          <span>Add New Party</span>
+          <span>Add Custom Party</span>
         </button>
       </div>
 
@@ -439,9 +437,6 @@
           <div>
             <h2 class="text-lg font-bold text-slate-900">Airen Pipe & Complete Fittings Reference</h2>
             <p class="text-xs text-slate-500">Industry-standard catalog for Agri/Irrigation (kg/cm²), CPVC, UPVC, and SWR drainage systems.</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs text-slate-400 font-medium">Quick Ref</span>
           </div>
         </div>
 
@@ -523,7 +518,7 @@
           <svg class="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           <div>
             <p class="font-bold">Default Master PIN is: <span class="font-mono bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded text-sm tracking-widest font-black">1234</span></p>
-            <p class="text-[11px] text-emerald-800 mt-1">Staff can freely punch orders and register parties, but deleting records requires this PIN.</p>
+            <p class="text-[11px] text-emerald-800 mt-1">Staff can freely punch orders, but deleting records requires this PIN.</p>
           </div>
         </div>
 
@@ -546,45 +541,6 @@
 
       <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
         <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-          <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-          </div>
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Database Backup & Device Transfer</h2>
-            <p class="text-xs text-slate-500">Save a backup or transfer data between devices easily.</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
-            <div>
-              <h4 class="font-bold text-sm text-slate-900">Download Airen Pipe Backup (.json)</h4>
-              <p class="text-xs text-slate-500 mt-1">Exports all registered parties and recorded orders into a single backup file.</p>
-            </div>
-            <button onclick="exportFullJsonBackup()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              <span>Download Backup File</span>
-            </button>
-          </div>
-
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
-            <div>
-              <h4 class="font-bold text-sm text-slate-900">Restore from Backup File</h4>
-              <p class="text-xs text-slate-500 mt-1">Load backup file on another phone or browser (Requires Master PIN).</p>
-            </div>
-            <div>
-              <input type="file" id="import-backup-file" accept=".json" class="hidden" onchange="handleRestoreBackupFile(event)">
-              <button onclick="triggerRestoreBackupPrompt()" class="w-full px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                <span>Upload & Restore Backup</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
@@ -603,19 +559,9 @@
                 Update URL
               </button>
             </div>
-            <p class="text-[11px] text-emerald-600 mt-1 font-medium">✓ Central Google Sheet live connection is active by default.</p>
+            <p class="text-[11px] text-emerald-600 mt-1 font-medium">✓ Central Google Sheet live connection is active.</p>
           </div>
         </div>
-      </div>
-
-      <div class="bg-red-50/50 p-5 rounded-2xl border border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h3 class="font-bold text-red-900 text-sm">Clear All Local Data (Admin Only)</h3>
-          <p class="text-xs text-red-700 mt-0.5">Wipes local records on this device. Locked behind Master Security PIN.</p>
-        </div>
-        <button onclick="clearAllDataPrompt()" class="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shrink-0 shadow-xs">
-          🔒 Reset App Data (Requires PIN)
-        </button>
       </div>
     </div>
   </main>
@@ -684,7 +630,7 @@
           <div>
             <span class="text-slate-400 uppercase font-bold text-[10px] block mb-0.5">Party / Customer Details</span>
             <h4 id="slip-party-name" class="font-bold text-sm text-slate-900">--</h4>
-            <p id="slip-party-firm" class="text-slate-700 font-medium">--</p>
+            <p id="slip-party-gst" class="text-emerald-700 font-bold mt-0.5">GSTIN: --</p>
             <p id="slip-party-phone" class="text-slate-600 mt-0.5">Phone: --</p>
             <p id="slip-party-city" class="text-slate-600">Location: --</p>
           </div>
@@ -774,40 +720,29 @@
         <input type="hidden" id="edit-party-id" value="">
         
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Contact Person <span class="text-red-500">*</span></label>
-          <input type="text" id="party-name" required placeholder="e.g. Ramesh Bhai / Rajesh Patel" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name <span class="text-red-500">*</span></label>
+          <input type="text" id="party-name" required placeholder="e.g. Balaji Hardware / Rajesh Traders" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Firm / Shop Name</label>
-          <input type="text" id="party-firm" placeholder="e.g. Kisan Agro Agency / Balaji Hardware" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">GST Number (GSTIN)</label>
+          <input type="text" id="party-gst" maxlength="15" placeholder="e.g. 23AAAAA0000A1Z5 (Leave blank if URP)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase font-mono">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number <span class="text-red-500">*</span></label>
-            <input type="tel" id="party-phone" required placeholder="e.g. 9876543210" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
+            <input type="tel" id="party-phone" placeholder="e.g. 9876543210" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">City / Town</label>
-            <input type="text" id="party-city" placeholder="e.g. Surat, Indore, Pune" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <input type="text" id="party-city" placeholder="e.g. Bhopal, Sironj, Vidisha" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party Type / Category</label>
-          <select id="party-type" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="Agri Dealer / Agro Center">Agricultural Equipment / Agro Dealer</option>
-            <option value="Retailer / Dealer">Retailer / Hardware Store</option>
-            <option value="Plumbing Contractor">Plumbing Contractor</option>
-            <option value="Builder / Developer">Builder / Project Site</option>
-            <option value="Wholesaler / Sub-Dealer">Sub-Dealer / Wholesaler</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Notes / Delivery Address</label>
-          <textarea id="party-address" rows="2" placeholder="Address, brand preference, GST if any..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Address / Location Details</label>
+          <textarea id="party-address" rows="2" placeholder="Market, ward, landmark..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
         </div>
 
         <div class="pt-2 flex justify-end space-x-2">
@@ -831,15 +766,227 @@
     const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
 
     /* ==========================================================
-       DATA CONSTANTS & PRESETS
+       217 PRE-LOADED PARTIES DIRECT FROM data.xlsx
        ========================================================== */
-    const SALES_TEAM = [
-      "Sonam Jain",
-      "Adil Beg",
-      "Ateeque Ahmed",
-      "Abhishek Agrawal",
-      "Office Counter"
-    ];
+    const DEFAULT_PARTIES = [
+  {"id": "pty_001", "name": "A to Z HARDWARE", "firm": "A to Z HARDWARE", "phone": "", "city": "Sironj", "gst": "Unregistered", "address": "Sironj", "type": "Unregistered (URP)"},
+  {"id": "pty_002", "name": "A to Z TRADERS", "firm": "A to Z TRADERS", "phone": "", "city": "Vidisha", "gst": "23CNWPA4952Q1ZA", "address": "NEAR MANSHA POORAN MANDIR WARD NO. 21 LATERI ROAD Sironj Vidisha, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
+  {"id": "pty_003", "name": "ABABIL ENTERPRISES", "firm": "ABABIL ENTERPRISES", "phone": "", "city": "Ahmedabad", "gst": "24ALFPM1205K1ZF", "address": "Ground Floor 74 Maulana Azad Park Society Sarkhej Raod Ahmedabad", "type": "Registered Dealer"},
+  {"id": "pty_004", "name": "ABHISHEK AGRAWAL", "firm": "ABHISHEK AGRAWAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_005", "name": "ACCOUNTING CHARGES", "firm": "ACCOUNTING CHARGES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_006", "name": "AGRO TRADERS", "firm": "AGRO TRADERS", "phone": "", "city": "Bhopal", "gst": "23AIEPG8904D1ZP", "address": "GROUND FLOOR BHOPAL PLAZA SHOP NO 46-47-48-49 HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_007", "name": "AIREN POLYPIPES PVT LTD", "firm": "AIREN POLYPIPES PVT LTD", "phone": "", "city": "Bhopal", "gst": "23AABCA3944M1ZP", "address": "HOTEL RAJDOOT  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_008", "name": "AMIT TRADER", "firm": "AMIT TRADER", "phone": "", "city": "Seoni Malwa", "gst": "23DDVPR1849P1ZI", "address": "WARD NO 15 Main Road Seoni Malwa", "type": "Registered Dealer"},
+  {"id": "pty_009", "name": "AMIT TRADERS", "firm": "AMIT TRADERS", "phone": "", "city": "", "gst": "23ACWPC7424L1ZA", "address": "C SECTOR 23 RIASEN ROAD INDRAPURI", "type": "Registered Dealer"},
+  {"id": "pty_010", "name": "AMRIT ENTERPRISES", "firm": "AMRIT ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23BJHPD2812E1ZX", "address": "Amrit Villa 21 NEAR LAKE TOWER Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_011", "name": "ANAPURNA INDUSTRIES", "firm": "ANAPURNA INDUSTRIES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_012", "name": "ANIL STEELS", "firm": "ANIL STEELS", "phone": "", "city": "Obaidullaganj", "gst": "23CEUPM2388K1ZT", "address": "OBAIDULLAGANJ WARD NO.04, GOHARGANJ ROAD OBAIDULLAGANJ", "type": "Registered Dealer"},
+  {"id": "pty_013", "name": "ANMOL SANITATION", "firm": "ANMOL SANITATION", "phone": "", "city": "Bhopal", "gst": "23BYGPA2912L1ZR", "address": "PLOT NO 1A SHOPNO 1 80 FEET ROAD Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_014", "name": "ANOOP TRADERS", "firm": "ANOOP TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACFPM4877N1Z2", "address": "Ground Floor 0 Capital Hotel, Bharat Talkies BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_015", "name": "ARIHANT SALES", "firm": "ARIHANT SALES", "phone": "", "city": "Bhopal", "gst": "23AHNPJ0018P1ZA", "address": "SHOP NO. 01  HAMIDIA ROAD SHAH BUILDING COMPOUND KE ANDAR  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_016", "name": "ARIHANT TUBES", "firm": "ARIHANT TUBES", "phone": "", "city": "Bhopal", "gst": "23AANFA7516L1Z9", "address": "04 OPPOSITE BHOPAL TALKIES HAMIDIA ROAD BHOPAL  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_017", "name": "ARUN AGRAWAL", "firm": "ARUN AGRAWAL", "phone": "", "city": "", "gst": "23AARPA8699Q1ZO", "address": "B-62 PARASPAR COLONY KOLAR ROAD CHUNA BHATTI", "type": "Registered Dealer"},
+  {"id": "pty_018", "name": "ASEEDO TECHNOLOGY PRIVATE LIMITED", "firm": "ASEEDO TECHNOLOGY PRIVATE LIMITED", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_019", "name": "ATIK AHMED", "firm": "ATIK AHMED", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_020", "name": "AUDIT FEES", "firm": "AUDIT FEES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_021", "name": "BALAJI HARDWARE AND KRISHI SEVAKENDRA", "firm": "BALAJI HARDWARE AND KRISHI SEVAKENDRA", "phone": "", "city": "Sehore", "gst": "23ACOPL2323F1ZY", "address": "0 SEHORE SHYAMPUR ROAD CHANDBAD DHANKHEDI DHANKHEDI  Sehore, Madhya Pradesh-466001 India", "type": "Registered Dealer"},
+  {"id": "pty_022", "name": "BALAJI PIPE AND SANITARY STORE", "firm": "BALAJI PIPE AND SANITARY STORE", "phone": "", "city": "Shivpuri", "gst": "23CIYPS1748B1ZZ", "address": "BHERO BABA TEMPLE DHARAMLA ROAD SHIVPURI", "type": "Registered Dealer"},
+  {"id": "pty_023", "name": "BALAJI TRADERS", "firm": "BALAJI TRADERS", "phone": "", "city": "Raisen", "gst": "23JQGPK8563R1ZU", "address": "WARD NUMBER 09 UDAIPURA Udaipura Raisen, Madhya Pradesh-464770 India", "type": "Registered Dealer"},
+  {"id": "pty_024", "name": "BALAJI TRADERS & PLYWOOD", "firm": "BALAJI TRADERS & PLYWOOD", "phone": "", "city": "Bhopal", "gst": "23AKUPP2390J1ZN", "address": "HANUMAN NAGAR BALAJI TOWER PLOT NO 10 JATKHEDI ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_025", "name": "Bank Charges", "firm": "Bank Charges", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_026", "name": "BANK INTEREST", "firm": "BANK INTEREST", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_027", "name": "BARKHA TRADERS", "firm": "BARKHA TRADERS", "phone": "", "city": "Doraha", "gst": "Unregistered", "address": "DORAHA", "type": "Unregistered (URP)"},
+  {"id": "pty_028", "name": "BHOUMIK TRADERS", "firm": "BHOUMIK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
+  {"id": "pty_029", "name": "BOMBAY ELECTRIC & MACHINERY STORE", "firm": "BOMBAY ELECTRIC & MACHINERY STORE", "phone": "", "city": "", "gst": "23AEJPS5915D1ZK", "address": "WARD ITWARA ROAD ITWARA BAZAR", "type": "Registered Dealer"},
+  {"id": "pty_030", "name": "Car Insurance", "firm": "Car Insurance", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_031", "name": "Car LOAN EMI", "firm": "Car LOAN EMI", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_032", "name": "CHIRAYU AGRAWAL", "firm": "CHIRAYU AGRAWAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_033", "name": "CHOUKSEY STONE CRUSHER", "firm": "CHOUKSEY STONE CRUSHER", "phone": "", "city": "Raisen", "gst": "23AEWPC9700K1Z9", "address": "POLICE CHOUKI KE SAMANE  RAISEN ROAD ANAND NAGAR", "type": "Registered Dealer"},
+  {"id": "pty_034", "name": "CHOURASIYA TRADERS", "firm": "CHOURASIYA TRADERS", "phone": "", "city": "Bhopal", "gst": "23ADKPC0615J1Z1", "address": "SECTOR B 20 B ASHOKA GARDEN STATION ROAD BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_035", "name": "CONVENANCE EXPENSES", "firm": "CONVENANCE EXPENSES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_036", "name": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "firm": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "phone": "", "city": "Bhopal", "gst": "23AAKCC9454H1ZG", "address": "First Floor Gurudwara Gali Shop No 9, 7B Hamidia Road Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_037", "name": "DARWESH HARDWARE  STORE", "firm": "DARWESH HARDWARE  STORE", "phone": "", "city": "Bhopal", "gst": "23AFUPP5910K1Z0", "address": "21  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_038", "name": "DD ENTERPRISES", "firm": "DD ENTERPRISES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_039", "name": "DEEP TRADERS", "firm": "DEEP TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "AYODHYA BYPASS ROAD GEET BUNGLOW", "type": "Unregistered (URP)"},
+  {"id": "pty_040", "name": "DEEVA LOGISTICS PVT LTD", "firm": "DEEVA LOGISTICS PVT LTD", "phone": "", "city": "Indore", "gst": "23AAECD4595L1ZC", "address": "309, Block B  Shalimar Corporate Centre, 8A South Tukoganj Indore, Madhya Pradesh-452001 India", "type": "Registered Dealer"},
+  {"id": "pty_041", "name": "DHAKAD HARDWARE AND PAINTS", "firm": "DHAKAD HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23JPBPK7599B1ZO", "address": "KENRA BANK SHOP NO 02 BDA ROAD SALAIYA BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_042", "name": "DILIP TRADERS", "firm": "DILIP TRADERS", "phone": "", "city": "Obaidullaganj", "gst": "23AGXPM1973B1ZA", "address": "OBAIDULLAGANJ WARD NO 04 MAIN ROAD GOHARGANJ OBAIDULLAGANJ", "type": "Registered Dealer"},
+  {"id": "pty_043", "name": "DUBEY ENTERPRISES", "firm": "DUBEY ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23ARGPD4977Q1Z8", "address": "123  HOME GURAD OFFICE ROAD HEAVY INDUSTRIAL AR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_044", "name": "ELECTRICITY BILL", "firm": "ELECTRICITY BILL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_045", "name": "EMKAY INDIA", "firm": "EMKAY INDIA", "phone": "", "city": "Bhopal", "gst": "23AAAFE3355N1ZH", "address": "5  HAMIDIA ROAD BEHIND MANOHAR DAIRY BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_046", "name": "FAST TRACK INFRASTRUCTURE", "firm": "FAST TRACK INFRASTRUCTURE", "phone": "", "city": "Bhopal", "gst": "23AACFF2565P1Z8", "address": "SHOP NO 4 RAVIDAS MARKET NEAR DURGA MANDIR BARKHEDA PATHANI BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_047", "name": "FOUR LAKES", "firm": "FOUR LAKES", "phone": "", "city": "", "gst": "23AAGFF5547B1ZT", "address": "JHAGARIYA KHURD", "type": "Registered Dealer"},
+  {"id": "pty_048", "name": "FREIGHT", "firm": "FREIGHT", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_049", "name": "GAURAV ENTERPEISES", "firm": "GAURAV ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ANNPA1853D1ZI", "address": "28 behind hotel palace shop no 1 hamidia road bhopal", "type": "Registered Dealer"},
+  {"id": "pty_050", "name": "GAYATREE TRADING COMPANY", "firm": "GAYATREE TRADING COMPANY", "phone": "", "city": "Bhopal", "gst": "23ABOPM6445L1Z7", "address": "7 JK BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_051", "name": "GODOWN RENT", "firm": "GODOWN RENT", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_052", "name": "GOURAV AGRO TECH", "firm": "GOURAV AGRO TECH", "phone": "", "city": "Ashta", "gst": "23APKPV1693R1ZX", "address": "0 ASHTA INDORE BHOPAL ROAD ASHTA", "type": "Registered Dealer"},
+  {"id": "pty_053", "name": "GRASIM INDUATRY C/O GULAB CHAND SAHU", "firm": "GRASIM INDUATRY C/O GULAB CHAND SAHU", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_054", "name": "GRASIM INDUSTRIES C/O SIMARIYA TRADERS", "firm": "GRASIM INDUSTRIES C/O SIMARIYA TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_055", "name": "GRASIM INDUSTRIES LIMITED", "firm": "GRASIM INDUSTRIES LIMITED", "phone": "", "city": "", "gst": "29AAACG4464B1ZU", "address": "GRASIM INDUSTRIES LIMITED  P.B.NO.9, HARIHAR - 577 601", "type": "Registered Dealer"},
+  {"id": "pty_056", "name": "GRASIM INDUSTRY C/O CHOUKSEY  TRADERS", "firm": "GRASIM INDUSTRY C/O CHOUKSEY  TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_057", "name": "GST PAID", "firm": "GST PAID", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_058", "name": "GUPTA HARDWARE AND PAINTS", "firm": "GUPTA HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23FAVPS3981Q1ZE", "address": "ASHOK VIHAR COLONY H.NO. 222 HIG ASHOKA GARDEN BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_059", "name": "GURU NANAK PRABANDHAN COMMITTEE", "firm": "GURU NANAK PRABANDHAN COMMITTEE", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Hamidia Road Bhopal", "type": "Unregistered (URP)"},
+  {"id": "pty_060", "name": "HARI OM TRADERS", "firm": "HARI OM TRADERS", "phone": "", "city": "", "gst": "23AAGPL0257Q1ZI", "address": "shop no 58 railway  station road ganjbasoda", "type": "Registered Dealer"},
+  {"id": "pty_061", "name": "HARSHIT MANGAL", "firm": "HARSHIT MANGAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_062", "name": "Health Insurance", "firm": "Health Insurance", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_063", "name": "HEMADRI INFRASTRUCTURE", "firm": "HEMADRI INFRASTRUCTURE", "phone": "", "city": "Bhopal", "gst": "23AAMFH8955K1ZS", "address": "INDRAPURI C-61 INDRAPURI BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_064", "name": "HIND CHEMICAL", "firm": "HIND CHEMICAL", "phone": "", "city": "Bhopal", "gst": "23ADLPT4284B1ZJ", "address": "SHOP NO 02 ALARK ARCADE DATA COLONY AIRPORT ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_065", "name": "HOME ENTERPRISES", "firm": "HOME ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AUDPP0256E1Z2", "address": "Bhawna Nagar Plot No.-1, Shop No-01 Patel Market, Ayodhya Bypass Road Bhopal, Madhya Pradesh-462021 India", "type": "Registered Dealer"},
+  {"id": "pty_066", "name": "HOUSE RENT", "firm": "HOUSE RENT", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_067", "name": "JAI MANGLANI", "firm": "JAI MANGLANI", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_068", "name": "JAIN ENTERPRISES", "firm": "JAIN ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFTPJ7113B2ZQ", "address": "146 b ashoka garden bhopal", "type": "Registered Dealer"},
+  {"id": "pty_069", "name": "JAIN TRADERS", "firm": "JAIN TRADERS", "phone": "", "city": "", "gst": "23AEIPJ1356C1Z1", "address": "1/1  BUS STAND GANDHI NAGAR  B", "type": "Registered Dealer"},
+  {"id": "pty_070", "name": "JOHAR HARDWARE", "firm": "JOHAR HARDWARE", "phone": "", "city": "Sironj", "gst": "23BFJPJ5812A1Z0", "address": "WARD NO 06 SIRONJ  TALAIYA Sironj, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
+  {"id": "pty_071", "name": "JP SONS", "firm": "JP SONS", "phone": "", "city": "Bhopal", "gst": "23ALRPM6831B1Z6", "address": "SHOP NO. 10  PATWA MARKET BHARAT TALKIES ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_072", "name": "JYOTI ENTERPRISES", "firm": "JYOTI ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AVQPV0733L1Z4", "address": "811 AYODHYA BY PASS ROAD G SECTOR MINAL RESIDENCY BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_073", "name": "KHANDELWAL ELECTRICALS", "firm": "KHANDELWAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23ASDPK1661L1ZT", "address": "MAIN ROAD BHOPAL INDORE ROAD KHAJURI SADAK", "type": "Registered Dealer"},
+  {"id": "pty_074", "name": "KHANDELWAL TRADERS", "firm": "KHANDELWAL TRADERS", "phone": "", "city": "", "gst": "23EOQPK1785A1ZY", "address": "25 GRAM DEEWANGANJ BHAWANI CHOK DEEWANGANJ", "type": "Registered Dealer"},
+  {"id": "pty_075", "name": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "firm": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "phone": "", "city": "Indore", "gst": "23AAACK7078B2ZT", "address": "8 TH FLOOR APARTMENT NO. 801 AND 803 BRILLIANT SAPPHIRE PLOT NO. 10 SCHEME NO. 78-II INDORE", "type": "Registered Dealer"},
+  {"id": "pty_076", "name": "KRITI INDUSTRIES (INDIA) LTD.", "firm": "KRITI INDUSTRIES (INDIA) LTD.", "phone": "", "city": "Indore", "gst": "23AAACK7078B1ZU", "address": "8th  FLOOR APARTMENT 801-802 BRILLIANT SAPHIRE SCH NO 78 INDORE", "type": "Registered Dealer"},
+  {"id": "pty_077", "name": "KUSHWAHA TRADERS", "firm": "KUSHWAHA TRADERS", "phone": "", "city": "Govindpura", "gst": "23APXPK8696L1ZQ", "address": "30c semra road govindpura shubh labh nagar", "type": "Registered Dealer"},
+  {"id": "pty_078", "name": "Labour Expenses", "firm": "Labour Expenses", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_079", "name": "LAXMI INDUSTRIES", "firm": "LAXMI INDUSTRIES", "phone": "", "city": "", "gst": "23DDBPG5788N1Z3", "address": "0 GRAM MANKAPUR MAHGANWA KALAN", "type": "Registered Dealer"},
+  {"id": "pty_080", "name": "legal Expenses", "firm": "legal Expenses", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_081", "name": "M/S AGRAWAL TRADERS", "firm": "M/S AGRAWAL TRADERS", "phone": "", "city": "", "gst": "23ACSPA6696E1ZF", "address": "AGRAWAL TRADERS TAHKUR COMPLEX", "type": "Registered Dealer"},
+  {"id": "pty_082", "name": "M/S ANKUR TRADERS", "firm": "M/S ANKUR TRADERS", "phone": "", "city": "Bhopal", "gst": "23AMXPJ9866G1ZA", "address": "00 WORD NO.13 BHOPAL SAGAR ROAD BEGUMGANJ", "type": "Registered Dealer"},
+  {"id": "pty_083", "name": "M/S BALKRISHNA BANSAL", "firm": "M/S BALKRISHNA BANSAL", "phone": "", "city": "", "gst": "23ACBPB7900R1ZN", "address": "0  NEAR KHAR NALA M.S. ROAD SABALGARH", "type": "Registered Dealer"},
+  {"id": "pty_084", "name": "M/S CHINTAMANI HARDWARE", "firm": "M/S CHINTAMANI HARDWARE", "phone": "", "city": "Vidisha", "gst": "23AIIPJ1472D2ZO", "address": "00 BHOPAL SAGAR ROAD VIDISHA R", "type": "Registered Dealer"},
+  {"id": "pty_085", "name": "M/S G.S MACHINERY", "firm": "M/S G.S MACHINERY", "phone": "", "city": "Bhopal", "gst": "23AGZPR6997G1ZB", "address": "PUNJAB BOOT HOUSE KE UPAR 30 STATION ROAD HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_086", "name": "M/S JEET HOMES", "firm": "M/S JEET HOMES", "phone": "", "city": "Bhopal", "gst": "23AAIFJ4506A3ZY", "address": "17  DURGA CHOUK, NARELA SHANKAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_087", "name": "M/S MEENA AGRO INDUSTRIES", "firm": "M/S MEENA AGRO INDUSTRIES", "phone": "", "city": "Raisen", "gst": "23BQYPS2454K1Z4", "address": "01  BHOPAL ROAD RAISEN", "type": "Registered Dealer"},
+  {"id": "pty_088", "name": "M/S PRABHAT STORES", "firm": "M/S PRABHAT STORES", "phone": "", "city": "", "gst": "23ATMPP0154H1ZS", "address": "SHOP NO 08 MANDI COMPLEX BUS STAND ROAD BADI", "type": "Registered Dealer"},
+  {"id": "pty_089", "name": "MAA KARMA TRADERS", "firm": "MAA KARMA TRADERS", "phone": "", "city": "", "gst": "23DEBPS8018L1Z8", "address": "00 WD NO 10 00 BAMHORI TAH BAMHORI", "type": "Registered Dealer"},
+  {"id": "pty_090", "name": "MAA NAMAMI TRADERS", "firm": "MAA NAMAMI TRADERS", "phone": "", "city": "", "gst": "23ASAPL5864B1Z3", "address": "WORD NO 08  J J ROAD BRAMHA NAGAR BARI", "type": "Registered Dealer"},
+  {"id": "pty_091", "name": "MAA VAISHNAVI ELECTRICALS", "firm": "MAA VAISHNAVI ELECTRICALS", "phone": "", "city": "Sehore", "gst": "Unregistered", "address": "SHYAMPUR CHANDBAD DIST SEHORE", "type": "Unregistered (URP)"},
+  {"id": "pty_092", "name": "MADHAV ENTERPRISES", "firm": "MADHAV ENTERPRISES", "phone": "", "city": "Sehore", "gst": "23BHQPS0236J1Z5", "address": "H. No. 338 Main Road Ahmadpur Barkheda Sehore, Madhya Pradesh-466664 India", "type": "Registered Dealer"},
+  {"id": "pty_093", "name": "MAHAVIR ENTERPRISES", "firm": "MAHAVIR ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AHYPJ1616J2Z4", "address": "17 AREDI AYODHYA BY PASS ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_094", "name": "MAMTA ELECTRICALS", "firm": "MAMTA ELECTRICALS", "phone": "", "city": "Narsinghgarh", "gst": "23AFUPC3578C1ZI", "address": "PAL ROAD  NARSINGHGARH NARSINGHGARH", "type": "Registered Dealer"},
+  {"id": "pty_095", "name": "MANAS TRADERS", "firm": "MANAS TRADERS", "phone": "", "city": "Sehore", "gst": "23AYPPP8753N1ZH", "address": "01  Mubarakpura Choraha new indore bhopal road Sehore, Madhya Pradesh-466001 India", "type": "Registered Dealer"},
+  {"id": "pty_096", "name": "MANISHA ENTERPEISES", "firm": "MANISHA ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ADBPA8015H1Z7", "address": "SHOP NO 14 HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_097", "name": "MANISHA PUMPS AND PIPES", "firm": "MANISHA PUMPS AND PIPES", "phone": "", "city": "", "gst": "23CQYPA7603P1ZA", "address": "SAI PARISAR PUNJABI BAGH H.NO 75", "type": "Registered Dealer"},
+  {"id": "pty_098", "name": "MANOHAR LAL KUNGWANI", "firm": "MANOHAR LAL KUNGWANI", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_099", "name": "MATESHWARI SANITARY", "firm": "MATESHWARI SANITARY", "phone": "", "city": "Bhopal", "gst": "23AQDPR9202N1ZL", "address": "INFRONT OF CANARA BANK WARD NO 4 BERASIA ROAD KAROND BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_100", "name": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "firm": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "Bhopal", "gst": "23AAZPP4981G1Z1", "address": "SHOP No. 1-B SHAHPURA MANISHA MARKET BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_101", "name": "MEGA DISTRIBUTER", "firm": "MEGA DISTRIBUTER", "phone": "", "city": "Govindpura", "gst": "23AEOPF2262H1ZQ", "address": "SEC F-22  INDUSTRIAL AREA GOVINDPURA", "type": "Registered Dealer"},
+  {"id": "pty_102", "name": "Mega Meet Expenses", "firm": "Mega Meet Expenses", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_103", "name": "METER HOUSE & ELECTRICAL", "firm": "METER HOUSE & ELECTRICAL", "phone": "", "city": "", "gst": "23ADBPK7430Q1ZD", "address": "SHOP NO.13 GURU DWARA LANE HAMIDIA ROAD", "type": "Registered Dealer"},
+  {"id": "pty_104", "name": "MINI KISAN SEWA KENDRA", "firm": "MINI KISAN SEWA KENDRA", "phone": "", "city": "Bhopal", "gst": "23CJAPS1853E1ZH", "address": "KHASRA NO.410/3/1/1,  VILLAGE GOL GHEDI BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_105", "name": "MIRACLE  BUILDCON", "firm": "MIRACLE  BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II M P NAGAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_106", "name": "MODI HOME DECOR", "firm": "MODI HOME DECOR", "phone": "", "city": "Bhopal", "gst": "23BDEPM9378R1ZM", "address": "GROUND FLOOR SHOP NO - 07, PLOT NO - 110 SECTOR - A, VIDHYA NAGAR, HOSHANGABAD ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_107", "name": "MODI TRADERS", "firm": "MODI TRADERS", "phone": "", "city": "", "gst": "23ACVPJ6070C1ZN", "address": "56 moditraders zone-2 mp nagar", "type": "Registered Dealer"},
+  {"id": "pty_108", "name": "MOHAMMAD TRADERS", "firm": "MOHAMMAD TRADERS", "phone": "", "city": "", "gst": "23EPCPK4992A1Z3", "address": "0  MAIN ROAD BARKHEDA HASAN SHYAMPUR", "type": "Registered Dealer"},
+  {"id": "pty_109", "name": "MP HARDWARE", "firm": "MP HARDWARE", "phone": "", "city": "Bhopal", "gst": "23ACCPT3946J1ZE", "address": "29  zone 11 M P NAGAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_110", "name": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "firm": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "phone": "", "city": "", "gst": "23BVRPJ3531L1ZC", "address": "SAINT THOMAS SCHOOL VIVER KE PASS", "type": "Registered Dealer"},
+  {"id": "pty_111", "name": "MUKEEM KHAN", "firm": "MUKEEM KHAN", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "SHYAMPUR", "type": "Unregistered (URP)"},
+  {"id": "pty_112", "name": "MUSKAN CARE", "firm": "MUSKAN CARE", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_113", "name": "N.S TRADERS", "firm": "N.S TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Ashoka Garden Bhopal", "type": "Unregistered (URP)"},
+  {"id": "pty_114", "name": "NAINA HARDWARE", "firm": "NAINA HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CESPV7145D2Z3", "address": "SHOP NO 18 CHHOLA HANUMAN MANDIR KE SAMNE CHHOLA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_115", "name": "NATRAJ UNITED LIMITED", "firm": "NATRAJ UNITED LIMITED", "phone": "", "city": "Indore", "gst": "Unregistered", "address": "INDORE", "type": "Unregistered (URP)"},
+  {"id": "pty_116", "name": "NAVEEN MANGAL", "firm": "NAVEEN MANGAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_117", "name": "NeelamTraders", "firm": "NeelamTraders", "phone": "", "city": "Bhopal", "gst": "23ADGPJ4952P2Z5", "address": "NEARSANKALP NETRALAYA 106 M.P. NAGAR ZONE -2 BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_118", "name": "NEELESHWARI ENTERPRISE", "firm": "NEELESHWARI ENTERPRISE", "phone": "", "city": "Bhopal", "gst": "23ABFPM0382D2Z4", "address": "A-47, ALKAPURI HABIBGANJ BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_119", "name": "NEW  REASONABLE ELECTRICALS", "firm": "NEW  REASONABLE ELECTRICALS", "phone": "", "city": "Indore", "gst": "23AKSPD8612M1ZU", "address": "0 INDORE ROAD NASRULLANGANJ", "type": "Registered Dealer"},
+  {"id": "pty_120", "name": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "firm": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "", "gst": "23DXKPR6077L1ZQ", "address": "VILLAGE PHANDA KALAN  POST PHANDA KALAN", "type": "Registered Dealer"},
+  {"id": "pty_121", "name": "NIKHIL TTRADERS", "firm": "NIKHIL TTRADERS", "phone": "", "city": "", "gst": "23BUQPD2642N1ZF", "address": "AMBIKA GRAH NIRMAN SOCIETY IN FRONT OF GAYATRI MANDIR", "type": "Registered Dealer"},
+  {"id": "pty_122", "name": "OCEANBLUE POLYPLAST", "firm": "OCEANBLUE POLYPLAST", "phone": "", "city": "Bhopal", "gst": "23AAIFO3207D1ZT", "address": "C 68  Opposite janta Quarter Berkheda pathani Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_123", "name": "OM TRADERS", "firm": "OM TRADERS", "phone": "", "city": "Sehore", "gst": "23GCVPS5739B1Z4", "address": "MITTAL PETROL PUMP WARD NO.15 ENGLISH PURA SEHORE", "type": "Registered Dealer"},
+  {"id": "pty_124", "name": "ONE SHOP HARDWARE & ELECTRICALS", "firm": "ONE SHOP HARDWARE & ELECTRICALS", "phone": "", "city": "", "gst": "23ATTPC4710H1ZW", "address": "NH-12 NEAR GP PALACE NH-12, GOHARGANJ", "type": "Registered Dealer"},
+  {"id": "pty_125", "name": "PANKAJ PLASTO INDUSTRY", "firm": "PANKAJ PLASTO INDUSTRY", "phone": "", "city": "", "gst": "23ALDPG3408N2Z9", "address": "- VILL- KANSOR KALA,POST- BARKHEDA HASAN", "type": "Registered Dealer"},
+  {"id": "pty_126", "name": "PARVINDAR SINGH PAL", "firm": "PARVINDAR SINGH PAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_127", "name": "PATEL HARDWARE STORE", "firm": "PATEL HARDWARE STORE", "phone": "", "city": "Bhopal", "gst": "23BEVPP7158G1ZX", "address": "1-2 TAGORE NAGAR KHAJURI KALAN ROAD PATEL NAGAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_128", "name": "PAYAL ELECTRICALS", "firm": "PAYAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23AWTPP6236A1ZI", "address": "MANHINDRA PALAZA 01 GULMOHAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_129", "name": "PERSONAL EXPENSES", "firm": "PERSONAL EXPENSES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_130", "name": "PRACHI TRADERS", "firm": "PRACHI TRADERS", "phone": "", "city": "Bhopal", "gst": "23JKIPK1766E1Z4", "address": "H NO. 367 SECTOR-B  SHIV SHAKTI NAGAR BHOPAL Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_131", "name": "PRAKASH TRADERS", "firm": "PRAKASH TRADERS", "phone": "", "city": "Bhopal", "gst": "23AYLPL3999A1ZA", "address": "Prakash Traders Near- H P Petrol Pump Kurawar Road Shyampur Sehore, Madhya Pradesh-466651 India", "type": "Registered Dealer"},
+  {"id": "pty_132", "name": "PREMNARAYAN SHARMA", "firm": "PREMNARAYAN SHARMA", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_133", "name": "PRIME CLEANING SERVICES", "firm": "PRIME CLEANING SERVICES", "phone": "", "city": "", "gst": "09AANFP5691F1ZP", "address": "SECOND FLOOR GOVINDA BHAWAN 25/3 ASHOK MARG LUCKNOW", "type": "Registered Dealer"},
+  {"id": "pty_134", "name": "PRIYANSH TRADERS", "firm": "PRIYANSH TRADERS", "phone": "", "city": "Bhopal", "gst": "23AFIPJ4758H1ZD", "address": "56 zone-2 m p nagar Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
+  {"id": "pty_135", "name": "R M ENTERPRISES", "firm": "R M ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CGMPB1408H1ZW", "address": "SHOP NO.1 PLOT NO.36-D MAHARANA PRATAP NAGAR ZONE-2 BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_136", "name": "R.D TRADERS", "firm": "R.D TRADERS", "phone": "", "city": "Bhopal", "gst": "23FOWPS8643A1ZG", "address": "74 Raisen Road Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_137", "name": "R.S INTERNATIONAL", "firm": "R.S INTERNATIONAL", "phone": "", "city": "Bhopal", "gst": "23AYAPR1511M2ZL", "address": "PLOT NO 52 HOTEL TAJ  NEAR ALPANA TALKIES HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_138", "name": "Radheshyam Ji", "firm": "Radheshyam Ji", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "Berasia", "type": "Unregistered (URP)"},
+  {"id": "pty_139", "name": "RAGHU TRADERS", "firm": "RAGHU TRADERS", "phone": "", "city": "Sironj", "gst": "23CZIPR5626Q1ZM", "address": "AMAAN SINGH RAGHUVANSHI  MADHUKAR CHOURAHA Sironj, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
+  {"id": "pty_140", "name": "RAI SHREE MACHINERY HOUSE", "firm": "RAI SHREE MACHINERY HOUSE", "phone": "", "city": "Hoshangabad", "gst": "23BDWPC9501N1Z5", "address": "SHOP NO 3 Hoshangabad Road IN FRONT OF MANDI GATE ITARSI", "type": "Registered Dealer"},
+  {"id": "pty_141", "name": "RAJ", "firm": "RAJ", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_142", "name": "RAJ ENTERPRISES", "firm": "RAJ ENTERPRISES", "phone": "", "city": "Berasia", "gst": "23ADMPN3168P1ZY", "address": "MAGIT MARKET 5 BERASIA ROAD KAROND", "type": "Registered Dealer"},
+  {"id": "pty_143", "name": "RAJDHANI ENTERPRISES", "firm": "RAJDHANI ENTERPRISES", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_144", "name": "RAJI ENTERPRISES", "firm": "RAJI ENTERPRISES", "phone": "", "city": "Lateri", "gst": "23FPTPS9771F1Z0", "address": "0  Lateri Anandpur Bandipur Road Anandpur Lateri, Madhya Pradesh-464114 India", "type": "Registered Dealer"},
+  {"id": "pty_145", "name": "RAJIV KIRANA STORES", "firm": "RAJIV KIRANA STORES", "phone": "", "city": "", "gst": "23CIQPR3656B1Z5", "address": "WARD NO 8  SHIKSHA BIBHAG COLONY BARKHEDAGOUR", "type": "Registered Dealer"},
+  {"id": "pty_146", "name": "RAJNEESH AGRAWAL", "firm": "RAJNEESH AGRAWAL", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "HAMIDIA ROAD BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_147", "name": "RAMA TRADERS", "firm": "RAMA TRADERS", "phone": "", "city": "", "gst": "23ADCPC2697Q1Z9", "address": "6 J.K BUILDING HAMIDIA ROAD", "type": "Registered Dealer"},
+  {"id": "pty_148", "name": "RAMESH PATHAK", "firm": "RAMESH PATHAK", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_149", "name": "RAMJI TRADERS", "firm": "RAMJI TRADERS", "phone": "", "city": "Goharganj", "gst": "Unregistered", "address": "GOHARGANJ", "type": "Unregistered (URP)"},
+  {"id": "pty_150", "name": "RATHORE GROUP C/O MUKESH RATHORE", "firm": "RATHORE GROUP C/O MUKESH RATHORE", "phone": "", "city": "", "gst": "Unregistered", "address": "20 IMAMI GATE MAIN ROAD", "type": "Unregistered (URP)"},
+  {"id": "pty_151", "name": "Repair & Maintenance Expenses", "firm": "Repair & Maintenance Expenses", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_152", "name": "RUHEEN SHOAIB", "firm": "RUHEEN SHOAIB", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_153", "name": "S A INFOTECH", "firm": "S A INFOTECH", "phone": "", "city": "Bhopal", "gst": "23ACRPS3067J1Z4", "address": "118  MALVIYA NAGAR BHOPAL Bhopal, Madhya Pradesh-462003 India", "type": "Registered Dealer"},
+  {"id": "pty_154", "name": "S.K. PIPIES", "firm": "S.K. PIPIES", "phone": "", "city": "Bhopal", "gst": "23BTRPM9060M1ZZ", "address": "PLOT NO 136 S.K.PIPES ACHARPURA SPECIAL INDUSTRIAL AREA GUNGA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_155", "name": "SAAVLI ENTERPRISES", "firm": "SAAVLI ENTERPRISES", "phone": "", "city": "Berasia", "gst": "23AFWPM9249Q1Z9", "address": "BHOPAL TALKIES CHOURAHA 5 BERASIA ROAD HAMIDIA ROAD", "type": "Registered Dealer"},
+  {"id": "pty_156", "name": "SACHIN HARDWARE STORE", "firm": "SACHIN HARDWARE STORE", "phone": "", "city": "Vidisha", "gst": "23ARCPG8041J1Z0", "address": "18 bus stand complex vidisha road gairatganj", "type": "Registered Dealer"},
+  {"id": "pty_157", "name": "SADGURU KRIPA TRADERS", "firm": "SADGURU KRIPA TRADERS", "phone": "", "city": "Sironj", "gst": "23ARUPG9176C1ZJ", "address": "WARD NO. 15  SAINKHEDA ROAD Sironj, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
+  {"id": "pty_158", "name": "SAHIL HARDWARE AND ELECTRICALS", "firm": "SAHIL HARDWARE AND ELECTRICALS", "phone": "", "city": "", "gst": "23EGIPS4281K1ZX", "address": "SHOP NO 3 PLOT NO 2 AND 5 RAJIV GANDHI COLONY NEAR BIKANER MISHTHAN BHANDAR RATIBAD", "type": "Registered Dealer"},
+  {"id": "pty_159", "name": "SAI CONSTRICTIONS", "firm": "SAI CONSTRICTIONS", "phone": "", "city": "Indore", "gst": "23AACFS6772M1ZS", "address": "2 MANAS BHAWAN 215 11 RNT MARG INDORE", "type": "Registered Dealer"},
+  {"id": "pty_160", "name": "SAI NATH", "firm": "SAI NATH", "phone": "", "city": "Bhopal", "gst": "23AEWPC7953C2ZE", "address": "75 AHIRPURA CHURCH ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_161", "name": "SALARY EXPENSES", "firm": "SALARY EXPENSES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_162", "name": "SANDHYA ENTERPRISES", "firm": "SANDHYA ENTERPRISES", "phone": "", "city": "", "gst": "23DZFPR5351N1ZW", "address": "NEW SABJI MANDI, KAROND 01 80 FIT ROAD BHANPUR", "type": "Registered Dealer"},
+  {"id": "pty_163", "name": "SANJAY TRADERS", "firm": "SANJAY TRADERS", "phone": "", "city": "Dehgaon", "gst": "23BOCPK6173D1Z9", "address": "01  BAMHORI ROAD DEHGAON", "type": "Registered Dealer"},
+  {"id": "pty_164", "name": "SARAF ENTERPRISES", "firm": "SARAF ENTERPRISES", "phone": "", "city": "", "gst": "23AAZPJ7585J1ZU", "address": "14  hamidia road bal vihar ke samne", "type": "Registered Dealer"},
+  {"id": "pty_165", "name": "SATYAM TRADERS", "firm": "SATYAM TRADERS", "phone": "", "city": "Seoni", "gst": "23CNKPA9832P1ZJ", "address": "0 ward no 08 0 BANK OGF INDIA KE SAMNE Seoni, Madhya Pradesh-480661 India", "type": "Registered Dealer"},
+  {"id": "pty_166", "name": "SATYENDRA VYAS", "firm": "SATYENDRA VYAS", "phone": "", "city": "", "gst": "Unregistered", "address": "BAGHSEVANIYA NEAR ASHIMA MALL", "type": "Unregistered (URP)"},
+  {"id": "pty_167", "name": "School Fees", "firm": "School Fees", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_168", "name": "Shahbaaz Mohd Khan", "firm": "Shahbaaz Mohd Khan", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_169", "name": "SHANTI HARDWARE", "firm": "SHANTI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CBYPP8983N1Z9", "address": "LEELA ARCADE PLOT NO. 335, SHOP NO. 4  NEW JAIL ROAD KAROND BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_170", "name": "SHIV SHAKTI TRADERS", "firm": "SHIV SHAKTI TRADERS", "phone": "", "city": "Raisen", "gst": "23AUKPB0943K1ZU", "address": "OLD NH 12 UDAIPURA DIST. RAISEN", "type": "Registered Dealer"},
+  {"id": "pty_171", "name": "SHIVAM TRADERS", "firm": "SHIVAM TRADERS", "phone": "", "city": "", "gst": "23BJUPL1911P1ZR", "address": "SHOP AT JHULELAL MARKET GANDHI NAGAR", "type": "Registered Dealer"},
+  {"id": "pty_172", "name": "SHIVIKA TRADERS", "firm": "SHIVIKA TRADERS", "phone": "", "city": "", "gst": "23ACDPY9836H1Z4", "address": "SHOP NO. 7 PATWA MARKET NEAR BHARAT TALKIES HAMIDIA ROAD", "type": "Registered Dealer"},
+  {"id": "pty_173", "name": "SHREE HARDWARE", "firm": "SHREE HARDWARE", "phone": "", "city": "Vidisha", "gst": "23AHTPJ2029G1ZG", "address": "29/1 VIDISHA ROAD BHANPUR", "type": "Registered Dealer"},
+  {"id": "pty_174", "name": "SHREE SHIVAAY HARDWARE", "firm": "SHREE SHIVAAY HARDWARE", "phone": "", "city": "Bhopal", "gst": "23BABPC9869F1ZQ", "address": "mahendra plaza E-8 36 & 37 Bawadiya kalan Bhopal, Madhya Pradesh-462026 India", "type": "Registered Dealer"},
+  {"id": "pty_175", "name": "SHREE SHYAM TRADERS", "firm": "SHREE SHYAM TRADERS", "phone": "", "city": "Bhopal", "gst": "23CSFPM6553F1ZR", "address": "House No. 30 Transport Area Near Kokta Transport Nagar Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_176", "name": "SHRI  ADVERTISING AND MARKETING", "firm": "SHRI  ADVERTISING AND MARKETING", "phone": "", "city": "Govindpura", "gst": "23AKKPM9285H1ZP", "address": "B-48  GOVINDPURA BHOPAL Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_177", "name": "SHRI BALAJI MARKETING CO(MFG UNIT)", "firm": "SHRI BALAJI MARKETING CO(MFG UNIT)", "phone": "", "city": "Indore", "gst": "23APDPM4839B1Z8", "address": "87/2  Tel Gali Corner, Siyaganj INDORE", "type": "Registered Dealer"},
+  {"id": "pty_178", "name": "SHRI KRISHNA TRADERS", "firm": "SHRI KRISHNA TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_179", "name": "SHRI SAINATH TRADERS", "firm": "SHRI SAINATH TRADERS", "phone": "", "city": "Bhopal", "gst": "23BPUPS3323A1Z1", "address": "CHANDRIKA HOUSING SOCEITY PLOT NO 24 AYODHYA BY PASS ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_180", "name": "SHRI SAROJ ENTERPRISES", "firm": "SHRI SAROJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CCPPS7555B1ZC", "address": "House no 279 Rohit Nagar Gram Bawadiya Kalan Bhopal, Madhya Pradesh-462026 India", "type": "Registered Dealer"},
+  {"id": "pty_181", "name": "SHRI SHANKAR MACHINERY STORES", "firm": "SHRI SHANKAR MACHINERY STORES", "phone": "", "city": "", "gst": "23AAUPA6758M1Z5", "address": "29/4 opposite bal vihar hamidia road", "type": "Registered Dealer"},
+  {"id": "pty_182", "name": "SHRI SHIV SAI TRADER", "firm": "SHRI SHIV SAI TRADER", "phone": "", "city": "Seoni", "gst": "23AYMPK2325G2ZN", "address": "01  RUNIVHA DHAM COLONY SEONI MALWA", "type": "Registered Dealer"},
+  {"id": "pty_183", "name": "SHUBHAM ENTERPRISES", "firm": "SHUBHAM ENTERPRISES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_184", "name": "SIDDHI VINAYAK TRADERS", "firm": "SIDDHI VINAYAK TRADERS", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "KHAJURIA KALAN SHYAMPUR ROAD", "type": "Unregistered (URP)"},
+  {"id": "pty_185", "name": "SIMARIYA HARDWARE", "firm": "SIMARIYA HARDWARE", "phone": "", "city": "Udaipura", "gst": "23BMOPS3691E1ZQ", "address": "00 00 00 NEAR UDAIPURA NAKA JAYSINGHNAGAR ROAD BARELI Bareli, Madhya Pradesh-464668 India", "type": "Registered Dealer"},
+  {"id": "pty_186", "name": "SIMRANJEET SINGH OBEROI", "firm": "SIMRANJEET SINGH OBEROI", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_187", "name": "SINGH TRADERS", "firm": "SINGH TRADERS", "phone": "", "city": "Bhopal", "gst": "23ASUPS0024J1ZL", "address": "9- A  Awadhpuri Road Bhopal Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_188", "name": "SK ENTERPRISES", "firm": "SK ENTERPRISES", "phone": "", "city": "Sironj", "gst": "23ALNPJ1907H1ZA", "address": "RAVJI PURA 0 RAVJI PATH Sironj, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
+  {"id": "pty_189", "name": "SONAKSHI INTERPRISES", "firm": "SONAKSHI INTERPRISES", "phone": "", "city": "Bhopal", "gst": "23EPBPS7456Q1Z2", "address": "Plot No - 68 Sewaniya Kanasaiya, Near Sagar Public School Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_190", "name": "SOURAV GARG", "firm": "SOURAV GARG", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_191", "name": "SP ENTERPRISE", "firm": "SP ENTERPRISE", "phone": "7000512025", "city": "Bhopal", "gst": "23CAMPK5961L1Z8", "address": "H. NO. 211 VIJAY NAGAR NEAR VIJAY NAGAR SQUARE CHANDBAD , BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_192", "name": "SSK INTERIO", "firm": "SSK INTERIO", "phone": "", "city": "Bhopal", "gst": "23ASJPV1911C1Z2", "address": "FIRST FLOOR PLOT NO 03  AYODHYA BYPASS ROAD MINAL RESIDENCY BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_193", "name": "STAMP DUTY", "firm": "STAMP DUTY", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_194", "name": "STOCK INSURANCE", "firm": "STOCK INSURANCE", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_195", "name": "SUNIL TRADING COMPANY", "firm": "SUNIL TRADING COMPANY", "phone": "", "city": "", "gst": "Unregistered", "address": "MANGALWARA TRANSPORT NAGAR", "type": "Unregistered (URP)"},
+  {"id": "pty_196", "name": "SUSHILA INDUSTRY", "firm": "SUSHILA INDUSTRY", "phone": "", "city": "Bhopal", "gst": "23AKPPK0844F1ZB", "address": "PLOT NO 37, INDUSTRIAL AREA RICHHAI JABALPUR MADHYA PRADESH", "type": "Registered Dealer"},
+  {"id": "pty_197", "name": "SUSPENSE", "firm": "SUSPENSE", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_198", "name": "SWASTIK TRADERS", "firm": "SWASTIK TRADERS", "phone": "", "city": "Udaipura", "gst": "23ADQPU6302A1ZS", "address": "Gokul Dham Ward No 01 PH No 08 Udaipura, Madhya Pradesh-464770 India", "type": "Registered Dealer"},
+  {"id": "pty_199", "name": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "firm": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "phone": "", "city": "Bhopal", "gst": "23ABDCS5083N1ZZ", "address": "DELUX HIG 16 BHEEM KUNG  KOLAR ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_200", "name": "TARA DEVI", "firm": "TARA DEVI", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_201", "name": "TARA DEVI DHANANI", "firm": "TARA DEVI DHANANI", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_202", "name": "TARUN HARDWARE STORE", "firm": "TARUN HARDWARE STORE", "phone": "", "city": "Bhopal", "gst": "23ACKPT2879E1ZB", "address": "PLOT NO 03  SANTOSHI VIHAR AYODHYA BY PASS ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_203", "name": "Transportation Expenses", "firm": "Transportation Expenses", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_204", "name": "UDAY HARDWEARE & ELECTRICALS", "firm": "UDAY HARDWEARE & ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23ASBPD4059P1ZO", "address": "mayur vihar calony e 23 mayur vihar calony ashoka garden bhopal", "type": "Registered Dealer"},
+  {"id": "pty_205", "name": "Utillity Bill", "firm": "Utillity Bill", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_206", "name": "VAIBHAV HARDWARE AND SPARE PARTS", "firm": "VAIBHAV HARDWARE AND SPARE PARTS", "phone": "", "city": "Bari", "gst": "23AHUPJ5139Q1ZL", "address": "main road 01 jj road bari", "type": "Registered Dealer"},
+  {"id": "pty_207", "name": "VAIBHAV TRADERS", "firm": "VAIBHAV TRADERS", "phone": "", "city": "Bhopal", "gst": "23AHWPJ0907E1ZI", "address": "VILLAGE- DEHGAON 01 SAGAR BHOPAL ROAD", "type": "Registered Dealer"},
+  {"id": "pty_208", "name": "VEVEK AGRAWAL", "firm": "VEVEK AGRAWAL", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_209", "name": "VIKAS SANITARY PLAZA", "firm": "VIKAS SANITARY PLAZA", "phone": "", "city": "Bhopal", "gst": "23AORPJ8767Q1ZT", "address": "FINE AVENUE COMPLEX SHOP NO.-4 KOLAR ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_210", "name": "VINAYAK TRADERS", "firm": "VINAYAK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
+  {"id": "pty_211", "name": "VISHU VERMA", "firm": "VISHU VERMA", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
+  {"id": "pty_212", "name": "WATERFLO PIPING SYSTEM", "firm": "WATERFLO PIPING SYSTEM", "phone": "", "city": "", "gst": "23AABFW0415G1ZQ", "address": "BUILDING NO.4D, RAMESH MALIK SECTOR-B INDUSTRIAL AREA MANDIDEEP", "type": "Registered Dealer"},
+  {"id": "pty_213", "name": "YAKSHA ENTERPRISES", "firm": "YAKSHA ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CIDPR3352M1Z2", "address": "Shop No 2 and 3 Ward No 1 Murli Manohar Mandir Road Sukhi Sewaniya Sukhi Sewaniya, Madhya Pradesh-462010 India", "type": "Registered Dealer"},
+  {"id": "pty_214", "name": "YASH ELECTRICAL", "firm": "YASH ELECTRICAL", "phone": "", "city": "Obaidullaganj", "gst": "23AYBPS8557R1ZI", "address": "GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ", "type": "Registered Dealer"},
+  {"id": "pty_215", "name": "YASH HARDWAREAND ELECTRICALS", "firm": "YASH HARDWAREAND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "ANAND NAGAR BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_216", "name": "YASHODA CERAMICS", "firm": "YASHODA CERAMICS", "phone": "", "city": "Bhopal", "gst": "23BQHPP6954Q1ZZ", "address": "SHOP NO - 01 SAHYOG VIHAR HOUSING BOARD COLONY KAROND BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_217", "name": "ZARA TRADERS", "firm": "ZARA TRADERS", "phone": "", "city": "Bhopal", "gst": "23BEDPH0336A1ZH", "address": "SHOP NO G-03 Vironika Khushi Homes, Near Janki Hospital, Karond Bhopal, Madhya Pradesh-462038 India", "type": "Registered Dealer"}
+];
 
     const PIPE_CATEGORIES = [
       "PVC Agri / Irrigation Fittings",
@@ -1071,12 +1218,13 @@
     ];
 
     /* ==========================================================
-       STORAGE, PIN SECURITY & DATA PERSISTENCE
+       STORAGE, PIN SECURITY & AUTO-SYNC
        ========================================================== */
     let parties = [];
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
+    const PARTIES_DATA_VERSION = "2026_v2_parties_217";
 
     function getMasterPin() {
       return localStorage.getItem('airen_pipe_master_pin') || "1234";
@@ -1139,12 +1287,20 @@
     }
 
     function initDataStore() {
-      const storedParties = localStorage.getItem('airen_pipe_parties');
-      if (storedParties) {
-        try { parties = JSON.parse(storedParties); } catch (e) { parties = []; }
-      } else {
-        parties = [];
+      // Auto-load 217 default parties from data.xlsx seamlessly
+      const savedVersion = localStorage.getItem('airen_parties_version');
+      if (savedVersion !== PARTIES_DATA_VERSION) {
+        parties = [...DEFAULT_PARTIES];
         saveParties();
+        localStorage.setItem('airen_parties_version', PARTIES_DATA_VERSION);
+      } else {
+        const storedParties = localStorage.getItem('airen_pipe_parties');
+        if (storedParties) {
+          try { parties = JSON.parse(storedParties); } catch (e) { parties = [...DEFAULT_PARTIES]; }
+        } else {
+          parties = [...DEFAULT_PARTIES];
+          saveParties();
+        }
       }
 
       const storedOrders = localStorage.getItem('airen_pipe_orders');
@@ -1181,77 +1337,6 @@
       const url = document.getElementById('google-webhook-url').value.trim();
       localStorage.setItem('airen_pipe_google_webhook', url || DEFAULT_WEBHOOK_URL);
       showToast("Google Sheets webhook URL updated!", "success");
-    }
-
-    function exportFullJsonBackup() {
-      const backupData = {
-        organization: "Airen Pipe",
-        version: "2.0",
-        exportDate: new Date().toISOString(),
-        parties: parties,
-        orders: orders
-      };
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `AirenPipe_Backup_${new Date().toISOString().split('T')[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast("Airen Pipe database backup file downloaded!", "success");
-    }
-
-    function triggerRestoreBackupPrompt() {
-      requirePin(() => {
-        document.getElementById('import-backup-file').click();
-      }, "Unlock Database Restore");
-    }
-
-    function handleRestoreBackupFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (parsed && Array.isArray(parsed.parties) && Array.isArray(parsed.orders)) {
-            parties = parsed.parties;
-            orders = parsed.orders;
-            saveParties();
-            saveOrders();
-            populatePartyDropdowns();
-            renderOrdersList();
-            renderPartiesList();
-            updateGlobalKPIs();
-            showToast(`Restored ${parties.length} parties & ${orders.length} orders successfully!`, "success");
-            switchTab('orders');
-          } else {
-            showToast("Invalid backup file format.", "error");
-          }
-        } catch (err) {
-          showToast("Error parsing backup file.", "error");
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = "";
-    }
-
-    function clearAllDataPrompt() {
-      requirePin(() => {
-        parties = [];
-        orders = [];
-        saveParties();
-        saveOrders();
-        populatePartyDropdowns();
-        renderOrdersList();
-        renderPartiesList();
-        resetOrderForm();
-        updateGlobalKPIs();
-        showToast("All Airen Pipe app data has been reset.", "info");
-        switchTab('orders');
-      }, "Authorize Complete Data Reset");
     }
 
     /* ==========================================================
@@ -1498,37 +1583,51 @@
     }
 
     function populatePartyDropdowns() {
+      filterPartyDropdown("");
+    }
+
+    function filterPartyDropdown(query) {
       const select = document.getElementById('form-party-id');
       const filterSelect = document.getElementById('order-party-filter');
-
+      const q = (query || "").toLowerCase().trim();
       const currentSelected = select.value;
-      const currentFilter = filterSelect.value;
 
-      select.innerHTML = '<option value="">-- Select Registered Party --</option>';
-      filterSelect.innerHTML = '<option value="ALL">All Parties</option>';
+      select.innerHTML = '<option value="">-- Select Party (217 Available) --</option>';
 
-      if (parties.length === 0) {
-        const disabledOpt = document.createElement('option');
-        disabledOpt.value = "";
-        disabledOpt.disabled = true;
-        disabledOpt.textContent = "No parties registered yet - Click '+ Add New Party'";
-        select.appendChild(disabledOpt);
-      } else {
+      const filtered = parties.filter(p => {
+        if (!q) return true;
+        return (
+          p.name.toLowerCase().includes(q) ||
+          (p.city && p.city.toLowerCase().includes(q)) ||
+          (p.gst && p.gst.toLowerCase().includes(q)) ||
+          (p.address && p.address.toLowerCase().includes(q))
+        );
+      });
+
+      filtered.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        const gstBadge = (p.gst && p.gst !== 'Unregistered') ? ` [${p.gst}]` : ' [URP]';
+        const cityBadge = p.city ? ` - ${p.city}` : '';
+        option.textContent = `${p.name}${cityBadge}${gstBadge}`;
+        select.appendChild(option);
+      });
+
+      if (filterSelect && (!q || filterSelect.children.length <= 1)) {
+        const currentFilter = filterSelect.value;
+        filterSelect.innerHTML = '<option value="ALL">All Parties (217)</option>';
         parties.forEach(p => {
-          const option = document.createElement('option');
-          option.value = p.id;
-          option.textContent = `${p.name} (${p.firm || p.city || 'Party'})`;
-          select.appendChild(option);
-
-          const filterOpt = document.createElement('option');
-          filterOpt.value = p.id;
-          filterOpt.textContent = `${p.name} - ${p.firm || p.city}`;
-          filterSelect.appendChild(filterOpt);
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.name;
+          filterSelect.appendChild(opt);
         });
+        if (currentFilter) filterSelect.value = currentFilter;
       }
 
-      if (currentSelected) select.value = currentSelected;
-      if (currentFilter) filterSelect.value = currentFilter;
+      if (currentSelected && filtered.some(p => p.id === currentSelected)) {
+        select.value = currentSelected;
+      }
     }
 
     function onPartySelected(partyId) {
@@ -1539,7 +1638,10 @@
       }
       const party = parties.find(p => p.id === partyId);
       if (party) {
-        infoEl.textContent = `📍 ${party.firm ? party.firm + ' | ' : ''}Phone: ${party.phone} | City: ${party.city || 'N/A'}`;
+        const gstText = (party.gst && party.gst !== 'Unregistered') ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">GST: ${party.gst}</span>` : `<span class="bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Unregistered (URP)</span>`;
+        const phoneText = party.phone ? ` • 📞 ${party.phone}` : '';
+        const locText = party.address ? ` • 📍 ${party.address}` : (party.city ? ` • 📍 ${party.city}` : '');
+        infoEl.innerHTML = `${gstText}${phoneText}${locText}`;
         infoEl.classList.remove('hidden');
       }
     }
@@ -1630,9 +1732,11 @@
             ...orders[index],
             salesperson,
             partyId,
-            partyName: `${party.name} (${party.firm || party.city})`,
-            partyPhone: party.phone,
+            partyName: party.name,
+            partyGst: party.gst || "Unregistered",
+            partyPhone: party.phone || "",
             partyCity: party.city || "",
+            partyAddress: party.address || "",
             orderDate,
             targetDate,
             status,
@@ -1652,9 +1756,11 @@
           id: newOrderId,
           salesperson,
           partyId,
-          partyName: `${party.name} (${party.firm || party.city})`,
-          partyPhone: party.phone,
+          partyName: party.name,
+          partyGst: party.gst || "Unregistered",
+          partyPhone: party.phone || "",
           partyCity: party.city || "",
+          partyAddress: party.address || "",
           orderDate,
           targetDate,
           status,
@@ -1685,6 +1791,7 @@
       document.getElementById('order-form-title').textContent = "Record Airen Pipe & Fittings Order";
       document.getElementById('save-order-btn-text').textContent = "Save & Record Order";
       document.getElementById('party-quick-info').classList.add('hidden');
+      document.getElementById('party-search-box').value = "";
       
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('form-order-date').value = today;
@@ -1692,6 +1799,8 @@
       // Keep remembered salesperson
       const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
       if (savedSalesperson) document.getElementById('form-salesperson').value = savedSalesperson;
+
+      populatePartyDropdowns();
 
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
@@ -1716,6 +1825,7 @@
           const matchId = order.id.toLowerCase().includes(searchQuery);
           const matchSalesperson = (order.salesperson || "").toLowerCase().includes(searchQuery);
           const matchParty = (order.partyName || "").toLowerCase().includes(searchQuery);
+          const matchGst = (order.partyGst || "").toLowerCase().includes(searchQuery);
           const matchRef = (order.partyRef || "").toLowerCase().includes(searchQuery);
           const matchCity = (order.partyCity || "").toLowerCase().includes(searchQuery);
           const matchItems = order.items.some(it => 
@@ -1726,7 +1836,7 @@
             (it.specClass || "").toLowerCase().includes(searchQuery) ||
             (it.remarks || "").toLowerCase().includes(searchQuery)
           );
-          return matchId || matchSalesperson || matchParty || matchRef || matchCity || matchItems;
+          return matchId || matchSalesperson || matchParty || matchGst || matchRef || matchCity || matchItems;
         }
         return true;
       });
@@ -1758,12 +1868,15 @@
           statusBadge = `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-full">Cancelled</span>`;
         }
 
+        const gstDisplay = (order.partyGst && order.partyGst !== 'Unregistered') ? `<span class="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold px-1.5 py-0.5 rounded">${order.partyGst}</span>` : '';
+
         return `
           <div class="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div class="flex-1 space-y-1.5 min-w-0">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${order.id}</span>
                 <span class="font-bold text-sm text-slate-900 truncate">${order.partyName}</span>
+                ${gstDisplay}
                 ${statusBadge}
                 <span class="text-xs bg-blue-50 text-brand-800 font-bold px-2 py-0.5 rounded border border-blue-200">👤 ${order.salesperson || 'Staff'}</span>
                 <span class="text-xs text-slate-400 font-medium">📅 ${order.orderDate}</span>
@@ -1809,8 +1922,9 @@
       document.getElementById('slip-salesperson').textContent = order.salesperson || "Counter / Direct";
       document.getElementById('slip-footer-salesperson').textContent = `(${order.salesperson || 'Airen Pipe Desk'})`;
       document.getElementById('slip-party-name').textContent = order.partyName;
+      document.getElementById('slip-party-gst').textContent = (order.partyGst && order.partyGst !== 'Unregistered') ? `GSTIN: ${order.partyGst}` : 'GSTIN: Unregistered (URP)';
       document.getElementById('slip-party-phone').textContent = `Phone: ${order.partyPhone || 'N/A'}`;
-      document.getElementById('slip-party-city').textContent = `City: ${order.partyCity || 'N/A'}`;
+      document.getElementById('slip-party-city').textContent = `Location: ${order.partyAddress || order.partyCity || 'N/A'}`;
       document.getElementById('slip-party-ref').textContent = order.partyRef || "None / Direct";
       document.getElementById('slip-target-date').textContent = order.targetDate || "Immediate / ASAP";
       document.getElementById('slip-delivery-site').textContent = order.deliverySite || "Godown counter";
@@ -1863,6 +1977,7 @@
       msg += `*Order #:* ${order.id}\n`;
       msg += `*Booked By (Sales):* ${order.salesperson || 'Airen Desk'}\n`;
       msg += `*Party:* ${order.partyName}\n`;
+      if (order.partyGst && order.partyGst !== 'Unregistered') msg += `*GSTIN:* ${order.partyGst}\n`;
       msg += `*Date:* ${order.orderDate}\n`;
       if (order.partyRef) msg += `*Ref PO:* ${order.partyRef}\n`;
       if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
@@ -1965,23 +2080,19 @@
         if (!searchQuery) return true;
         return (
           p.name.toLowerCase().includes(searchQuery) ||
-          (p.firm || "").toLowerCase().includes(searchQuery) ||
-          (p.phone || "").includes(searchQuery) ||
-          (p.city || "").toLowerCase().includes(searchQuery) ||
-          (p.type || "").toLowerCase().includes(searchQuery)
+          (p.gst && p.gst.toLowerCase().includes(searchQuery)) ||
+          (p.phone && p.phone.includes(searchQuery)) ||
+          (p.city && p.city.toLowerCase().includes(searchQuery)) ||
+          (p.address && p.address.toLowerCase().includes(searchQuery))
         );
       });
 
       if (parties.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full py-12 px-4 text-center bg-white rounded-2xl border border-slate-200">
-            <div class="w-14 h-14 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-3">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            </div>
-            <h3 class="text-sm font-bold text-slate-700">No Parties Registered Yet</h3>
-            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Add your plumbing contractors, hardware retail dealers, and agricultural clients to record orders quickly.</p>
+            <h3 class="text-sm font-bold text-slate-700">No Parties Available</h3>
             <button onclick="openPartyModal()" class="mt-3.5 inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
-              + Register First Party
+              + Add Party
             </button>
           </div>
         `;
@@ -2000,6 +2111,7 @@
       grid.innerHTML = filtered.map(p => {
         const partyOrders = orders.filter(o => o.partyId === p.id);
         const totalPcs = partyOrders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+        const isGst = p.gst && p.gst !== 'Unregistered';
 
         return `
           <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
@@ -2007,27 +2119,22 @@
               <div class="flex justify-between items-start gap-2">
                 <div>
                   <h3 class="font-bold text-slate-900 text-base">${p.name}</h3>
-                  <p class="text-xs font-semibold text-brand-700">${p.firm || 'Individual / Contractor'}</p>
+                  <p class="text-xs font-mono font-bold ${isGst ? 'text-emerald-700' : 'text-slate-500'} mt-0.5">
+                    ${isGst ? 'GST: ' + p.gst : 'URP (Unregistered)'}
+                  </p>
                 </div>
-                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded border border-slate-200">${p.type || 'Party'}</span>
+                <span class="text-[10px] ${isGst ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'} font-semibold px-2 py-0.5 rounded border">${isGst ? 'GST Registered' : 'URP'}</span>
               </div>
 
               <div class="mt-3 space-y-1 text-xs text-slate-600">
-                <p class="flex items-center space-x-1.5">
-                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                  <span>${p.phone}</span>
-                </p>
-                <p class="flex items-center space-x-1.5">
-                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-                  <span>${p.city ? p.city : 'City not specified'}</span>
-                </p>
-                ${p.address ? `<p class="text-[11px] text-slate-500 italic mt-1">${p.address}</p>` : ''}
+                ${p.phone ? `<p class="flex items-center space-x-1.5"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg><span>${p.phone}</span></p>` : ''}
+                <p class="text-[11px] text-slate-500 mt-1">${p.address || p.city || 'Address not specified'}</p>
               </div>
             </div>
 
             <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
               <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Recorded History</span>
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">History</span>
                 <span class="font-bold text-slate-800">${partyOrders.length} Orders (${totalPcs.toLocaleString()} pcs)</span>
               </div>
               <div class="flex items-center space-x-1">
@@ -2036,9 +2143,6 @@
                 </button>
                 <button onclick="editPartyModal('${p.id}')" class="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100" title="Edit Party">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </button>
-                <button onclick="deletePartyPrompt('${p.id}')" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50" title="Delete Party (Requires PIN)">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               </div>
             </div>
@@ -2071,56 +2175,44 @@
       document.getElementById('edit-party-id').value = p.id;
       document.getElementById('party-modal-title').textContent = `Edit Party - ${p.name}`;
       document.getElementById('party-name').value = p.name || "";
-      document.getElementById('party-firm').value = p.firm || "";
+      document.getElementById('party-gst').value = (p.gst && p.gst !== 'Unregistered') ? p.gst : "";
       document.getElementById('party-phone').value = p.phone || "";
       document.getElementById('party-city').value = p.city || "";
-      document.getElementById('party-type').value = p.type || "Retailer / Dealer";
       document.getElementById('party-address').value = p.address || "";
       document.getElementById('partyModal').classList.remove('hidden');
-    }
-
-    function deletePartyPrompt(partyId) {
-      const party = parties.find(p => p.id === partyId);
-      const name = party ? party.name : 'Party';
-      requirePin(() => {
-        parties = parties.filter(p => p.id !== partyId);
-        saveParties();
-        populatePartyDropdowns();
-        renderPartiesList();
-        showToast(`Party "${name}" deleted by Admin PIN.`, "info");
-      }, `Authorize Deletion of Party: ${name}`);
     }
 
     function handleSaveParty(event) {
       event.preventDefault();
       const editId = document.getElementById('edit-party-id').value;
       const name = document.getElementById('party-name').value.trim();
-      const firm = document.getElementById('party-firm').value.trim();
+      const rawGst = document.getElementById('party-gst').value.trim().toUpperCase();
+      const gst = rawGst || "Unregistered";
       const phone = document.getElementById('party-phone').value.trim();
       const city = document.getElementById('party-city').value.trim();
-      const type = document.getElementById('party-type').value;
       const address = document.getElementById('party-address').value.trim();
 
       if (editId) {
         const idx = parties.findIndex(p => p.id === editId);
         if (idx !== -1) {
-          parties[idx] = { ...parties[idx], name, firm, phone, city, type, address };
+          parties[idx] = { ...parties[idx], name, gst, phone, city, address, type: gst !== 'Unregistered' ? 'Registered Dealer' : 'Unregistered (URP)' };
           saveParties();
-          showToast(`Party "${name}" updated successfully!`, "success");
+          showToast(`Party "${name}" updated!`, "success");
         }
       } else {
         const newParty = {
           id: `pty_${Date.now()}`,
           name,
-          firm,
+          firm: name,
           phone,
           city,
-          type,
-          address
+          gst,
+          address,
+          type: gst !== 'Unregistered' ? 'Registered Dealer' : 'Unregistered (URP)'
         };
-        parties.push(newParty);
+        parties.unshift(newParty);
         saveParties();
-        showToast(`New party "${name}" registered!`, "success");
+        showToast(`Party "${name}" added!`, "success");
       }
 
       closePartyModal();
@@ -2154,7 +2246,7 @@
         return;
       }
 
-      let csv = "Order ID,Order Date,Salesperson,Party Name,Party Phone,City,Status,Party PO Ref,Delivery Site,Category,Fitting Item,Brand,Size,Pressure/Kg/Class,Length,Quantity,Unit,Line Remarks\n";
+      let csv = "Order ID,Order Date,Salesperson,Party Name,GSTIN,Party Phone,City,Status,Party PO Ref,Delivery Site,Category,Fitting Item,Brand,Size,Pressure/Kg/Class,Length,Quantity,Unit,Line Remarks\n";
 
       orders.forEach(o => {
         o.items.forEach(it => {
@@ -2163,6 +2255,7 @@
             o.orderDate || "",
             `"${(o.salesperson || "").replace(/"/g, '""')}"`,
             `"${(o.partyName || "").replace(/"/g, '""')}"`,
+            `"${(o.partyGst || "").replace(/"/g, '""')}"`,
             `"${o.partyPhone || ""}"`,
             `"${o.partyCity || ""}"`,
             o.status || "",
