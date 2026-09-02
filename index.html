@@ -1126,18 +1126,7 @@
     };
 
     const PIPE_BRANDS = [
-      "Airen Pipe",
       "KASTA",
-      "Astral",
-      "Supreme",
-      "Finolex",
-      "Ashirvad",
-      "Prince",
-      "Jindal",
-      "Tata Pipes",
-      "Apollo",
-      "Generic / Local",
-      "Other"
     ];
 
     const PIPE_SIZES = [
@@ -1207,7 +1196,7 @@
     ];
 
     const PIPE_UNITS = [
-      "Pcs (Pieces)",
+      "Nos (Numbers)",
       "Bags / Bags Pack",
       "Boxes / Cartons",
       "Lengths (Pipes)",
@@ -1401,7 +1390,7 @@
       
       const specClass = item.specClass !== undefined ? item.specClass : defaultClass;
       const length = item.length || (category.includes('Fitting') ? "None / N.A. (Fittings)" : (category.includes('Agri') ? PIPE_LENGTHS[1] : PIPE_LENGTHS[2]));
-      const qty = item.qty !== undefined ? item.qty : 20;
+      const qty = item.qty !== undefined ? item.qty : 0;
       const unit = item.unit || (category.includes('Fitting') ? "Pcs (Pieces)" : "Lengths (Pipes)");
       const remarks = item.remarks || "";
 
