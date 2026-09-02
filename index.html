@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airen Pipe - Order Desk & Distribution Booking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            },
+            accent: {
+              500: '#f97316',
+              600: '#ea580c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printOrderModal, #printOrderModal * {
+        visibility: visible;
+      }
+      #printOrderModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-500 flex items-center justify-center shadow-inner">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" stroke-width="2.5" stroke-dasharray="2 3"/>
+              <circle cx="12" cy="12" r="5" stroke-width="2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-accent-500">Pipe</span></span>
+              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                Sheet Live Linked
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Airen Pipe Distribution & Order Booking Desk</p>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab active px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <span>Order Book</span>
+          </button>
+          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <svg class="w-4 h-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Punch Order</span>
+          </button>
+          <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span>Parties</span>
+          </button>
+          <button onclick="switchTab('catalog')" id="tab-catalog-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <span>Specs & Catalog</span>
+          </button>
+          <button onclick="switchTab('settings')" id="tab-settings-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Owner PIN & Sync</span>
+          </button>
+        </nav>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="quickOpenNewOrder()" class="bg-accent-500 hover:bg-accent-600 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+            <span class="hidden sm:inline">New Order</span>
+            <span class="sm:hidden">New</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="md:hidden bg-slate-800 border-b border-slate-700 text-slate-300 text-xs flex justify-around p-1.5 sticky top-16 z-30 shadow-sm">
+    <button onclick="switchTab('orders')" id="m-tab-orders" class="m-nav-tab flex-1 py-1.5 text-center font-medium text-white bg-brand-600 rounded">Orders</button>
+    <button onclick="switchTab('new-order')" id="m-tab-new-order" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">+ Punch</button>
+    <button onclick="switchTab('parties')" id="m-tab-parties" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Parties</button>
+    <button onclick="switchTab('catalog')" id="m-tab-catalog" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Specs</button>
+    <button onclick="switchTab('settings')" id="m-tab-settings" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded text-emerald-400">Security</button>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
+        <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Orders</p>
+          <h3 id="stat-total-orders" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
+        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Confirmation</p>
+          <h3 id="stat-pending-orders" class="text-xl sm:text-2xl font-bold text-amber-600">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
+        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Confirmed Orders</p>
+          <h3 id="stat-confirmed-orders" class="text-xl sm:text-2xl font-bold text-emerald-600">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
+        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Quantity (Pcs/Coils)</p>
+          <h3 id="stat-total-pcs" class="text-xl sm:text-2xl font-bold text-indigo-700">0</h3>
+        </div>
+      </div>
+    </section>
+
+    <div id="view-orders" class="tab-view space-y-4">
+      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="flex-1 flex flex-col sm:flex-row gap-2">
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </span>
+            <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search by Salesperson, Party, City, Order #, or Items..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition-all">
+          </div>
+
+          <select id="order-status-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ALL">All Statuses</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Recorded">Recorded (Draft)</option>
+            <option value="Hold">On Hold</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+
+          <select id="order-salesperson-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ALL">All Salespersons</option>
+            <option value="Sonam Jain">Sonam Jain</option>
+            <option value="Adil Beg">Adil Beg</option>
+            <option value="Ateeque Ahmed">Ateeque Ahmed</option>
+            <option value="Abhishek Agrawal">Abhishek Agrawal</option>
+            <option value="Office Counter">Office Counter</option>
+          </select>
+
+          <select id="order-party-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="ALL">All Parties</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="exportOrdersToCSV()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors flex items-center space-x-1.5" title="Export all orders to CSV">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Export CSV</span>
+          </button>
+          <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm flex items-center space-x-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Punch Order</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+            <span>Airen Pipe Recorded Orders</span>
+            <span id="filtered-count-badge" class="bg-brand-100 text-brand-700 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+          </h2>
+          <span class="text-xs text-slate-500">Sorted by newest order</span>
+        </div>
+
+        <div id="orders-container" class="divide-y divide-slate-100"></div>
+
+        <div id="orders-empty-state" class="py-12 px-4 text-center">
+          <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-3">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <h3 class="text-base font-semibold text-slate-700">No Orders Recorded Yet</h3>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Your Airen Pipe order desk is ready. Add parties and punch orders.</p>
+          <div class="mt-4 flex justify-center gap-2">
+            <button onclick="openPartyModal()" class="inline-flex items-center px-3.5 py-2 bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-200">
+              + Add First Party
+            </button>
+            <button onclick="quickOpenNewOrder()" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
+              Punch First Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-new-order" class="tab-view hidden space-y-6">
+      <form id="orderForm" onsubmit="handleSaveOrder(event)" class="space-y-6">
+        <input type="hidden" id="edit-order-id" value="">
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+            <div>
+              <h2 id="order-form-title" class="text-lg font-bold text-slate-900">Record Airen Pipe & Fittings Order</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Select salesperson, party, sizes, class/pressure rating (kg), and quantities.</p>
+            </div>
+            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Sheet Connected
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-brand-700 uppercase mb-1 flex items-center gap-1">
+                <span>👤 Salesperson / Booked By</span>
+                <span class="text-red-500">*</span>
+              </label>
+              <select id="form-salesperson" required class="w-full px-3.5 py-2.5 text-sm bg-blue-50/70 border border-blue-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none font-bold text-slate-800">
+                <option value="">-- Select Salesperson --</option>
+                <option value="Sonam Jain">Sonam Jain</option>
+                <option value="Adil Beg">Adil Beg</option>
+                <option value="Ateeque Ahmed">Ateeque Ahmed</option>
+                <option value="Abhishek Agrawal">Abhishek Agrawal</option>
+                <option value="Office Counter">Office / Counter</option>
+              </select>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this device</span>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-bold text-slate-700 uppercase">Party / Dealer Name <span class="text-red-500">*</span></label>
+                <button type="button" onclick="openPartyModal()" class="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
+                  <span>+ New Party</span>
+                </button>
+              </div>
+              <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+                <option value="">-- Select Registered Party --</option>
+              </select>
+              <p id="party-quick-info" class="text-xs text-slate-500 mt-1 italic hidden"></p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Order Date <span class="text-red-500">*</span></label>
+              <input type="date" id="form-order-date" required class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target / Req. Date</label>
+              <input type="date" id="form-target-date" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Order Status</label>
+              <select id="form-order-status" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+                <option value="Confirmed" selected>Confirmed (Party Approved)</option>
+                <option value="Recorded">Recorded (Draft / Tentative)</option>
+                <option value="Hold">On Hold (Awaiting Spec confirmation)</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party PO / Ref Slip #</label>
+              <input type="text" id="form-party-ref" placeholder="e.g. WhatsApp / Verbal / PO-882" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Delivery Destination / Site Remarks</label>
+              <input type="text" id="form-delivery-site" placeholder="e.g. Site Godown, Transport Nagar, or Party self-pickup" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                <span>Pipes & Fittings Specification Line Items</span>
+                <span id="line-items-count-badge" class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">1 item</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Select category, fitting type/pipe, size, pressure rating (kg / class), length/unit, and quantity.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <button type="button" onclick="insertQuickPreset('agri_fittings')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2.5 py-1.5 rounded-lg border border-emerald-300 transition-colors font-semibold">
+                🌾 + Agri & Irrigation Pack
+              </button>
+              <button type="button" onclick="insertQuickPreset('cpvc_fittings')" class="text-xs bg-red-50 hover:bg-red-100 text-red-700 px-2.5 py-1.5 rounded-lg border border-red-200 transition-colors font-medium">
+                ⚡ + CPVC Pack
+              </button>
+              <button type="button" onclick="insertQuickPreset('upvc_fittings')" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2.5 py-1.5 rounded-lg border border-blue-200 transition-colors font-medium">
+                ⚡ + UPVC Pack
+              </button>
+              <button type="button" onclick="insertQuickPreset('swr_fittings')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg border border-amber-200 transition-colors font-medium">
+                ⚡ + SWR Pack
+              </button>
+              <button type="button" onclick="addOrderItemRow()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm flex items-center space-x-1 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>+ Add Row</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto -mx-5 sm:mx-0">
+            <table class="w-full text-left text-xs text-slate-700 min-w-[980px]">
+              <thead class="bg-slate-100/90 text-slate-600 uppercase font-semibold text-[11px] tracking-wider border-y border-slate-200">
+                <tr>
+                  <th class="py-3 px-2 w-8 text-center">#</th>
+                  <th class="py-3 px-2 w-48">Category</th>
+                  <th class="py-3 px-2 w-52">Fitting Type / Item</th>
+                  <th class="py-3 px-2 w-28">Brand</th>
+                  <th class="py-3 px-2 w-32">Size / Dia</th>
+                  <th class="py-3 px-2 w-36">Kg / Class / Pressure</th>
+                  <th class="py-3 px-2 w-28">Length / Pkg</th>
+                  <th class="py-3 px-2 w-24 text-right">Quantity</th>
+                  <th class="py-3 px-2 w-24">Unit</th>
+                  <th class="py-3 px-2">Remarks / Specs</th>
+                  <th class="py-3 px-2 w-10 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="order-items-tbody" class="divide-y divide-slate-100 font-normal"></tbody>
+            </table>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/80 p-3 rounded-xl gap-3">
+            <div class="text-xs text-slate-600 flex items-center space-x-4">
+              <span>Total Line Items: <strong id="summary-total-lines" class="text-slate-900 font-bold">0</strong></span>
+              <span>Total Pieces/Units: <strong id="summary-total-qty" class="text-brand-700 font-bold text-sm">0</strong></span>
+            </div>
+            <button type="button" onclick="addOrderItemRow()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
+              <span>+ Add another pipe or fitting specification</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">General Order Notes / Remarks</label>
+          <textarea id="form-order-notes" rows="2" placeholder="e.g. Priority order for farm irrigation, Party requested standard 4kg / 6kg, Pack fittings in bags..." class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none"></textarea>
+
+          <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
+            <button type="button" onclick="resetOrderForm()" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+              Clear / Cancel
+            </button>
+            <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 rounded-xl shadow-md transition-all flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <span id="save-order-btn-text">Save & Record Order</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="view-parties" class="tab-view hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </span>
+          <input type="text" id="party-search-input" oninput="renderPartiesList()" placeholder="Search party by name, phone, city, or firm name..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+        </div>
+        <button onclick="openPartyModal()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm flex items-center justify-center space-x-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>Add New Party</span>
+        </button>
+      </div>
+
+      <div id="parties-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <div id="view-catalog" class="tab-view hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Airen Pipe & Complete Fittings Reference</h2>
+            <p class="text-xs text-slate-500">Industry-standard catalog for Agri/Irrigation (kg/cm²), CPVC, UPVC, and SWR drainage systems.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400 font-medium">Quick Ref</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-emerald-900">PVC Agri / Irrigation Fittings</span>
+              <span class="text-[10px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-bold">2.5kg - 10kg</span>
+            </div>
+            <p class="text-xs text-slate-700"><strong>Agri Fittings:</strong> Coupler, Elbow 90°/45°, Equal Tee, Reducing Tee, Reducing Bushing, Tail Piece, Service Saddle with brass insert, Agri End Cap, Cross Tee</p>
+            <p class="text-xs text-slate-700"><strong>Adaptors & Valves:</strong> MTA, FTA, Agri Ball Valve, Foot Valve, NRV, Flange Set with Gasket, Heavy Agri Solvent</p>
+            <p class="text-xs text-slate-700"><strong>Standard Ratings:</strong> 2.5 kg/cm², 4.0 kg/cm², 6.0 kg/cm², 8.0 kg/cm², 10.0 kg/cm²</p>
+          </div>
+
+          <div class="p-4 bg-red-50/60 rounded-xl border border-red-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-red-900">CPVC Plumbing Fittings</span>
+              <span class="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded font-bold">Hot & Cold</span>
+            </div>
+            <p class="text-xs text-slate-700"><strong>Plain Fittings:</strong> Elbow 90°, Elbow 45°, Tee, Coupler/Socket, Union, End Cap, Cross Tee, Reducers</p>
+            <p class="text-xs text-slate-700"><strong>Brass Fittings:</strong> Brass FTA, Brass MTA, Brass Elbow 90°, Brass Tee, Reducer Brass Elbow/Tee</p>
+            <p class="text-xs text-slate-700"><strong>Valves:</strong> CPVC Ball Valve, Concealed Valve, Long Plug, Solvent Cement</p>
+          </div>
+
+          <div class="p-4 bg-blue-50/60 rounded-xl border border-blue-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-blue-900">UPVC Pressure Fittings</span>
+              <span class="text-[10px] bg-blue-200 text-blue-800 px-2 py-0.5 rounded font-bold">SCH 40 / 80</span>
+            </div>
+            <p class="text-xs text-slate-700"><strong>Standard:</strong> Plain Elbow 90°/45°, Plain Tee, Coupler, Union, End Cap, Cross Tee, Reducers</p>
+            <p class="text-xs text-slate-700"><strong>Threaded/Brass:</strong> MTA, FTA, Brass MTA, Brass FTA, Brass Elbow 90°, Brass Tee, UPVC Ball Valve, Flanges</p>
+          </div>
+
+          <div class="p-4 bg-amber-50/60 rounded-xl border border-amber-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-amber-900">PVC SWR Drainage Fittings</span>
+              <span class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded font-bold">Drainage</span>
+            </div>
+            <p class="text-xs text-slate-700"><strong>Bends & Branches:</strong> Bend 87.5° (Plain/Door), Bend 45°, Single Tee, Single Y, Double Y, Cross Tee</p>
+            <p class="text-xs text-slate-700"><strong>Traps & Specials:</strong> Nahani Trap (with jali), P-Trap, S-Trap, Q-Trap, Multi Floor Trap, Coupler, Reducer (110x75, 160x110)</p>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-slate-800">PVC Agri & Column Pipes</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Agri Delivery</span>
+            </div>
+            <p class="text-xs text-slate-600"><strong>Sizes:</strong> 1" to 8" (40mm to 200mm)</p>
+            <p class="text-xs text-slate-600"><strong>Pressure Ratings:</strong> 2.5 kg, 4.0 kg, 6.0 kg, 8.0 kg, 10.0 kg/cm²</p>
+            <p class="text-xs text-slate-600"><strong>Standard Length:</strong> 6 Meters (20 ft)</p>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-sm text-slate-800">Plumbing & Drainage Pipes</span>
+              <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Plumbing</span>
+            </div>
+            <p class="text-xs text-slate-600"><strong>CPVC:</strong> 1/2" to 2" (SDR 11, SDR 13.5, SCH 40/80)</p>
+            <p class="text-xs text-slate-600"><strong>UPVC:</strong> 1/2" to 4" (SCH 40/80) & 20mm to 200mm</p>
+            <p class="text-xs text-slate-600"><strong>SWR:</strong> 75mm (2.5"), 90mm (3"), 110mm (4"), 160mm (6") Type A/B</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-settings" class="tab-view hidden space-y-6">
+      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Airen Pipe Owner PIN Protection</h2>
+            <p class="text-xs text-slate-500">Protects your database so staff members cannot delete orders, delete parties, or reset data.</p>
+          </div>
+        </div>
+
+        <div class="bg-emerald-50/70 border border-emerald-200 p-4 rounded-xl flex items-start space-x-3 text-xs text-emerald-950">
+          <svg class="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <div>
+            <p class="font-bold">Default Master PIN is: <span class="font-mono bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded text-sm tracking-widest font-black">1234</span></p>
+            <p class="text-[11px] text-emerald-800 mt-1">Staff can freely punch orders and register parties, but deleting records requires this PIN.</p>
+          </div>
+        </div>
+
+        <form onsubmit="handleChangePin(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Current Master PIN</label>
+            <input type="password" id="pin-current" maxlength="8" required placeholder="Enter current PIN" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">New 4 to 6 Digit PIN</label>
+            <input type="password" id="pin-new" maxlength="8" required placeholder="Enter new PIN" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div class="flex items-end">
+            <button type="submit" class="w-full px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl shadow-xs transition-colors">
+              Update Security PIN
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Database Backup & Device Transfer</h2>
+            <p class="text-xs text-slate-500">Save a backup or transfer data between devices easily.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+            <div>
+              <h4 class="font-bold text-sm text-slate-900">Download Airen Pipe Backup (.json)</h4>
+              <p class="text-xs text-slate-500 mt-1">Exports all registered parties and recorded orders into a single backup file.</p>
+            </div>
+            <button onclick="exportFullJsonBackup()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download Backup File</span>
+            </button>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+            <div>
+              <h4 class="font-bold text-sm text-slate-900">Restore from Backup File</h4>
+              <p class="text-xs text-slate-500 mt-1">Load backup file on another phone or browser (Requires Master PIN).</p>
+            </div>
+            <div>
+              <input type="file" id="import-backup-file" accept=".json" class="hidden" onchange="handleRestoreBackupFile(event)">
+              <button onclick="triggerRestoreBackupPrompt()" class="w-full px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                <span>Upload & Restore Backup</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
+        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Google Sheets Central Sync</h2>
+            <p class="text-xs text-slate-500">Every order punched on any phone automatically records to your central Google Sheet.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Google Sheet Webhook URL (Pre-Configured)</label>
+            <div class="flex gap-2">
+              <input type="url" id="google-webhook-url" class="flex-1 px-3.5 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono text-slate-600">
+              <button onclick="saveGoogleWebhookUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs">
+                Update URL
+              </button>
+            </div>
+            <p class="text-[11px] text-emerald-600 mt-1 font-medium">✓ Central Google Sheet live connection is active by default.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-red-50/50 p-5 rounded-2xl border border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="font-bold text-red-900 text-sm">Clear All Local Data (Admin Only)</h3>
+          <p class="text-xs text-red-700 mt-0.5">Wipes local records on this device. Locked behind Master Security PIN.</p>
+        </div>
+        <button onclick="clearAllDataPrompt()" class="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shrink-0 shadow-xs">
+          🔒 Reset App Data (Requires PIN)
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xs w-full p-5 border border-slate-200 text-center space-y-4">
+      <div class="w-12 h-12 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-900 text-base" id="pin-modal-action-title">Enter Airen Pipe PIN</h3>
+        <p class="text-xs text-slate-500 mt-0.5">This action is protected. Enter master PIN to continue.</p>
+      </div>
+
+      <input type="password" id="pin-input-field" maxlength="8" placeholder="••••" class="w-32 mx-auto text-center tracking-widest text-lg font-bold py-2 bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-brand-500 focus:outline-none">
+
+      <div class="flex justify-center space-x-2 pt-1">
+        <button onclick="cancelPinModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
+          Cancel
+        </button>
+        <button onclick="confirmPinModal()" class="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl">
+          Unlock
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="orderDetailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center no-print">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <h3 class="font-bold text-sm sm:text-base tracking-tight" id="modal-order-title">Airen Pipe Order Requisition Slip</h3>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="shareOrderWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
+            <span>WhatsApp Slip</span>
+          </button>
+          <button onclick="window.print()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
+            <span>Print / PDF</span>
+          </button>
+          <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="printOrderModal" class="p-6 sm:p-8 overflow-y-auto flex-1 text-slate-800 space-y-6">
+        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">AIREN PIPE ORDER REQUISITION</h1>
+            <p class="text-xs text-slate-500 font-semibold tracking-wide uppercase mt-0.5">Godown Loading & Picking Requisition</p>
+            <p class="text-[11px] text-amber-700 font-medium mt-1 bg-amber-50 inline-block px-2 py-0.5 rounded border border-amber-200">Notice: Internal Order Booking Record (Non-Tax/Non-Invoice)</p>
+          </div>
+          <div class="text-right">
+            <div class="inline-block bg-slate-100 px-3 py-1 rounded-lg border border-slate-300">
+              <span class="text-[10px] text-slate-500 block uppercase font-bold">Order Number</span>
+              <span id="slip-order-id" class="text-sm font-black text-slate-900 font-mono">#ORD-0000</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Date: <strong id="slip-order-date" class="text-slate-800">--</strong></p>
+            <p class="text-xs text-brand-700 font-bold mt-0.5">Booked By: <span id="slip-salesperson">--</span></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+          <div>
+            <span class="text-slate-400 uppercase font-bold text-[10px] block mb-0.5">Party / Customer Details</span>
+            <h4 id="slip-party-name" class="font-bold text-sm text-slate-900">--</h4>
+            <p id="slip-party-firm" class="text-slate-700 font-medium">--</p>
+            <p id="slip-party-phone" class="text-slate-600 mt-0.5">Phone: --</p>
+            <p id="slip-party-city" class="text-slate-600">Location: --</p>
+          </div>
+          <div>
+            <span class="text-slate-400 uppercase font-bold text-[10px] block mb-0.5">Order & Delivery Details</span>
+            <p class="text-slate-700">Status: <span id="slip-status-badge" class="font-bold">--</span></p>
+            <p class="text-slate-700">Party PO/Ref: <strong id="slip-party-ref" class="text-slate-900">--</strong></p>
+            <p class="text-slate-700">Req. Target Date: <span id="slip-target-date" class="text-slate-900">--</span></p>
+            <p class="text-slate-700">Delivery Site: <span id="slip-delivery-site" class="text-slate-900">--</span></p>
+          </div>
+        </div>
+
+        <div>
+          <table class="w-full text-left text-xs border border-slate-300">
+            <thead class="bg-slate-800 text-white uppercase text-[10px] font-bold">
+              <tr>
+                <th class="py-2.5 px-2 border border-slate-700 w-8 text-center">#</th>
+                <th class="py-2.5 px-3 border border-slate-700">Category</th>
+                <th class="py-2.5 px-3 border border-slate-700">Fitting Item / Pipe Description</th>
+                <th class="py-2.5 px-2 border border-slate-700">Brand</th>
+                <th class="py-2.5 px-3 border border-slate-700">Size / Dia</th>
+                <th class="py-2.5 px-2 border border-slate-700">Kg / Class / Pressure</th>
+                <th class="py-2.5 px-2 border border-slate-700">Length/Pkg</th>
+                <th class="py-2.5 px-3 border border-slate-700 text-right">Quantity</th>
+                <th class="py-2.5 px-2 border border-slate-700">Unit</th>
+              </tr>
+            </thead>
+            <tbody id="slip-items-tbody" class="divide-y divide-slate-200"></tbody>
+            <tfoot class="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-400">
+              <tr>
+                <td colspan="7" class="py-2 px-3 text-right text-xs uppercase">Total Quantity Booked:</td>
+                <td id="slip-total-qty" class="py-2 px-3 text-right text-sm font-black text-brand-700 font-mono">0</td>
+                <td class="py-2 px-3 text-xs">Pcs / Units</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+            <span class="font-bold text-slate-700 block mb-0.5">Special Instructions / Remarks:</span>
+            <p id="slip-notes" class="text-slate-600 italic">No specific instructions.</p>
+          </div>
+
+          <div class="grid grid-cols-2 pt-6 gap-8 text-xs text-center border-t border-slate-300">
+            <div>
+              <div class="h-10 border-b border-dashed border-slate-400"></div>
+              <p class="font-semibold text-slate-700 mt-1">Booked & Verified By</p>
+              <p class="text-[10px] text-slate-500 font-medium" id="slip-footer-salesperson">(Sales Desk)</p>
+            </div>
+            <div>
+              <div class="h-10 border-b border-dashed border-slate-400"></div>
+              <p class="font-semibold text-slate-700 mt-1">Party / Receiver Sign</p>
+              <p class="text-[10px] text-slate-400">(Acknowledgement)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center no-print">
+        <div class="flex items-center space-x-2">
+          <button onclick="cloneOrderFromModal()" class="text-xs text-brand-700 font-semibold hover:underline">
+            🔄 Re-order (Clone This)
+          </button>
+          <span class="text-slate-300">|</span>
+          <button onclick="editOrderFromModal()" class="text-xs text-amber-700 font-semibold hover:underline">
+            ✏️ Edit Order
+          </button>
+        </div>
+        <button onclick="closeOrderDetailModal()" class="px-4 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg">
+          Close Slip
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="partyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
+        <button onclick="closePartyModal()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form id="partyForm" onsubmit="handleSaveParty(event)" class="space-y-3.5">
+        <input type="hidden" id="edit-party-id" value="">
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Contact Person <span class="text-red-500">*</span></label>
+          <input type="text" id="party-name" required placeholder="e.g. Ramesh Bhai / Rajesh Patel" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Firm / Shop Name</label>
+          <input type="text" id="party-firm" placeholder="e.g. Kisan Agro Agency / Balaji Hardware" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number <span class="text-red-500">*</span></label>
+            <input type="tel" id="party-phone" required placeholder="e.g. 9876543210" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">City / Town</label>
+            <input type="text" id="party-city" placeholder="e.g. Surat, Indore, Pune" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party Type / Category</label>
+          <select id="party-type" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="Agri Dealer / Agro Center">Agricultural Equipment / Agro Dealer</option>
+            <option value="Retailer / Dealer">Retailer / Hardware Store</option>
+            <option value="Plumbing Contractor">Plumbing Contractor</option>
+            <option value="Builder / Developer">Builder / Project Site</option>
+            <option value="Wholesaler / Sub-Dealer">Sub-Dealer / Wholesaler</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Notes / Delivery Address</label>
+          <textarea id="party-address" rows="2" placeholder="Address, brand preference, GST if any..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closePartyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl">
+            Save Party
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* ==========================================================
+       CENTRAL GOOGLE SHEET WEBHOOK INTEGRATION
+       ========================================================== */
+    const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
+
+    /* ==========================================================
+       DATA CONSTANTS & PRESETS
+       ========================================================== */
+    const SALES_TEAM = [
+      "Sonam Jain",
+      "Adil Beg",
+      "Ateeque Ahmed",
+      "Abhishek Agrawal",
+      "Office Counter"
+    ];
+
+    const PIPE_CATEGORIES = [
+      "PVC Agri / Irrigation Fittings",
+      "PVC Agri / Column Pipe",
+      "CPVC Plumbing Fittings",
+      "UPVC Pressure Fittings",
+      "PVC SWR Drainage Fittings",
+      "CPVC Plumbing Pipe",
+      "UPVC Pressure Pipe",
+      "PVC SWR Drainage Pipe",
+      "HDPE Coil / Pipe",
+      "PVC Conduit Electrical Pipe",
+      "GI / MS Steel Pipe",
+      "General Hardware / Solvents"
+    ];
+
+    const FITTINGS_CATALOG = {
+      "PVC Agri / Irrigation Fittings": [
+        "Agri Coupler / Socket (Fabricated / Molded)",
+        "Agri Elbow 90°",
+        "Agri Elbow 45°",
+        "Agri Tee (Equal)",
+        "Agri Reducing Tee",
+        "Agri Reducing Bushing / Reducer",
+        "Agri MTA (Male Threaded Adaptor)",
+        "Agri FTA (Female Threaded Adaptor)",
+        "Tail Piece / Flange Spigot",
+        "Agri Flange Set (with Rubber Gasket)",
+        "Service Saddle (Single / Double Strap)",
+        "Service Saddle with Brass Insert",
+        "Agri Ball Valve (Solid Handle)",
+        "Foot Valve / Strainer",
+        "Non Return Valve (NRV)",
+        "Agri End Cap (Plug)",
+        "Agri Cross Tee",
+        "Quick Release Coupling (QRC / Sprinkler)",
+        "Sprinkler Foot Batten / Riser",
+        "Drip Joiner / Grommet / Take-off",
+        "Agri Heavy Solvent Cement",
+        "Other Agri Fitting"
+      ],
+      "PVC Agri / Column Pipe": [
+        "Agri Delivery Pipe (Plain / Socketed)",
+        "Column Pipe (Submersible Pump)",
+        "Casing Pipe (Shallow / Deep Well)",
+        "Suction Hose Pipe",
+        "Sprinkler Pipe with Latch Clamp"
+      ],
+      "CPVC Plumbing Fittings": [
+        "Elbow 90°",
+        "Elbow 45°",
+        "Tee (Equal)",
+        "Coupler / Socket",
+        "Union",
+        "End Cap",
+        "Cross Tee",
+        "Brass Elbow 90° (Female)",
+        "Brass Tee (Female)",
+        "Brass FTA (Female Threaded Adaptor)",
+        "Brass MTA (Male Threaded Adaptor)",
+        "Plastic FTA (Plain)",
+        "Plastic MTA (Plain)",
+        "Reducer Elbow 90°",
+        "Reducer Tee",
+        "Reducer Coupler / Socket",
+        "Reducer Bushing",
+        "Reducer Brass Elbow",
+        "Reducer Brass Tee",
+        "CPVC Ball Valve",
+        "Concealed Valve",
+        "Long Plug",
+        "Tank Nipple",
+        "Pipe Clip / Saddle",
+        "CPVC Solvent Cement",
+        "Other CPVC Fitting"
+      ],
+      "UPVC Pressure Fittings": [
+        "Plain Elbow 90°",
+        "Plain Elbow 45°",
+        "Plain Tee (Equal)",
+        "Coupler / Socket",
+        "Union",
+        "End Cap",
+        "Cross Tee",
+        "Brass Elbow 90°",
+        "Brass Tee",
+        "Brass FTA (Female)",
+        "Brass MTA (Male)",
+        "Plain MTA",
+        "Plain FTA",
+        "Reducer Elbow 90°",
+        "Reducer Tee",
+        "Reducer Coupler / Socket",
+        "Reducer Bushing",
+        "UPVC Ball Valve",
+        "Non Return Valve (NRV)",
+        "Flange Set / Tail Piece",
+        "Tank Nipple",
+        "UPVC Solvent Cement",
+        "Other UPVC Fitting"
+      ],
+      "PVC SWR Drainage Fittings": [
+        "Bend 87.5° (Plain)",
+        "Bend 87.5° with Door",
+        "Bend 45° (Plain)",
+        "Single Tee (Plain)",
+        "Single Tee with Door",
+        "Single Y (45° Plain)",
+        "Single Y with Door",
+        "Double Y (Plain)",
+        "Double Y with Door",
+        "Cross Tee (Plain)",
+        "Cross Tee with Door",
+        "Nahani Trap (Self Cleaning)",
+        "Nahani Trap with Jali",
+        "P-Trap (with/without vent)",
+        "S-Trap",
+        "Q-Trap",
+        "Multi Floor Trap",
+        "Coupler / Socket",
+        "Reducer (e.g. 110x75)",
+        "Vent Cowl",
+        "Cleaning Pipe / Access Plug",
+        "Aerator",
+        "Pipe Clip / Bracket",
+        "Rubber Ring / Gasket",
+        "Solvent Cement SWR",
+        "Other SWR Fitting"
+      ],
+      "CPVC Plumbing Pipe": ["Standard CPVC Pipe"],
+      "UPVC Pressure Pipe": ["Standard UPVC Pressure Pipe"],
+      "PVC SWR Drainage Pipe": ["SWR Ringfit Pipe", "SWR Selfit Pipe"],
+      "HDPE Coil / Pipe": ["HDPE Coil", "HDPE Straight Pipe"],
+      "PVC Conduit Electrical Pipe": ["Electrical Conduit Pipe"],
+      "GI / MS Steel Pipe": ["GI Galvanized Pipe", "MS Black Pipe"],
+      "General Hardware / Solvents": ["Solvent Can", "Teflon Tape", "Rubber Washer", "Hacksaw Blade", "Clamp"]
+    };
+
+    const PIPE_BRANDS = [
+      "Airen Pipe",
+      "KASTA",
+      "Astral",
+      "Supreme",
+      "Finolex",
+      "Ashirvad",
+      "Prince",
+      "Jindal",
+      "Tata Pipes",
+      "Apollo",
+      "Generic / Local",
+      "Other"
+    ];
+
+    const PIPE_SIZES = [
+      "1/2\" (15mm / 20mm OD)",
+      "3/4\" (20mm / 25mm OD)",
+      "1\" (25mm / 32mm OD)",
+      "1-1/4\" (32mm / 40mm OD)",
+      "1-1/2\" (40mm / 50mm OD)",
+      "2\" (50mm / 63mm OD)",
+      "2-1/2\" (65mm / 75mm OD)",
+      "3\" (75mm / 90mm OD)",
+      "4\" (100mm / 110mm OD)",
+      "5\" (125mm / 140mm OD)",
+      "6\" (150mm / 160mm OD)",
+      "7\" (180mm OD)",
+      "8\" (200mm OD)",
+      "10\" (250mm OD)",
+      "12\" (315mm OD)",
+      "2\" x 1-1/2\" (63x50mm)",
+      "2-1/2\" x 2\" (75x63mm)",
+      "3\" x 2\" (90x63mm)",
+      "3\" x 2-1/2\" (90x75mm)",
+      "4\" x 2\" (110x63mm)",
+      "4\" x 2-1/2\" (110x75mm)",
+      "4\" x 3\" (110x90mm)",
+      "5\" x 4\" (140x110mm)",
+      "6\" x 4\" (160x110mm)",
+      "3/4\" x 1/2\"",
+      "1\" x 1/2\"",
+      "1\" x 3/4\"",
+      "1-1/4\" x 1\"",
+      "1-1/2\" x 1\"",
+      "1-1/2\" x 1-1/4\""
+    ];
+
+    const PIPE_CLASSES = [
+      "None",
+      "2.5 kg/cm² (Class 1 - Agri)",
+      "4.0 kg/cm² (Class 2 - Agri)",
+      "6.0 kg/cm² (Class 3 - Agri)",
+      "8.0 kg/cm² (Class 4 - Agri)",
+      "10.0 kg/cm² (Class 5 - Agri)",
+      "12.5 kg/cm² (High Pressure)",
+      "PN 4 (HDPE / Agri)",
+      "PN 6 (HDPE / Agri)",
+      "PN 10 (HDPE / Agri)",
+      "PN 12.5 (HDPE)",
+      "PN 16 (HDPE)",
+      "SCH 40 (Plumbing / Pressure)",
+      "SCH 80 (Heavy Pressure)",
+      "SDR 11 (Class 1 - CPVC)",
+      "SDR 13.5 (Class 2 - CPVC)",
+      "Type A (Rainwater)",
+      "Type B (Soil/Waste)",
+      "Standard / Molded"
+    ];
+
+    const PIPE_LENGTHS = [
+      "None / N.A. (Fittings)",
+      "6 Meters (20 ft)",
+      "3 Meters (10 ft)",
+      "5 Meters (16.4 ft)",
+      "100 Meter Coil",
+      "300 Meter Coil",
+      "500 Meter Coil",
+      "Custom / Cut Length"
+    ];
+
+    const PIPE_UNITS = [
+      "Pcs (Pieces)",
+      "Bags / Bags Pack",
+      "Boxes / Cartons",
+      "Lengths (Pipes)",
+      "Bundles",
+      "Coils",
+      "Meters",
+      "Feet"
+    ];
+
+    /* ==========================================================
+       STORAGE, PIN SECURITY & DATA PERSISTENCE
+       ========================================================== */
+    let parties = [];
+    let orders = [];
+    let activeModalOrder = null;
+    let pendingPinCallback = null;
+
+    function getMasterPin() {
+      return localStorage.getItem('airen_pipe_master_pin') || "1234";
+    }
+
+    function setMasterPin(newPin) {
+      localStorage.setItem('airen_pipe_master_pin', newPin);
+    }
+
+    function requirePin(actionCallback, actionDescription = "Proceed with this action") {
+      pendingPinCallback = actionCallback;
+      document.getElementById('pin-modal-action-title').textContent = actionDescription;
+      document.getElementById('pin-input-field').value = "";
+      document.getElementById('pinModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('pin-input-field').focus(), 100);
+    }
+
+    function cancelPinModal() {
+      document.getElementById('pinModal').classList.add('hidden');
+      pendingPinCallback = null;
+    }
+
+    function confirmPinModal() {
+      const enteredPin = document.getElementById('pin-input-field').value.trim();
+      const currentPin = getMasterPin();
+
+      if (enteredPin === currentPin) {
+        document.getElementById('pinModal').classList.add('hidden');
+        if (typeof pendingPinCallback === 'function') {
+          const cb = pendingPinCallback;
+          pendingPinCallback = null;
+          cb();
+        }
+      } else {
+        showToast("Incorrect Master PIN. Access Denied.", "error");
+        document.getElementById('pin-input-field').value = "";
+        document.getElementById('pin-input-field').focus();
+      }
+    }
+
+    function handleChangePin(event) {
+      event.preventDefault();
+      const currentEntered = document.getElementById('pin-current').value.trim();
+      const newPin = document.getElementById('pin-new').value.trim();
+      const realPin = getMasterPin();
+
+      if (currentEntered !== realPin) {
+        showToast("Current PIN is incorrect.", "error");
+        return;
+      }
+      if (newPin.length < 4) {
+        showToast("New PIN must be at least 4 digits.", "warning");
+        return;
+      }
+
+      setMasterPin(newPin);
+      document.getElementById('pin-current').value = "";
+      document.getElementById('pin-new').value = "";
+      showToast("Security PIN updated successfully!", "success");
+    }
+
+    function initDataStore() {
+      const storedParties = localStorage.getItem('airen_pipe_parties');
+      if (storedParties) {
+        try { parties = JSON.parse(storedParties); } catch (e) { parties = []; }
+      } else {
+        parties = [];
+        saveParties();
+      }
+
+      const storedOrders = localStorage.getItem('airen_pipe_orders');
+      if (storedOrders) {
+        try { orders = JSON.parse(storedOrders); } catch (e) { orders = []; }
+      } else {
+        orders = [];
+        saveOrders();
+      }
+
+      let webhook = localStorage.getItem('airen_pipe_google_webhook');
+      if (!webhook || !webhook.includes("AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw")) {
+        webhook = DEFAULT_WEBHOOK_URL;
+        localStorage.setItem('airen_pipe_google_webhook', webhook);
+      }
+      const webhookEl = document.getElementById('google-webhook-url');
+      if (webhookEl) webhookEl.value = webhook;
+
+      // Auto-load remembered salesperson on this phone
+      const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
+      const spSelect = document.getElementById('form-salesperson');
+      if (spSelect && savedSalesperson) spSelect.value = savedSalesperson;
+    }
+
+    function saveParties() {
+      localStorage.setItem('airen_pipe_parties', JSON.stringify(parties));
+    }
+
+    function saveOrders() {
+      localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
+    }
+
+    function saveGoogleWebhookUrl() {
+      const url = document.getElementById('google-webhook-url').value.trim();
+      localStorage.setItem('airen_pipe_google_webhook', url || DEFAULT_WEBHOOK_URL);
+      showToast("Google Sheets webhook URL updated!", "success");
+    }
+
+    function exportFullJsonBackup() {
+      const backupData = {
+        organization: "Airen Pipe",
+        version: "2.0",
+        exportDate: new Date().toISOString(),
+        parties: parties,
+        orders: orders
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `AirenPipe_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast("Airen Pipe database backup file downloaded!", "success");
+    }
+
+    function triggerRestoreBackupPrompt() {
+      requirePin(() => {
+        document.getElementById('import-backup-file').click();
+      }, "Unlock Database Restore");
+    }
+
+    function handleRestoreBackupFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && Array.isArray(parsed.parties) && Array.isArray(parsed.orders)) {
+            parties = parsed.parties;
+            orders = parsed.orders;
+            saveParties();
+            saveOrders();
+            populatePartyDropdowns();
+            renderOrdersList();
+            renderPartiesList();
+            updateGlobalKPIs();
+            showToast(`Restored ${parties.length} parties & ${orders.length} orders successfully!`, "success");
+            switchTab('orders');
+          } else {
+            showToast("Invalid backup file format.", "error");
+          }
+        } catch (err) {
+          showToast("Error parsing backup file.", "error");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function clearAllDataPrompt() {
+      requirePin(() => {
+        parties = [];
+        orders = [];
+        saveParties();
+        saveOrders();
+        populatePartyDropdowns();
+        renderOrdersList();
+        renderPartiesList();
+        resetOrderForm();
+        updateGlobalKPIs();
+        showToast("All Airen Pipe app data has been reset.", "info");
+        switchTab('orders');
+      }, "Authorize Complete Data Reset");
+    }
+
+    /* ==========================================================
+       TAB ROUTING
+       ========================================================== */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      const targetView = document.getElementById(`view-${tabId}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+        btn.classList.add('text-slate-300');
+      });
+      const activeBtn = document.getElementById(`tab-${tabId}-btn`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+        activeBtn.classList.remove('text-slate-300');
+      }
+
+      document.querySelectorAll('.m-nav-tab').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white');
+      });
+      const mActiveBtn = document.getElementById(`m-tab-${tabId}`);
+      if (mActiveBtn) {
+        mActiveBtn.classList.add('bg-brand-600', 'text-white');
+      }
+
+      if (tabId === 'orders') renderOrdersList();
+      if (tabId === 'parties') renderPartiesList();
+      if (tabId === 'new-order') {
+        populatePartyDropdowns();
+        const tbody = document.getElementById('order-items-tbody');
+        if (tbody.children.length === 0) {
+          addOrderItemRow();
+        }
+      }
+    }
+
+    function quickOpenNewOrder() {
+      resetOrderForm();
+      switchTab('new-order');
+    }
+
+    /* ==========================================================
+       ORDER ROW MANAGEMENT
+       ========================================================== */
+    function getItemsForCategory(category) {
+      return FITTINGS_CATALOG[category] || ["Standard Product", "Other"];
+    }
+
+    function createPipeRowHTML(item = {}) {
+      const category = item.category || PIPE_CATEGORIES[0];
+      const availableItems = getItemsForCategory(category);
+      const itemName = item.itemName || availableItems[0];
+      const brand = item.brand || "Airen Pipe";
+      const size = item.size || (category.includes('Agri') ? "2-1/2\" (65mm / 75mm OD)" : PIPE_SIZES[1]);
+      
+      let defaultClass = "None";
+      if (category.includes('Agri')) defaultClass = "4.0 kg/cm² (Class 2 - Agri)";
+      else if (category.includes('CPVC')) defaultClass = "SDR 11 (Class 1 - CPVC)";
+      
+      const specClass = item.specClass !== undefined ? item.specClass : defaultClass;
+      const length = item.length || (category.includes('Fitting') ? "None / N.A. (Fittings)" : (category.includes('Agri') ? PIPE_LENGTHS[1] : PIPE_LENGTHS[2]));
+      const qty = item.qty !== undefined ? item.qty : 20;
+      const unit = item.unit || (category.includes('Fitting') ? "Pcs (Pieces)" : "Lengths (Pipes)");
+      const remarks = item.remarks || "";
+
+      const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
+      const itemOptions = availableItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
+      const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
+      const sizeOptions = PIPE_SIZES.map(s => `<option value="${s}" ${s === size ? 'selected' : ''}>${s}</option>`).join('');
+      const classOptions = PIPE_CLASSES.map(cl => `<option value="${cl}" ${cl === specClass ? 'selected' : ''}>${cl}</option>`).join('');
+      const lengthOptions = PIPE_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
+      const unitOptions = PIPE_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
+
+      return `
+        <tr class="order-line-row hover:bg-slate-50 transition-colors">
+          <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
+          <td class="py-2.5 px-1.5">
+            <select onchange="onCategoryChange(this)" class="item-category w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
+              ${categoryOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-name w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-medium text-brand-900">
+              ${itemOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-brand w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
+              ${brandOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-size w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-900">
+              ${sizeOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-class w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-800 font-medium">
+              ${classOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-length w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
+              ${lengthOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <input type="number" min="1" step="1" required value="${qty}" oninput="recalculateFormTotals()" class="item-qty w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-bold text-slate-900 text-right">
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-unit w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
+              ${unitOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <input type="text" value="${remarks}" placeholder="e.g. 4kg pressure, Brass bolt, 25-bag pack" class="item-remarks w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-600">
+          </td>
+          <td class="py-2.5 px-1.5 text-center">
+            <button type="button" onclick="removeOrderItemRow(this)" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors" title="Delete Row">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function onCategoryChange(selectEl) {
+      const row = selectEl.closest('tr');
+      const category = selectEl.value;
+      const itemSelect = row.querySelector('.item-name');
+      const classSelect = row.querySelector('.item-class');
+      const lengthSelect = row.querySelector('.item-length');
+      const unitSelect = row.querySelector('.item-unit');
+
+      const items = getItemsForCategory(category);
+      itemSelect.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
+
+      if (category.includes('Agri / Irrigation Fittings')) {
+        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Pcs (Pieces)";
+      } else if (category.includes('Agri / Column Pipe')) {
+        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
+        lengthSelect.value = "6 Meters (20 ft)";
+        unitSelect.value = "Lengths (Pipes)";
+      } else if (category.includes('Fitting')) {
+        classSelect.value = "None";
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Pcs (Pieces)";
+      } else if (category.includes('Pipe')) {
+        if (category.includes('CPVC')) {
+          classSelect.value = "SDR 11 (Class 1 - CPVC)";
+          lengthSelect.value = "3 Meters (10 ft)";
+          unitSelect.value = "Lengths (Pipes)";
+        } else if (category.includes('UPVC')) {
+          classSelect.value = "SCH 40 (Plumbing / Pressure)";
+          lengthSelect.value = "6 Meters (20 ft)";
+          unitSelect.value = "Lengths (Pipes)";
+        } else if (category.includes('HDPE')) {
+          classSelect.value = "PN 6 (HDPE / Agri)";
+          lengthSelect.value = "100 Meter Coil";
+          unitSelect.value = "Coils";
+        }
+      }
+    }
+
+    function addOrderItemRow(itemData = null) {
+      const tbody = document.getElementById('order-items-tbody');
+      const tempWrapper = document.createElement('tbody');
+      tempWrapper.innerHTML = createPipeRowHTML(itemData || {});
+      const newRow = tempWrapper.firstElementChild;
+      tbody.appendChild(newRow);
+      renumberRowIndices();
+      recalculateFormTotals();
+    }
+
+    function removeOrderItemRow(btn) {
+      const tbody = document.getElementById('order-items-tbody');
+      if (tbody.children.length <= 1) {
+        showToast("At least one specification line is required.", "warning");
+        return;
+      }
+      const row = btn.closest('tr');
+      row.remove();
+      renumberRowIndices();
+      recalculateFormTotals();
+    }
+
+    function renumberRowIndices() {
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      rows.forEach((row, idx) => {
+        const indexEl = row.querySelector('.row-index');
+        if (indexEl) indexEl.textContent = idx + 1;
+      });
+      const badge = document.getElementById('line-items-count-badge');
+      if (badge) badge.textContent = `${rows.length} item${rows.length > 1 ? 's' : ''}`;
+    }
+
+    function recalculateFormTotals() {
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      let totalQty = 0;
+      rows.forEach(row => {
+        const qtyInput = row.querySelector('.item-qty');
+        const q = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+        totalQty += q;
+      });
+      document.getElementById('summary-total-lines').textContent = rows.length;
+      document.getElementById('summary-total-qty').textContent = totalQty.toLocaleString();
+    }
+
+    function insertQuickPreset(type) {
+      if (type === 'agri_fittings') {
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Coupler / Socket (Fabricated / Molded)", brand: "Airen Pipe", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 50, unit: "Pcs (Pieces)", remarks: "4kg Agri socket" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Tee (Equal)", brand: "Airen Pipe", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 25, unit: "Pcs (Pieces)", remarks: "4kg Equal Tee" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Reducing Tee", brand: "Airen Pipe", size: "2-1/2\" x 2\" (75x63mm)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 20, unit: "Pcs (Pieces)", remarks: "Branch reducer tee" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Service Saddle with Brass Insert", brand: "Airen Pipe", size: "2-1/2\" x 2\" (75x63mm)", specClass: "6.0 kg/cm² (Class 3 - Agri)", length: "None / N.A. (Fittings)", qty: 30, unit: "Pcs (Pieces)", remarks: "For sprinkler take-off" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Ball Valve (Solid Handle)", brand: "Airen Pipe", size: "2-1/2\" (65mm / 75mm OD)", specClass: "6.0 kg/cm² (Class 3 - Agri)", length: "None / N.A. (Fittings)", qty: 10, unit: "Pcs (Pieces)", remarks: "Solid farm handle" });
+        addOrderItemRow({ category: "PVC Agri / Column Pipe", itemName: "Agri Delivery Pipe (Plain / Socketed)", brand: "Airen Pipe", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "6 Meters (20 ft)", qty: 50, unit: "Lengths (Pipes)", remarks: "Farm mainline 4kg" });
+        showToast("Added Airen Pipe Agricultural Pack!", "info");
+      } else if (type === 'cpvc_fittings') {
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Elbow 90°", brand: "Airen Pipe", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 100, unit: "Pcs (Pieces)", remarks: "Standard 90 Elbow" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Tee (Equal)", brand: "Airen Pipe", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 50, unit: "Pcs (Pieces)", remarks: "Equal Tee" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Brass FTA (Female Threaded Adaptor)", brand: "Airen Pipe", size: "3/4\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 30, unit: "Pcs (Pieces)", remarks: "Brass insert" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "CPVC Ball Valve", brand: "Airen Pipe", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Pcs (Pieces)", remarks: "Heavy handle" });
+        addOrderItemRow({ category: "CPVC Plumbing Pipe", itemName: "Standard CPVC Pipe", brand: "Airen Pipe", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "3 Meters (10 ft)", qty: 25, unit: "Lengths (Pipes)", remarks: "Hot/Cold pipe" });
+        showToast("Added CPVC Fittings & Pipe Pack!", "info");
+      } else if (type === 'upvc_fittings') {
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Elbow 90°", brand: "Airen Pipe", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 50, unit: "Pcs (Pieces)", remarks: "Pressure Elbow" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Tee (Equal)", brand: "Airen Pipe", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 30, unit: "Pcs (Pieces)", remarks: "Pressure Tee" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Brass MTA (Male)", brand: "Airen Pipe", size: "1\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Pcs (Pieces)", remarks: "Brass MTA" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "UPVC Ball Valve", brand: "Airen Pipe", size: "1\" (25mm / 32mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 12, unit: "Pcs (Pieces)", remarks: "Solid handle" });
+        showToast("Added UPVC Pressure Fittings Pack!", "info");
+      } else if (type === 'swr_fittings') {
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Bend 87.5° (Plain)", brand: "Airen Pipe", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 25, unit: "Pcs (Pieces)", remarks: "Ringfit 90 bend" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Single Tee with Door", brand: "Airen Pipe", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 15, unit: "Pcs (Pieces)", remarks: "Inspection door" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Nahani Trap with Jali", brand: "Airen Pipe", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Pcs (Pieces)", remarks: "With SS Jali" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "P-Trap (with/without vent)", brand: "Airen Pipe", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Pcs (Pieces)", remarks: "Water seal trap" });
+        addOrderItemRow({ category: "PVC SWR Drainage Pipe", itemName: "SWR Ringfit Pipe", brand: "Airen Pipe", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "3 Meters (10 ft)", qty: 20, unit: "Lengths (Pipes)", remarks: "Rubber ring joint" });
+        showToast("Added SWR Drainage Fittings Pack!", "info");
+      }
+    }
+
+    function populatePartyDropdowns() {
+      const select = document.getElementById('form-party-id');
+      const filterSelect = document.getElementById('order-party-filter');
+
+      const currentSelected = select.value;
+      const currentFilter = filterSelect.value;
+
+      select.innerHTML = '<option value="">-- Select Registered Party --</option>';
+      filterSelect.innerHTML = '<option value="ALL">All Parties</option>';
+
+      if (parties.length === 0) {
+        const disabledOpt = document.createElement('option');
+        disabledOpt.value = "";
+        disabledOpt.disabled = true;
+        disabledOpt.textContent = "No parties registered yet - Click '+ Add New Party'";
+        select.appendChild(disabledOpt);
+      } else {
+        parties.forEach(p => {
+          const option = document.createElement('option');
+          option.value = p.id;
+          option.textContent = `${p.name} (${p.firm || p.city || 'Party'})`;
+          select.appendChild(option);
+
+          const filterOpt = document.createElement('option');
+          filterOpt.value = p.id;
+          filterOpt.textContent = `${p.name} - ${p.firm || p.city}`;
+          filterSelect.appendChild(filterOpt);
+        });
+      }
+
+      if (currentSelected) select.value = currentSelected;
+      if (currentFilter) filterSelect.value = currentFilter;
+    }
+
+    function onPartySelected(partyId) {
+      const infoEl = document.getElementById('party-quick-info');
+      if (!partyId) {
+        infoEl.classList.add('hidden');
+        return;
+      }
+      const party = parties.find(p => p.id === partyId);
+      if (party) {
+        infoEl.textContent = `📍 ${party.firm ? party.firm + ' | ' : ''}Phone: ${party.phone} | City: ${party.city || 'N/A'}`;
+        infoEl.classList.remove('hidden');
+      }
+    }
+
+    /* ==========================================================
+       ORDER SAVE & LIVE GOOGLE SHEETS SYNC
+       ========================================================== */
+    async function syncOrderToGoogleSheet(order) {
+      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      if (!webhookUrl) return;
+
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(order)
+        });
+      } catch (err) {
+        console.warn("Google webhook sync skipped or network unavailable", err);
+      }
+    }
+
+    async function handleSaveOrder(event) {
+      event.preventDefault();
+      
+      const editId = document.getElementById('edit-order-id').value;
+      const salesperson = document.getElementById('form-salesperson').value;
+      const partyId = document.getElementById('form-party-id').value;
+      const orderDate = document.getElementById('form-order-date').value;
+      const targetDate = document.getElementById('form-target-date').value;
+      const status = document.getElementById('form-order-status').value;
+      const partyRef = document.getElementById('form-party-ref').value.trim();
+      const deliverySite = document.getElementById('form-delivery-site').value.trim();
+      const notes = document.getElementById('form-order-notes').value.trim();
+
+      if (!salesperson) {
+        showToast("Please select the salesperson who is punching this order.", "error");
+        return;
+      }
+
+      // Remember Salesperson on this device
+      localStorage.setItem('airen_pipe_default_salesperson', salesperson);
+
+      if (!partyId) {
+        showToast("Please register/select a party first.", "error");
+        return;
+      }
+
+      const party = parties.find(p => p.id === partyId);
+      if (!party) {
+        showToast("Selected party does not exist.", "error");
+        return;
+      }
+
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      if (rows.length === 0) {
+        showToast("Please add at least one line item.", "error");
+        return;
+      }
+
+      const items = [];
+      for (const row of rows) {
+        const category = row.querySelector('.item-category').value;
+        const itemName = row.querySelector('.item-name') ? row.querySelector('.item-name').value : "Item";
+        const brand = row.querySelector('.item-brand').value;
+        const size = row.querySelector('.item-size').value;
+        const specClass = row.querySelector('.item-class').value || "None";
+        const length = row.querySelector('.item-length').value;
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const unit = row.querySelector('.item-unit').value;
+        const remarks = row.querySelector('.item-remarks').value.trim();
+
+        if (qty <= 0) {
+          showToast("Quantity must be greater than zero for all rows.", "error");
+          return;
+        }
+
+        items.push({ category, itemName, brand, size, specClass, length, qty, unit, remarks });
+      }
+
+      let savedOrderObj = null;
+
+      if (editId) {
+        const index = orders.findIndex(o => o.id === editId);
+        if (index !== -1) {
+          orders[index] = {
+            ...orders[index],
+            salesperson,
+            partyId,
+            partyName: `${party.name} (${party.firm || party.city})`,
+            partyPhone: party.phone,
+            partyCity: party.city || "",
+            orderDate,
+            targetDate,
+            status,
+            partyRef,
+            deliverySite,
+            notes,
+            items
+          };
+          savedOrderObj = orders[index];
+          saveOrders();
+          showToast(`Order #${editId} updated & synced!`, "success");
+        }
+      } else {
+        const nextNum = orders.length + 1001;
+        const newOrderId = `ORD-${nextNum}`;
+        const newOrder = {
+          id: newOrderId,
+          salesperson,
+          partyId,
+          partyName: `${party.name} (${party.firm || party.city})`,
+          partyPhone: party.phone,
+          partyCity: party.city || "",
+          orderDate,
+          targetDate,
+          status,
+          partyRef,
+          deliverySite,
+          notes,
+          items,
+          createdAt: new Date().toISOString()
+        };
+        orders.unshift(newOrder);
+        savedOrderObj = newOrder;
+        saveOrders();
+        showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
+      }
+
+      if (savedOrderObj) {
+        syncOrderToGoogleSheet(savedOrderObj);
+      }
+
+      resetOrderForm();
+      switchTab('orders');
+      updateGlobalKPIs();
+    }
+
+    function resetOrderForm() {
+      document.getElementById('orderForm').reset();
+      document.getElementById('edit-order-id').value = "";
+      document.getElementById('order-form-title').textContent = "Record Airen Pipe & Fittings Order";
+      document.getElementById('save-order-btn-text').textContent = "Save & Record Order";
+      document.getElementById('party-quick-info').classList.add('hidden');
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('form-order-date').value = today;
+
+      // Keep remembered salesperson
+      const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
+      if (savedSalesperson) document.getElementById('form-salesperson').value = savedSalesperson;
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      addOrderItemRow();
+    }
+
+    function renderOrdersList() {
+      const container = document.getElementById('orders-container');
+      const emptyState = document.getElementById('orders-empty-state');
+      const searchQuery = document.getElementById('order-search-input').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('order-status-filter').value;
+      const salespersonFilter = document.getElementById('order-salesperson-filter').value;
+      const partyFilter = document.getElementById('order-party-filter').value;
+
+      populatePartyDropdowns();
+
+      const filtered = orders.filter(order => {
+        if (statusFilter !== 'ALL' && order.status !== statusFilter) return false;
+        if (salespersonFilter !== 'ALL' && order.salesperson !== salespersonFilter) return false;
+        if (partyFilter !== 'ALL' && order.partyId !== partyFilter) return false;
+        if (searchQuery) {
+          const matchId = order.id.toLowerCase().includes(searchQuery);
+          const matchSalesperson = (order.salesperson || "").toLowerCase().includes(searchQuery);
+          const matchParty = (order.partyName || "").toLowerCase().includes(searchQuery);
+          const matchRef = (order.partyRef || "").toLowerCase().includes(searchQuery);
+          const matchCity = (order.partyCity || "").toLowerCase().includes(searchQuery);
+          const matchItems = order.items.some(it => 
+            (it.category || "").toLowerCase().includes(searchQuery) ||
+            (it.itemName || "").toLowerCase().includes(searchQuery) ||
+            (it.brand || "").toLowerCase().includes(searchQuery) ||
+            (it.size || "").toLowerCase().includes(searchQuery) ||
+            (it.specClass || "").toLowerCase().includes(searchQuery) ||
+            (it.remarks || "").toLowerCase().includes(searchQuery)
+          );
+          return matchId || matchSalesperson || matchParty || matchRef || matchCity || matchItems;
+        }
+        return true;
+      });
+
+      document.getElementById('filtered-count-badge').textContent = `${filtered.length} Orders`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = filtered.map(order => {
+        const totalItemsCount = order.items.reduce((sum, it) => sum + (it.qty || 0), 0);
+        const previewItemsText = order.items.slice(0, 3).map(it => {
+          const itemLabel = it.itemName ? `${it.itemName}` : it.category;
+          const classText = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass.split(' ')[0]}]` : '';
+          return `${it.qty} ${it.unit.split(' ')[0]} ${it.brand} ${itemLabel} ${it.size}${classText}`;
+        }).join(' • ');
+        const extraItemsBadge = order.items.length > 3 ? `<span class="text-xs text-brand-600 font-semibold">+${order.items.length - 3} more items</span>` : '';
+
+        let statusBadge = `<span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full">Draft</span>`;
+        if (order.status === 'Confirmed') {
+          statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full">Confirmed</span>`;
+        } else if (order.status === 'Hold') {
+          statusBadge = `<span class="bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full">On Hold</span>`;
+        } else if (order.status === 'Cancelled') {
+          statusBadge = `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-full">Cancelled</span>`;
+        }
+
+        return `
+          <div class="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex-1 space-y-1.5 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${order.id}</span>
+                <span class="font-bold text-sm text-slate-900 truncate">${order.partyName}</span>
+                ${statusBadge}
+                <span class="text-xs bg-blue-50 text-brand-800 font-bold px-2 py-0.5 rounded border border-blue-200">👤 ${order.salesperson || 'Staff'}</span>
+                <span class="text-xs text-slate-400 font-medium">📅 ${order.orderDate}</span>
+              </div>
+
+              <p class="text-xs text-slate-600 leading-relaxed truncate">
+                <strong class="text-slate-700">Items:</strong> ${previewItemsText} ${extraItemsBadge}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                <span>Total Quantity: <strong class="text-brand-700 font-bold font-mono">${totalItemsCount.toLocaleString()}</strong> units</span>
+                ${order.partyRef ? `<span>Ref: <strong class="text-slate-700">${order.partyRef}</strong></span>` : ''}
+                ${order.deliverySite ? `<span>Site: <strong class="text-slate-700">${order.deliverySite}</strong></span>` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 self-end md:self-center shrink-0">
+              <button onclick="viewOrderSlip('${order.id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold text-xs rounded-xl border border-brand-200 transition-colors flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                <span>View Slip</span>
+              </button>
+              <button onclick="editOrderDirect('${order.id}')" class="p-1.5 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Order">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="deleteOrderPrompt('${order.id}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Order (Requires PIN)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateGlobalKPIs();
+    }
+
+    function viewOrderSlip(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      activeModalOrder = order;
+
+      document.getElementById('slip-order-id').textContent = `#${order.id}`;
+      document.getElementById('slip-order-date').textContent = order.orderDate || "--";
+      document.getElementById('slip-salesperson').textContent = order.salesperson || "Counter / Direct";
+      document.getElementById('slip-footer-salesperson').textContent = `(${order.salesperson || 'Airen Pipe Desk'})`;
+      document.getElementById('slip-party-name').textContent = order.partyName;
+      document.getElementById('slip-party-phone').textContent = `Phone: ${order.partyPhone || 'N/A'}`;
+      document.getElementById('slip-party-city').textContent = `City: ${order.partyCity || 'N/A'}`;
+      document.getElementById('slip-party-ref').textContent = order.partyRef || "None / Direct";
+      document.getElementById('slip-target-date').textContent = order.targetDate || "Immediate / ASAP";
+      document.getElementById('slip-delivery-site').textContent = order.deliverySite || "Godown counter";
+      document.getElementById('slip-notes').textContent = order.notes || "No special instructions.";
+
+      const statusBadge = document.getElementById('slip-status-badge');
+      statusBadge.textContent = order.status;
+      statusBadge.className = order.status === 'Confirmed' ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold';
+
+      const tbody = document.getElementById('slip-items-tbody');
+      let totalQty = 0;
+      tbody.innerHTML = order.items.map((item, idx) => {
+        totalQty += (item.qty || 0);
+        const itemDesc = item.itemName ? `<strong>${item.itemName}</strong>` : `<strong>${item.category}</strong>`;
+        const lengthDisplay = (item.length && !item.length.includes('N.A.')) ? item.length : '-';
+        const classDisplay = (item.specClass && item.specClass !== 'None') ? item.specClass : '-';
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2 px-2 border border-slate-200 text-center font-mono">${idx + 1}</td>
+            <td class="py-2 px-3 border border-slate-200 text-slate-700 text-[11px]">${item.category}</td>
+            <td class="py-2 px-3 border border-slate-200 text-slate-900">
+              ${itemDesc}
+              ${item.remarks ? `<span class="block text-[10px] text-slate-500 font-normal italic">${item.remarks}</span>` : ''}
+            </td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-700">${item.brand}</td>
+            <td class="py-2 px-3 border border-slate-200 font-bold text-slate-900">${item.size}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-800 font-medium">${classDisplay}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-600">${lengthDisplay}</td>
+            <td class="py-2 px-3 border border-slate-200 text-right font-black font-mono text-slate-900">${item.qty}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.unit}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('slip-total-qty').textContent = totalQty.toLocaleString();
+      document.getElementById('orderDetailModal').classList.remove('hidden');
+    }
+
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').classList.add('hidden');
+      activeModalOrder = null;
+    }
+
+    function shareOrderWhatsApp() {
+      if (!activeModalOrder) return;
+      const order = activeModalOrder;
+
+      let msg = `*AIREN PIPE - ORDER REQUISITION SLIP*\n`;
+      msg += `*Order #:* ${order.id}\n`;
+      msg += `*Booked By (Sales):* ${order.salesperson || 'Airen Desk'}\n`;
+      msg += `*Party:* ${order.partyName}\n`;
+      msg += `*Date:* ${order.orderDate}\n`;
+      if (order.partyRef) msg += `*Ref PO:* ${order.partyRef}\n`;
+      if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
+      msg += `--------------------------------\n`;
+      msg += `*ITEMS BOOKED:*\n`;
+
+      order.items.forEach((it, i) => {
+        const itemTitle = it.itemName ? `${it.itemName}` : it.category;
+        const classStr = (it.specClass && it.specClass !== 'None') ? ` | Pressure/Rating: ${it.specClass}` : '';
+        const lenStr = (it.length && !it.length.includes('N.A.')) ? ` | Len: ${it.length}` : '';
+        msg += `${i+1}. [${it.brand}] *${itemTitle}* | Size: *${it.size}*${classStr}${lenStr} | *Qty: ${it.qty} ${it.unit}* ${it.remarks ? `(${it.remarks})` : ''}\n`;
+      });
+
+      const totalUnits = order.items.reduce((s, it) => s + (it.qty || 0), 0);
+      msg += `--------------------------------\n`;
+      msg += `*Total Units:* ${totalUnits}\n`;
+      if (order.notes) msg += `*Notes:* ${order.notes}\n`;
+      msg += `Status: ${order.status} (Recorded for godown packing & loading)`;
+
+      const encoded = encodeURIComponent(msg);
+      const url = `https://api.whatsapp.com/send?text=${encoded}`;
+      window.open(url, '_blank');
+    }
+
+    function cloneOrderFromModal() {
+      if (!activeModalOrder) return;
+      const order = activeModalOrder;
+      closeOrderDetailModal();
+      
+      resetOrderForm();
+      document.getElementById('form-salesperson').value = order.salesperson || "";
+      document.getElementById('form-party-id').value = order.partyId || "";
+      onPartySelected(order.partyId);
+      document.getElementById('form-party-ref').value = order.partyRef ? `Re-order of ${order.id}` : "";
+      document.getElementById('form-delivery-site').value = order.deliverySite || "";
+      document.getElementById('form-order-notes').value = order.notes || "";
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      order.items.forEach(it => {
+        addOrderItemRow(it);
+      });
+
+      switchTab('new-order');
+      showToast("Order items cloned into new order form. Ready to punch!", "info");
+    }
+
+    function editOrderFromModal() {
+      if (!activeModalOrder) return;
+      const id = activeModalOrder.id;
+      closeOrderDetailModal();
+      editOrderDirect(id);
+    }
+
+    function editOrderDirect(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      resetOrderForm();
+      document.getElementById('edit-order-id').value = order.id;
+      document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
+      document.getElementById('save-order-btn-text').textContent = "Update Order Details";
+
+      document.getElementById('form-salesperson').value = order.salesperson || "";
+      document.getElementById('form-party-id').value = order.partyId || "";
+      onPartySelected(order.partyId);
+      document.getElementById('form-order-date').value = order.orderDate || "";
+      document.getElementById('form-target-date').value = order.targetDate || "";
+      document.getElementById('form-order-status').value = order.status || "Recorded";
+      document.getElementById('form-party-ref').value = order.partyRef || "";
+      document.getElementById('form-delivery-site').value = order.deliverySite || "";
+      document.getElementById('form-order-notes').value = order.notes || "";
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      order.items.forEach(it => {
+        addOrderItemRow(it);
+      });
+
+      switchTab('new-order');
+    }
+
+    function deleteOrderPrompt(orderId) {
+      requirePin(() => {
+        orders = orders.filter(o => o.id !== orderId);
+        saveOrders();
+        renderOrdersList();
+        showToast(`Order #${orderId} deleted by Admin PIN.`, "info");
+      }, `Authorize Deletion of Order #${orderId}`);
+    }
+
+    /* ==========================================================
+       PARTIES DIRECTORY & CRUD
+       ========================================================== */
+    function renderPartiesList() {
+      const grid = document.getElementById('parties-grid-container');
+      const searchQuery = document.getElementById('party-search-input').value.toLowerCase().trim();
+
+      const filtered = parties.filter(p => {
+        if (!searchQuery) return true;
+        return (
+          p.name.toLowerCase().includes(searchQuery) ||
+          (p.firm || "").toLowerCase().includes(searchQuery) ||
+          (p.phone || "").includes(searchQuery) ||
+          (p.city || "").toLowerCase().includes(searchQuery) ||
+          (p.type || "").toLowerCase().includes(searchQuery)
+        );
+      });
+
+      if (parties.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 px-4 text-center bg-white rounded-2xl border border-slate-200">
+            <div class="w-14 h-14 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-3">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <h3 class="text-sm font-bold text-slate-700">No Parties Registered Yet</h3>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Add your plumbing contractors, hardware retail dealers, and agricultural clients to record orders quickly.</p>
+            <button onclick="openPartyModal()" class="mt-3.5 inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
+              + Register First Party
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-slate-500">
+            <p class="text-sm font-medium">No parties found matching "${searchQuery}".</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const partyOrders = orders.filter(o => o.partyId === p.id);
+        const totalPcs = partyOrders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+
+        return `
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <h3 class="font-bold text-slate-900 text-base">${p.name}</h3>
+                  <p class="text-xs font-semibold text-brand-700">${p.firm || 'Individual / Contractor'}</p>
+                </div>
+                <span class="text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded border border-slate-200">${p.type || 'Party'}</span>
+              </div>
+
+              <div class="mt-3 space-y-1 text-xs text-slate-600">
+                <p class="flex items-center space-x-1.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                  <span>${p.phone}</span>
+                </p>
+                <p class="flex items-center space-x-1.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                  <span>${p.city ? p.city : 'City not specified'}</span>
+                </p>
+                ${p.address ? `<p class="text-[11px] text-slate-500 italic mt-1">${p.address}</p>` : ''}
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">Recorded History</span>
+                <span class="font-bold text-slate-800">${partyOrders.length} Orders (${totalPcs.toLocaleString()} pcs)</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <button onclick="quickOrderForParty('${p.id}')" class="px-2.5 py-1 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition-colors">
+                  + Book Order
+                </button>
+                <button onclick="editPartyModal('${p.id}')" class="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100" title="Edit Party">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+                <button onclick="deletePartyPrompt('${p.id}')" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50" title="Delete Party (Requires PIN)">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickOrderForParty(partyId) {
+      resetOrderForm();
+      document.getElementById('form-party-id').value = partyId;
+      onPartySelected(partyId);
+      switchTab('new-order');
+    }
+
+    function openPartyModal() {
+      document.getElementById('partyForm').reset();
+      document.getElementById('edit-party-id').value = "";
+      document.getElementById('party-modal-title').textContent = "Register New Party";
+      document.getElementById('partyModal').classList.remove('hidden');
+    }
+
+    function closePartyModal() {
+      document.getElementById('partyModal').classList.add('hidden');
+    }
+
+    function editPartyModal(partyId) {
+      const p = parties.find(item => item.id === partyId);
+      if (!p) return;
+      document.getElementById('edit-party-id').value = p.id;
+      document.getElementById('party-modal-title').textContent = `Edit Party - ${p.name}`;
+      document.getElementById('party-name').value = p.name || "";
+      document.getElementById('party-firm').value = p.firm || "";
+      document.getElementById('party-phone').value = p.phone || "";
+      document.getElementById('party-city').value = p.city || "";
+      document.getElementById('party-type').value = p.type || "Retailer / Dealer";
+      document.getElementById('party-address').value = p.address || "";
+      document.getElementById('partyModal').classList.remove('hidden');
+    }
+
+    function deletePartyPrompt(partyId) {
+      const party = parties.find(p => p.id === partyId);
+      const name = party ? party.name : 'Party';
+      requirePin(() => {
+        parties = parties.filter(p => p.id !== partyId);
+        saveParties();
+        populatePartyDropdowns();
+        renderPartiesList();
+        showToast(`Party "${name}" deleted by Admin PIN.`, "info");
+      }, `Authorize Deletion of Party: ${name}`);
+    }
+
+    function handleSaveParty(event) {
+      event.preventDefault();
+      const editId = document.getElementById('edit-party-id').value;
+      const name = document.getElementById('party-name').value.trim();
+      const firm = document.getElementById('party-firm').value.trim();
+      const phone = document.getElementById('party-phone').value.trim();
+      const city = document.getElementById('party-city').value.trim();
+      const type = document.getElementById('party-type').value;
+      const address = document.getElementById('party-address').value.trim();
+
+      if (editId) {
+        const idx = parties.findIndex(p => p.id === editId);
+        if (idx !== -1) {
+          parties[idx] = { ...parties[idx], name, firm, phone, city, type, address };
+          saveParties();
+          showToast(`Party "${name}" updated successfully!`, "success");
+        }
+      } else {
+        const newParty = {
+          id: `pty_${Date.now()}`,
+          name,
+          firm,
+          phone,
+          city,
+          type,
+          address
+        };
+        parties.push(newParty);
+        saveParties();
+        showToast(`New party "${name}" registered!`, "success");
+      }
+
+      closePartyModal();
+      populatePartyDropdowns();
+      renderPartiesList();
+    }
+
+    /* ==========================================================
+       KPIS & EXPORT
+       ========================================================== */
+    function updateGlobalKPIs() {
+      const totalOrdersEl = document.getElementById('stat-total-orders');
+      const pendingOrdersEl = document.getElementById('stat-pending-orders');
+      const confirmedOrdersEl = document.getElementById('stat-confirmed-orders');
+      const totalPcsEl = document.getElementById('stat-total-pcs');
+
+      const totalCount = orders.length;
+      const pendingCount = orders.filter(o => o.status === 'Recorded' || o.status === 'Hold').length;
+      const confirmedCount = orders.filter(o => o.status === 'Confirmed').length;
+      const totalPcs = orders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+
+      if (totalOrdersEl) totalOrdersEl.textContent = totalCount;
+      if (pendingOrdersEl) pendingOrdersEl.textContent = pendingCount;
+      if (confirmedOrdersEl) confirmedOrdersEl.textContent = confirmedCount;
+      if (totalPcsEl) totalPcsEl.textContent = totalPcs.toLocaleString();
+    }
+
+    function exportOrdersToCSV() {
+      if (orders.length === 0) {
+        showToast("No orders available to export.", "warning");
+        return;
+      }
+
+      let csv = "Order ID,Order Date,Salesperson,Party Name,Party Phone,City,Status,Party PO Ref,Delivery Site,Category,Fitting Item,Brand,Size,Pressure/Kg/Class,Length,Quantity,Unit,Line Remarks\n";
+
+      orders.forEach(o => {
+        o.items.forEach(it => {
+          const row = [
+            o.id,
+            o.orderDate || "",
+            `"${(o.salesperson || "").replace(/"/g, '""')}"`,
+            `"${(o.partyName || "").replace(/"/g, '""')}"`,
+            `"${o.partyPhone || ""}"`,
+            `"${o.partyCity || ""}"`,
+            o.status || "",
+            `"${(o.partyRef || "").replace(/"/g, '""')}"`,
+            `"${(o.deliverySite || "").replace(/"/g, '""')}"`,
+            `"${it.category}"`,
+            `"${(it.itemName || "").replace(/"/g, '""')}"`,
+            `"${it.brand}"`,
+            `"${it.size}"`,
+            `"${it.specClass}"`,
+            `"${it.length}"`,
+            it.qty,
+            `"${it.unit}"`,
+            `"${(it.remarks || "").replace(/"/g, '""')}"`
+          ];
+          csv += row.join(",") + "\n";
+        });
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Airen_Pipe_Orders_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Airen Pipe orders CSV exported successfully!", "success");
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let bg = "bg-slate-900 text-white";
+      let icon = `<svg class="w-4 h-4 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+      if (type === "success") {
+        bg = "bg-emerald-900 text-emerald-50 border border-emerald-700";
+        icon = `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+      } else if (type === "warning" || type === "error") {
+        bg = "bg-red-900 text-red-50 border border-red-700";
+        icon = `<svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+      }
+
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs font-medium flex items-center space-x-2.5 transition-all duration-300 pointer-events-auto max-w-xs`;
+      toast.innerHTML = `${icon}<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    window.onload = function() {
+      initDataStore();
+      populatePartyDropdowns();
+      renderOrdersList();
+      resetOrderForm();
+      updateGlobalKPIs();
+    };
+  </script>
+</body>
+</html>
