@@ -346,8 +346,12 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <button type="button" onclick="openProductModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded-lg border border-indigo-200 transition-colors font-bold flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                <span>+ Add Product</span>
+              </button>
               <button type="button" onclick="insertQuickPreset('agri_fittings')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2.5 py-1.5 rounded-lg border border-emerald-300 transition-colors font-semibold">
-                🌾 + Agri & Irrigation Pack
+                🌾 + Agri Pack
               </button>
               <button type="button" onclick="insertQuickPreset('cpvc_fittings')" class="text-xs bg-red-50 hover:bg-red-100 text-red-700 px-2.5 py-1.5 rounded-lg border border-red-200 transition-colors font-medium">
                 ⚡ + CPVC Pack
@@ -391,9 +395,15 @@
               <span>Total Line Items: <strong id="summary-total-lines" class="text-slate-900 font-bold">0</strong></span>
               <span>Total Pieces/Units: <strong id="summary-total-qty" class="text-brand-700 font-bold text-sm">0</strong></span>
             </div>
-            <button type="button" onclick="addOrderItemRow()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
-              <span>+ Add another pipe or fitting specification</span>
-            </button>
+            <div class="flex items-center space-x-3">
+              <button type="button" onclick="openProductModal()" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 flex items-center space-x-1">
+                <span>+ Need a product not in list? Add here</span>
+              </button>
+              <span class="text-slate-300">|</span>
+              <button type="button" onclick="addOrderItemRow()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
+                <span>+ Add another row</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -438,6 +448,10 @@
             <h2 class="text-lg font-bold text-slate-900">Airen Pipe & Complete Fittings Reference</h2>
             <p class="text-xs text-slate-500">Industry-standard catalog for Agri/Irrigation (kg/cm²), CPVC, UPVC, and SWR drainage systems.</p>
           </div>
+          <button onclick="openProductModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+            <span>+ Add New Product</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
@@ -505,20 +519,12 @@
     <div id="view-settings" class="tab-view hidden space-y-6">
       <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
         <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+          <div class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           </div>
           <div>
-            <h2 class="text-base font-bold text-slate-900">Airen Pipe Owner PIN Protection</h2>
-            <p class="text-xs text-slate-500">Protects your database so staff members cannot delete orders, delete parties, or reset data.</p>
-          </div>
-        </div>
-
-        <div class="bg-emerald-50/70 border border-emerald-200 p-4 rounded-xl flex items-start space-x-3 text-xs text-emerald-950">
-          <svg class="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <div>
-            <p class="font-bold">Default Master PIN is: <span class="font-mono bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded text-sm tracking-widest font-black">1234</span></p>
-            <p class="text-[11px] text-emerald-800 mt-1">Staff can freely punch orders, but deleting records requires this PIN.</p>
+            <h2 class="text-base font-bold text-slate-900">Airen Pipe Owner Security PIN</h2>
+            <p class="text-xs text-slate-500">Protects database against unauthorized deletions of orders and parties.</p>
           </div>
         </div>
 
@@ -566,14 +572,51 @@
     </div>
   </main>
 
+  <div id="productModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-900 text-base flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+          <span>Add New Product / Fitting Spec</span>
+        </h3>
+        <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form id="productForm" onsubmit="handleSaveCustomProduct(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Category <span class="text-red-500">*</span></label>
+          <select id="new-prod-category" required class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-slate-800">
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Product / Pipe / Fitting Name <span class="text-red-500">*</span></label>
+          <input type="text" id="new-prod-name" required placeholder="e.g. CPVC Concealed Valve / Agri Bend 63mm" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <p class="text-[11px] text-slate-500 mt-1">This item will permanently appear in the order dropdown for this category.</p>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-colors">
+            Save Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-xs w-full p-5 border border-slate-200 text-center space-y-4">
-      <div class="w-12 h-12 mx-auto bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+      <div class="w-12 h-12 mx-auto bg-slate-100 text-slate-700 rounded-full flex items-center justify-center">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
       <div>
-        <h3 class="font-bold text-slate-900 text-base" id="pin-modal-action-title">Enter Airen Pipe PIN</h3>
-        <p class="text-xs text-slate-500 mt-0.5">This action is protected. Enter master PIN to continue.</p>
+        <h3 class="font-bold text-slate-900 text-base" id="pin-modal-action-title">Owner Authorization Required</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Enter Master PIN to confirm this action.</p>
       </div>
 
       <input type="password" id="pin-input-field" maxlength="8" placeholder="••••" class="w-32 mx-auto text-center tracking-widest text-lg font-bold py-2 bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-brand-500 focus:outline-none">
@@ -582,8 +625,8 @@
         <button onclick="cancelPinModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
           Cancel
         </button>
-        <button onclick="confirmPinModal()" class="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl">
-          Unlock
+        <button onclick="confirmPinModal()" class="px-5 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl">
+          Authorize
         </button>
       </div>
     </div>
@@ -806,139 +849,137 @@
   {"id": "pty_035", "name": "GAURAV ENTERPEISES", "firm": "GAURAV ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ANNPA1853D1ZI", "address": "28 behind hotel palace shop no 1 babal sai complex shahjahnabad bhopal", "type": "Registered Dealer"},
   {"id": "pty_036", "name": "GAYATREE TRADING COMPANY", "firm": "GAYATREE TRADING COMPANY", "phone": "", "city": "Bhopal", "gst": "23ABOPM6445L1Z7", "address": "7 JK BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
   {"id": "pty_037", "name": "GOURAV AGRO TECH", "firm": "GOURAV AGRO TECH", "phone": "", "city": "Bhopal", "gst": "23APKPV1693R1ZX", "address": "0 ASHTA INDORE BHOPAL ROAD ASHTA", "type": "Registered Dealer"},
-  {"id": "pty_038", "name": "GRASIM INDUATRY C/O GULAB CHAND SAHU", "firm": "GRASIM INDUATRY C/O GULAB CHAND SAHU", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
-  {"id": "pty_039", "name": "GRASIM INDUSTRIES C/O SIMARIYA TRADERS", "firm": "GRASIM INDUSTRIES C/O SIMARIYA TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
-  {"id": "pty_040", "name": "GRASIM INDUSTRIES LIMITED", "firm": "GRASIM INDUSTRIES LIMITED", "phone": "", "city": "", "gst": "29AAACG4464B1ZU", "address": "GRASIM INDUSTRIES LIMITED  P.B.ROAD KUMARAPATNAM", "type": "Registered Dealer"},
-  {"id": "pty_041", "name": "GRASIM INDUSTRY C/O CHOUKSEY  TRADERS", "firm": "GRASIM INDUSTRY C/O CHOUKSEY  TRADERS", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
-  {"id": "pty_042", "name": "GUPTA HARDWARE AND PAINTS", "firm": "GUPTA HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23FAVPS3981Q1ZE", "address": "ASHOK VIHAR COLONY H.NO. 222 HATAIKHEDA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_043", "name": "GURU NANAK PRABANDHAN COMMITTEE", "firm": "GURU NANAK PRABANDHAN COMMITTEE", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Hamidia Road Bhopal", "type": "Unregistered (URP)"},
-  {"id": "pty_044", "name": "HARI OM TRADERS", "firm": "HARI OM TRADERS", "phone": "", "city": "", "gst": "23AAGPL0257Q1ZI", "address": "shop no 58 railway  station road bairagarh", "type": "Registered Dealer"},
-  {"id": "pty_045", "name": "HEMADRI INFRASTRUCTURE", "firm": "HEMADRI INFRASTRUCTURE", "phone": "", "city": "Bhopal", "gst": "23AAMFH8955K1ZS", "address": "INDRAPURI C-61 INDRAPURI BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_046", "name": "HIND CHEMICAL", "firm": "HIND CHEMICAL", "phone": "", "city": "Bhopal", "gst": "23ADLPT4284B1ZJ", "address": "SHOP NO 02 ALARK ARCADE DATA COLONY, AIR PORT ROAD BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_047", "name": "HOME ENTERPRISES", "firm": "HOME ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AUDPP0256E1Z2", "address": "Bhawna Nagar Plot No.-1, Shop No.-07-08 Vikas Kunj Society, Near Tanatan Dhaba Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_048", "name": "JAIN ENTERPRISES", "firm": "JAIN ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFTPJ7113B2ZQ", "address": "146 b ashoka garden bhopal", "type": "Registered Dealer"},
-  {"id": "pty_049", "name": "JAIN TRADERS", "firm": "JAIN TRADERS", "phone": "", "city": "Bhopal", "gst": "23AEIPJ1356C1Z1", "address": "1/1  BUS STAND GANDHI NAGAR  Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"},
-  {"id": "pty_050", "name": "JOHAR HARDWARE", "firm": "JOHAR HARDWARE", "phone": "", "city": "Sironj", "gst": "23BFJPJ5812A1Z0", "address": "WARD NO 06 SIRONJ  TALAIYA Sironj", "type": "Registered Dealer"},
-  {"id": "pty_051", "name": "JP SONS", "firm": "JP SONS", "phone": "", "city": "Bhopal", "gst": "23ALRPM6831B1Z6", "address": "SHOP NO. 10  PATWA MARKET BHARAT TALKIES  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_052", "name": "JYOTI ENTERPRISES", "firm": "JYOTI ENTERPRISES", "phone": "", "city": "", "gst": "23AVQPV0733L1Z4", "address": "811 AYODHYA BY PASS ROAD G SECTOR AYODHYA NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_053", "name": "KHANDELWAL ELECTRICALS", "firm": "KHANDELWAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23ASDPK1661L1ZT", "address": "MAIN ROAD BHOPAL INDORE ROAD KHAJURI SADAK KHAJURI  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_054", "name": "KHANDELWAL TRADERS", "firm": "KHANDELWAL TRADERS", "phone": "", "city": "Raisen", "gst": "23EOQPK1785A1ZY", "address": "25 GRAM DEEWANGANJ BHAWANI CHOWK RAISEN DEEWANGANJ", "type": "Registered Dealer"},
-  {"id": "pty_055", "name": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "firm": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "phone": "", "city": "Indore", "gst": "23AAACK7078B2ZT", "address": "8 TH FLOOR APARTMENT NO. 801 AND 802 BRILLIANT SAPPHIRE PLOT NO. 10, PSP, IDA SCHEME NO. 78, PART II INDORE", "type": "Registered Dealer"},
-  {"id": "pty_056", "name": "KRITI INDUSTRIES (INDIA) LTD.", "firm": "KRITI INDUSTRIES (INDIA) LTD.", "phone": "", "city": "Indore", "gst": "23AAACK7078B1ZU", "address": "8th  FLOOR APARTMENT 801-802 BRILLIANT SAPPHIRE PLOT NO.10, PSP,IDA SCHMEM NO 78, PART -II INDORE", "type": "Registered Dealer"},
-  {"id": "pty_057", "name": "KUSHWAHA TRADERS", "firm": "KUSHWAHA TRADERS", "phone": "", "city": "Govindpura", "gst": "23APXPK8696L1ZQ", "address": "30c semra road govindpura shubhash colony", "type": "Registered Dealer"},
-  {"id": "pty_058", "name": "LAXMI INDUSTRIES", "firm": "LAXMI INDUSTRIES", "phone": "", "city": "", "gst": "23DDBPG5788N1Z3", "address": "0 GRAM MANKAPUR MAHGANWA KALAN Silwani", "type": "Registered Dealer"},
-  {"id": "pty_059", "name": "M/S AGRAWAL TRADERS", "firm": "M/S AGRAWAL TRADERS", "phone": "", "city": "Berasia", "gst": "23ACSPA6696E1ZF", "address": "AGRAWAL TRADERS TAHKUR COMPLEX BERASIA ROAD PIPAL CHORAHA KAROND", "type": "Registered Dealer"},
-  {"id": "pty_060", "name": "M/S ANKUR TRADERS", "firm": "M/S ANKUR TRADERS", "phone": "", "city": "Bhopal", "gst": "23AMXPJ9866G1ZA", "address": "00 WORD NO.13 BHOPAL SAGAR ROAD NANDANI NAGAR GAIRATGANJ", "type": "Registered Dealer"},
-  {"id": "pty_061", "name": "M/S BALKRISHNA BANSAL", "firm": "M/S BALKRISHNA BANSAL", "phone": "", "city": "", "gst": "23ACBPB7900R1ZN", "address": "0  NEAR KHAR NALA M.S. ROAD SABALGARH", "type": "Registered Dealer"},
-  {"id": "pty_062", "name": "M/S CHINTAMANI HARDWARE", "firm": "M/S CHINTAMANI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23AIIPJ1472D2ZO", "address": "00 BHOPAL SAGAR ROAD VIDISHA Raisen, Madhya Pradesh-464884 India", "type": "Registered Dealer"},
-  {"id": "pty_063", "name": "M/S G.S MACHINERY", "firm": "M/S G.S MACHINERY", "phone": "", "city": "Bhopal", "gst": "23AGZPR6997G1ZB", "address": "PUNJAB BOOT HOUSE KE UPAR 30 SHAH BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_064", "name": "M/S JEET HOMES", "firm": "M/S JEET HOMES", "phone": "", "city": "Bhopal", "gst": "23AAIFJ4506A3ZY", "address": "17  DURGA CHOUK, NARELA SHANKARI BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_065", "name": "M/S MEENA AGRO INDUSTRIES", "firm": "M/S MEENA AGRO INDUSTRIES", "phone": "", "city": "Bhopal", "gst": "23BQYPS2454K1Z4", "address": "01  BHOPAL ROAD RAISEN", "type": "Registered Dealer"},
-  {"id": "pty_066", "name": "M/S PRABHAT STORES", "firm": "M/S PRABHAT STORES", "phone": "", "city": "Berasia", "gst": "23ATMPP0154H1ZS", "address": "SHOP NO 08 MANDI COMPLEX BUS STAND BERASIA", "type": "Registered Dealer"},
-  {"id": "pty_067", "name": "MAA KARMA TRADERS", "firm": "MAA KARMA TRADERS", "phone": "", "city": "", "gst": "23DEBPS8018L1Z8", "address": "00 WD NO 10 00 BAMHORI TAH BAMHORI", "type": "Registered Dealer"},
-  {"id": "pty_068", "name": "MAA NAMAMI TRADERS", "firm": "MAA NAMAMI TRADERS", "phone": "", "city": "", "gst": "23ASAPL5864B1Z3", "address": "WORD NO 08  J J ROAD BRAMHA NAGAR UDAYPURA UDAYPURA", "type": "Registered Dealer"},
-  {"id": "pty_069", "name": "MAA VAISHNAVI ELECTRICALS", "firm": "MAA VAISHNAVI ELECTRICALS", "phone": "", "city": "Sehore", "gst": "Unregistered", "address": "SHYAMPUR CHANDBAD DIST SEHORE", "type": "Unregistered (URP)"},
-  {"id": "pty_070", "name": "MADHAV ENTERPRISES", "firm": "MADHAV ENTERPRISES", "phone": "", "city": "", "gst": "23BHQPS0236J1Z5", "address": "H. No. 338 Main Road Ahmadpur Ahmadpur", "type": "Registered Dealer"},
-  {"id": "pty_071", "name": "MAHAVIR ENTERPRISES", "firm": "MAHAVIR ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AHYPJ1616J2Z4", "address": "17 AREDI AYODHYA BY PASS ROAD Bhopal Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_072", "name": "MAMTA ELECTRICALS", "firm": "MAMTA ELECTRICALS", "phone": "", "city": "Narsinghgarh", "gst": "23AFUPC3578C1ZI", "address": "PAL ROAD  NARSINGHGARH NARSINGHGARH", "type": "Registered Dealer"},
-  {"id": "pty_073", "name": "MANAS TRADERS", "firm": "MANAS TRADERS", "phone": "", "city": "Bhopal", "gst": "23AYPPP8753N1ZH", "address": "01  Mubarakpura Choraha new indore by pass shati nagar bhopal bhopal  Sehore, Madhya Pradesh-462016 India", "type": "Registered Dealer"},
-  {"id": "pty_074", "name": "MANISHA ENTERPEISES", "firm": "MANISHA ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ADBPA8015H1Z7", "address": "SHOP NO 14 HAMIDIA ROAD BHOPAL TALKIES", "type": "Registered Dealer"},
-  {"id": "pty_075", "name": "MANISHA PUMPS AND PIPES", "firm": "MANISHA PUMPS AND PIPES", "phone": "", "city": "Bhopal", "gst": "23CQYPA7603P1ZA", "address": "SAI PARISAR PUNJABI BAGH H.NO 5B PUNJABI BAGH Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_076", "name": "MATESHWARI SANITARY", "firm": "MATESHWARI SANITARY", "phone": "", "city": "Bhopal", "gst": "23AQDPR9202N1ZL", "address": "INFRONT OF CANARA BANK WARD NO 26 194/1 NEELBAD TEH HUZUR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_077", "name": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "firm": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "", "gst": "23AAZPP4981G1Z1", "address": "SHOP No. 1-B SHAHPURA MANISHA MARKET SHAHPURA", "type": "Registered Dealer"},
-  {"id": "pty_078", "name": "MEGA DISTRIBUTER", "firm": "MEGA DISTRIBUTER", "phone": "", "city": "Bhopal", "gst": "23AEOPF2262H1ZQ", "address": "SEC F-22  INDUSTRIAL AREA GOVINDPURA BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_079", "name": "METER HOUSE & ELECTRICAL", "firm": "METER HOUSE & ELECTRICAL", "phone": "", "city": "Bhopal", "gst": "23ADBPK7430Q1ZD", "address": "SHOP NO.13 GURU DWARA LANE HAMIDIA ROAD BHOPAL Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_080", "name": "MINI KISAN SEWA KENDRA", "firm": "MINI KISAN SEWA KENDRA", "phone": "", "city": "", "gst": "23CJAPS1853E1ZH", "address": "KHASRA NO.410/3/1/1,  VILLAGE HATHODA GANJ BASODA", "type": "Registered Dealer"},
-  {"id": "pty_081", "name": "MIRACLE  BUILDCON", "firm": "MIRACLE  BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II MP NAGAR BHOPAL Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
-  {"id": "pty_082", "name": "MODI HOME DECOR", "firm": "MODI HOME DECOR", "phone": "", "city": "Bhopal", "gst": "23BDEPM9378R1ZM", "address": "GROUND FLOOR SHOP NO - 07, PLOT NO -40 MANDAKNI COLONY KOLAR ROAD Bhopal, Madhya Pradesh-462042 India", "type": "Registered Dealer"},
-  {"id": "pty_083", "name": "MODI TRADERS", "firm": "MODI TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACVPJ6070C1ZN", "address": "56 moditraders zone-2 mp nagar bhopal", "type": "Registered Dealer"},
-  {"id": "pty_084", "name": "MOHAMMAD TRADERS", "firm": "MOHAMMAD TRADERS", "phone": "", "city": "Shyampur", "gst": "23EPCPK4992A1Z3", "address": "0  MAIN ROAD BARKHEDA HASAN SHYAMPUR", "type": "Registered Dealer"},
-  {"id": "pty_085", "name": "MP HARDWARE", "firm": "MP HARDWARE", "phone": "", "city": "Bhopal", "gst": "23ACCPT3946J1ZE", "address": "29  zone 11 M P NAGAR BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
-  {"id": "pty_086", "name": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "firm": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "phone": "", "city": "Bhopal", "gst": "23BVRPJ3531L1ZC", "address": "SAINT THOMAS SCHOOL VIVER KE PASS SHOP NO. 3 HIG 397 AYODHYA NAGAR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_087", "name": "MUKEEM KHAN", "firm": "MUKEEM KHAN", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "SHYAMPUR", "type": "Unregistered (URP)"},
-  {"id": "pty_088", "name": "N.S TRADERS", "firm": "N.S TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Ashoka Garden Bhopal", "type": "Unregistered (URP)"},
-  {"id": "pty_089", "name": "NAINA HARDWARE", "firm": "NAINA HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CESPV7145D2Z3", "address": "SHOP NO 18 CHHOLA HANUMAN MANDIR COLONY CHHOLA ROAD Bhopal  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_090", "name": "NATRAJ UNITED LIMITED", "firm": "NATRAJ UNITED LIMITED", "phone": "", "city": "Indore", "gst": "Unregistered", "address": "INDORE", "type": "Unregistered (URP)"},
-  {"id": "pty_091", "name": "NeelamTraders", "firm": "NeelamTraders", "phone": "", "city": "Bhopal", "gst": "23ADGPJ4952P2Z5", "address": "NEARSANKALP NETRALAYA 106 M.P. NAGAR ZONE 2 BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_092", "name": "NEELESHWARI ENTERPRISE", "firm": "NEELESHWARI ENTERPRISE", "phone": "", "city": "Bhopal", "gst": "23ABFPM0382D2Z4", "address": "A-47, ALKAPURI HABIBGANJ BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_093", "name": "NEW  REASONABLE ELECTRICALS", "firm": "NEW  REASONABLE ELECTRICALS", "phone": "", "city": "Indore", "gst": "23AKSPD8612M1ZU", "address": "0 INDORE ROAD NASRULLANGANJ", "type": "Registered Dealer"},
-  {"id": "pty_094", "name": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "firm": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "Bhopal", "gst": "23DXKPR6077L1ZQ", "address": "VILLAGE PHANDA KALAN  POST PHANDA KALAN PHANDA BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_095", "name": "NIKHIL TTRADERS", "firm": "NIKHIL TTRADERS", "phone": "", "city": "Bhopal", "gst": "23BUQPD2642N1ZF", "address": "AMBIKA GRAH NIRMAN SOCIETY IN FRONT OF IPS SCHOOL SHOP NO. 01 A HOSHANGABAD ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_096", "name": "OCEANBLUE POLYPLAST", "firm": "OCEANBLUE POLYPLAST", "phone": "", "city": "Bhopal", "gst": "23AAIFO3207D1ZT", "address": "C 68  Opposite janta Quarter Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_097", "name": "OM TRADERS", "firm": "OM TRADERS", "phone": "", "city": "", "gst": "23GCVPS5739B1Z4", "address": "MITTAL PETROL PUMP WARD NO.15 Ubaidullahganj Main Road Ubaidullahganj", "type": "Registered Dealer"},
-  {"id": "pty_098", "name": "ONE SHOP HARDWARE & ELECTRICALS", "firm": "ONE SHOP HARDWARE & ELECTRICALS", "phone": "", "city": "Raisen", "gst": "23ATTPC4710H1ZW", "address": "NH-12 NEAR GP PALACE NH-12, GOHARGANJ ROAD OBAIDULLAGANJ  Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
-  {"id": "pty_099", "name": "PANKAJ PLASTO INDUSTRY", "firm": "PANKAJ PLASTO INDUSTRY", "phone": "", "city": "", "gst": "23ALDPG3408N2Z9", "address": "- VILL- KANSOR KALA,POST- BARKHEDA,TEHSIL- BIAORA Rajgarh", "type": "Registered Dealer"},
-  {"id": "pty_100", "name": "PATEL HARDWARE STORE", "firm": "PATEL HARDWARE STORE", "phone": "", "city": "", "gst": "23BEVPP7158G1ZX", "address": "1-2 TAGORE NAGAR KHAJURI KALA", "type": "Registered Dealer"},
-  {"id": "pty_101", "name": "PAYAL ELECTRICALS", "firm": "PAYAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23AWTPP6236A1ZI", "address": "MANHINDRA PALAZA 01 GULMOHAR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_102", "name": "PRACHI TRADERS", "firm": "PRACHI TRADERS", "phone": "", "city": "Bhopal", "gst": "23JKIPK1766E1Z4", "address": "H NO. 367 SECTOR-B  SHIV SHAKTI NAGAR Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_103", "name": "PRAKASH TRADERS", "firm": "PRAKASH TRADERS", "phone": "", "city": "", "gst": "23AYLPL3999A1ZA", "address": "Prakash Traders Near- H P Petrol Pump Main Road Banapura", "type": "Registered Dealer"},
-  {"id": "pty_104", "name": "PREMNARAYAN SHARMA", "firm": "PREMNARAYAN SHARMA", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_105", "name": "PRIME CLEANING SERVICES", "firm": "PRIME CLEANING SERVICES", "phone": "", "city": "", "gst": "09AANFP5691F1ZP", "address": "SECOND FLOOR GOVINDA BHAWAN 25 NAWAL KISHORE ROAD HAZRATGANJ", "type": "Registered Dealer"},
-  {"id": "pty_106", "name": "PRIYANSH TRADERS", "firm": "PRIYANSH TRADERS", "phone": "", "city": "Bhopal", "gst": "23AFIPJ4758H1ZD", "address": "56 zone-2 m p nagar Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
-  {"id": "pty_107", "name": "R M ENTERPRISES", "firm": "R M ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CGMPB1408H1ZW", "address": "SHOP NO.1 PLOT NO.36-D MAHARANA PRATAP NAGAR ZONE-2 BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_108", "name": "R.D TRADERS", "firm": "R.D TRADERS", "phone": "", "city": "Bhopal", "gst": "23FOWPS8643A1ZG", "address": "74 Raisen Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_109", "name": "R.S INTERNATIONAL", "firm": "R.S INTERNATIONAL", "phone": "", "city": "Bhopal", "gst": "23AYAPR1511M2ZL", "address": "PLOT NO 52 HOTEL TAJ  NEAR ALPANA TALKIES HAMIDIA ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_110", "name": "Radheshyam Ji", "firm": "Radheshyam Ji", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "Berasia", "type": "Unregistered (URP)"},
-  {"id": "pty_111", "name": "RAGHU TRADERS", "firm": "RAGHU TRADERS", "phone": "", "city": "Lateri", "gst": "23CZIPR5626Q1ZM", "address": "AMAAN SINGH RAGHUVANSHI  MADHUSUDAN GARH ROAD LATERI", "type": "Registered Dealer"},
-  {"id": "pty_112", "name": "RAI SHREE MACHINERY HOUSE", "firm": "RAI SHREE MACHINERY HOUSE", "phone": "", "city": "Bhopal", "gst": "23BDWPC9501N1Z5", "address": "SHOP NO 3 Hoshangabad Road IN FRONT OF SKODA SHOWROOM Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_113", "name": "RAJ ENTERPRISES", "firm": "RAJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23ADMPN3168P1ZY", "address": "MAGIT MARKET 5 BERASIA ROAD KAROD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_114", "name": "RAJDHANI ENTERPRISES", "firm": "RAJDHANI ENTERPRISES", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_115", "name": "RAJI ENTERPRISES", "firm": "RAJI ENTERPRISES", "phone": "", "city": "Vidisha", "gst": "23FPTPS9771F1Z0", "address": "0  Lateri Anandpur Bandipur Road Lateri  Vidisha, Madhya Pradesh-464114 India", "type": "Registered Dealer"},
-  {"id": "pty_116", "name": "RAJIV KIRANA STORES", "firm": "RAJIV KIRANA STORES", "phone": "", "city": "Raisen", "gst": "23CIQPR3656B1Z5", "address": "WARD NO 8  SHIKSHA BIBHAG COLONY RAISEN  Raisen, Madhya Pradesh-464551 India", "type": "Registered Dealer"},
-  {"id": "pty_117", "name": "RAJNEESH AGRAWAL", "firm": "RAJNEESH AGRAWAL", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "HAMIDIA ROAD BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_118", "name": "RAMA TRADERS", "firm": "RAMA TRADERS", "phone": "", "city": "", "gst": "23ADCPC2697Q1Z9", "address": "6 J.K BUILDING HAMIDIA ROAD", "type": "Registered Dealer"},
-  {"id": "pty_119", "name": "RAMESH PATHAK", "firm": "RAMESH PATHAK", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_120", "name": "RAMJI TRADERS", "firm": "RAMJI TRADERS", "phone": "", "city": "Goharganj", "gst": "Unregistered", "address": "GOHARGANJ", "type": "Unregistered (URP)"},
-  {"id": "pty_121", "name": "RATHORE GROUP C/O MUKESH RATHORE", "firm": "RATHORE GROUP C/O MUKESH RATHORE", "phone": "", "city": "", "gst": "Unregistered", "address": "20 IMAMI GATE MAIN ROAD", "type": "Unregistered (URP)"},
-  {"id": "pty_122", "name": "S A INFOTECH", "firm": "S A INFOTECH", "phone": "", "city": "Bhopal", "gst": "23ACRPS3067J1Z4", "address": "118  MALVIYA NAGAR BHOPAL Bhopal, Madhya Pradesh-462003 India", "type": "Registered Dealer"},
-  {"id": "pty_123", "name": "S.K. PIPIES", "firm": "S.K. PIPIES", "phone": "", "city": "Bhopal", "gst": "23BTRPM9060M1ZZ", "address": "PLOT NO 136 S.K.PIPES ACHARPURA INDUSTRIAL AREA BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_124", "name": "SAAVLI ENTERPRISES", "firm": "SAAVLI ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFWPM9249Q1Z9", "address": "BHOPAL TALKIES CHOURAHA 5 BERASIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_125", "name": "SACHIN HARDWARE STORE", "firm": "SACHIN HARDWARE STORE", "phone": "", "city": "Vidisha", "gst": "23ARCPG8041J1Z0", "address": "18 bus stand complex vidisha road, bustand berasia", "type": "Registered Dealer"},
-  {"id": "pty_126", "name": "SADGURU KRIPA TRADERS", "firm": "SADGURU KRIPA TRADERS", "phone": "", "city": "Raisen", "gst": "23ARUPG9176C1ZJ", "address": "WARD NO. 15  SAINKHEDA ROAD Silwani  Raisen, Madhya Pradesh-464886 India", "type": "Registered Dealer"},
-  {"id": "pty_127", "name": "SAHIL HARDWARE AND ELECTRICALS", "firm": "SAHIL HARDWARE AND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23EGIPS4281K1ZX", "address": "SHOP NO 3 PLOT NO 2 AND 5 RAJIV PALACE BDA COLONY AWADHPURI  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_128", "name": "SAI CONSTRICTIONS", "firm": "SAI CONSTRICTIONS", "phone": "", "city": "Indore", "gst": "23AACFS6772M1ZS", "address": "2 MANAS BHAWAN 215 11 RNT MARG INDORE", "type": "Registered Dealer"},
-  {"id": "pty_129", "name": "SAI NATH", "firm": "SAI NATH", "phone": "", "city": "Bhopal", "gst": "23AEWPC7953C2ZE", "address": "75 AHIRPURA CHURCH ROAD BHOPAL  Bhopal, Madhya Pradesh-462008 India", "type": "Registered Dealer"},
-  {"id": "pty_130", "name": "SANDHYA ENTERPRISES", "firm": "SANDHYA ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23DZFPR5351N1ZW", "address": "NEW SABJI MANDI, KAROND 01 80 FIT ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_131", "name": "SANJAY TRADERS", "firm": "SANJAY TRADERS", "phone": "", "city": "Dehgaon", "gst": "23BOCPK6173D1Z9", "address": "01  BAMHORI ROAD DEHGAON", "type": "Registered Dealer"},
-  {"id": "pty_132", "name": "SARAF ENTERPRISES", "firm": "SARAF ENTERPRISES", "phone": "", "city": "", "gst": "23AAZPJ7585J1ZU", "address": "14  hamidia road bal vihar ke samne", "type": "Registered Dealer"},
-  {"id": "pty_133", "name": "SATYAM TRADERS", "firm": "SATYAM TRADERS", "phone": "", "city": "", "gst": "23CNKPA9832P1ZJ", "address": "0 ward no 08 0 BANK OGF INDIA KE SAMNE KURAWAR", "type": "Registered Dealer"},
-  {"id": "pty_134", "name": "SATYENDRA VYAS", "firm": "SATYENDRA VYAS", "phone": "", "city": "", "gst": "Unregistered", "address": "BAGHSEVANIYA NEAR ASHIMA MALL", "type": "Unregistered (URP)"},
-  {"id": "pty_135", "name": "SHANTI HARDWARE", "firm": "SHANTI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CBYPP8983N1Z9", "address": "LEELA ARCADE PLOT NO. 335, SHOP NO. 1&2 SECTOR - E PHASE 2 Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_136", "name": "SHIV SHAKTI TRADERS", "firm": "SHIV SHAKTI TRADERS", "phone": "", "city": "Raisen", "gst": "23AUKPB0943K1ZU", "address": "OLD NH 12 UDAIPURA DIST. RAISEN (M.P)", "type": "Registered Dealer"},
-  {"id": "pty_137", "name": "SHIVAM TRADERS", "firm": "SHIVAM TRADERS", "phone": "", "city": "", "gst": "23BJUPL1911P1ZR", "address": "SHOP AT JHULELAL MARKET GANDHI NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_138", "name": "SHIVIKA TRADERS", "firm": "SHIVIKA TRADERS", "phone": "", "city": "", "gst": "23ACDPY9836H1Z4", "address": "SHOP NO. 7 PATWA MARKET NEAR BHARAT TALKIES", "type": "Registered Dealer"},
-  {"id": "pty_139", "name": "SHREE HARDWARE", "firm": "SHREE HARDWARE", "phone": "", "city": "Vidisha", "gst": "23AHTPJ2029G1ZG", "address": "29/1 VIDISHA ROAD BHANPUR", "type": "Registered Dealer"},
-  {"id": "pty_140", "name": "SHREE SHIVAAY HARDWARE", "firm": "SHREE SHIVAAY HARDWARE", "phone": "", "city": "Bhopal", "gst": "23BABPC9869F1ZQ", "address": "mahendra plaza E-8 36 & 37 Bawadiya Kalan Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_141", "name": "SHREE SHYAM TRADERS", "firm": "SHREE SHYAM TRADERS", "phone": "", "city": "Bhopal", "gst": "23CSFPM6553F1ZR", "address": "House No. 30 Transport Area New Itwara Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_142", "name": "SHRI  ADVERTISING AND MARKETING", "firm": "SHRI  ADVERTISING AND MARKETING", "phone": "", "city": "Bhopal", "gst": "23AKKPM9285H1ZP", "address": "B-48  GOVINDPURA BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
-  {"id": "pty_143", "name": "SHRI BALAJI MARKETING CO(MFG UNIT)", "firm": "SHRI BALAJI MARKETING CO(MFG UNIT)", "phone": "", "city": "", "gst": "23APDPM4839B1Z8", "address": "87/2  Tel Gali Corner, Siyaganj", "type": "Registered Dealer"},
-  {"id": "pty_144", "name": "SHRI SAINATH TRADERS", "firm": "SHRI SAINATH TRADERS", "phone": "", "city": "", "gst": "23BPUPS3323A1Z1", "address": "CHANDRIKA HOUSING SOCEITY PLOT NO . 88 SHOP NO. 1 R S NAGAR ROHIT NAGAR -1 BAWADIYAKALAN", "type": "Registered Dealer"},
-  {"id": "pty_145", "name": "SHRI SAROJ ENTERPRISES", "firm": "SHRI SAROJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CCPPS7555B1ZC", "address": "House no 279 Rohit Nagar Gram Nirman samiti Phase II shop No 2 Gram Bawadia kalan Ward no 52 Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_146", "name": "SHRI SHANKAR MACHINERY STORES", "firm": "SHRI SHANKAR MACHINERY STORES", "phone": "", "city": "Bhopal", "gst": "23AAUPA6758M1Z5", "address": "29/4 opposite bal vihar hamidia road bhopal", "type": "Registered Dealer"},
-  {"id": "pty_147", "name": "SHRI SHIV SAI TRADER", "firm": "SHRI SHIV SAI TRADER", "phone": "", "city": "Seoni Malwa", "gst": "23AYMPK2325G2ZN", "address": "01  RUNIVHA DHAM COLONY SEONI MALWA  Narmadapuram, Madhya Pradesh-461223 India", "type": "Registered Dealer"},
-  {"id": "pty_148", "name": "SIDDHI VINAYAK TRADERS", "firm": "SIDDHI VINAYAK TRADERS", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "KHAJURIA KALAN SHYAMPUR ROAD", "type": "Unregistered (URP)"},
-  {"id": "pty_149", "name": "SIMARIYA HARDWARE", "firm": "SIMARIYA HARDWARE", "phone": "", "city": "Raisen", "gst": "23BMOPS3691E1ZQ", "address": "00 00 00 NEAR UDAIPURA NAKA J J ROAD BARELI TAH BARELI  Raisen, Madhya Pradesh-464668 India", "type": "Registered Dealer"},
-  {"id": "pty_150", "name": "SINGH TRADERS", "firm": "SINGH TRADERS", "phone": "", "city": "Bhopal", "gst": "23ASUPS0024J1ZL", "address": "9- A  Awadhpuri Road Bhopal  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_151", "name": "SK ENTERPRISES", "firm": "SK ENTERPRISES", "phone": "", "city": "Sironj", "gst": "23ALNPJ1907H1ZA", "address": "RAVJI PURA 0 RAVJI PATH Sironj", "type": "Registered Dealer"},
-  {"id": "pty_152", "name": "SONAKSHI INTERPRISES", "firm": "SONAKSHI INTERPRISES", "phone": "", "city": "", "gst": "23EPBPS7456Q1Z2", "address": "Plot No - 68 Sewaniya Kanasaiya Bilkhiriya Khurd", "type": "Registered Dealer"},
-  {"id": "pty_153", "name": "SP ENTERPRISE", "firm": "SP ENTERPRISE", "phone": "7000512025", "city": "Bhopal", "gst": "23CAMPK5961L1Z8", "address": "H. NO. 211 VIJAY NAGAR NEAR VIJAY NAGAR SQUARE CHANDBAD , BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_154", "name": "SSK INTERIO", "firm": "SSK INTERIO", "phone": "", "city": "", "gst": "23ASJPV1911C1Z2", "address": "FIRST FLOOR PLOT NO 03  AYODHYA BY PASS ROAD SANTOSHI VIHAR", "type": "Registered Dealer"},
-  {"id": "pty_155", "name": "SUNIL TRADING COMPANY", "firm": "SUNIL TRADING COMPANY", "phone": "", "city": "", "gst": "Unregistered", "address": "MANGALWARA TRANSPORT NAGAR", "type": "Unregistered (URP)"},
-  {"id": "pty_156", "name": "SUSHILA INDUSTRY", "firm": "SUSHILA INDUSTRY", "phone": "", "city": "", "gst": "23AKPPK0844F1ZB", "address": "PLOT NO 37, INDUSTRIAL AREA RICHHAI RICHHAI RICHHAI JABALPUR", "type": "Registered Dealer"},
-  {"id": "pty_157", "name": "SWASTIK TRADERS", "firm": "SWASTIK TRADERS", "phone": "", "city": "Obaidullaganj", "gst": "23ADQPU6302A1ZS", "address": "Gokul Dham Ward No 01 PH No 08 Shop No A-03, A-04, Near NH -12 Main Road Obaidullaganj", "type": "Registered Dealer"},
-  {"id": "pty_158", "name": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "firm": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "phone": "", "city": "Bhopal", "gst": "23ABDCS5083N1ZZ", "address": "DELUX HIG 16 BHEEM KUNG  KOLAR ROAD BHOPAL  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_159", "name": "TARUN HARDWARE STORE", "firm": "TARUN HARDWARE STORE", "phone": "", "city": "", "gst": "23ACKPT2879E1ZB", "address": "PLOT NO 03  SANTOSHI VIHAR AYODHYA NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_160", "name": "UDAY HARDWEARE & ELECTRICALS", "firm": "UDAY HARDWEARE & ELECTRICALS", "phone": "", "city": "", "gst": "23ASBPD4059P1ZO", "address": "mayur vihar calony e 23 mayur vihar calony ashoka gaden ashoka gaden", "type": "Registered Dealer"},
-  {"id": "pty_161", "name": "VAIBHAV HARDWARE AND SPARE PARTS", "firm": "VAIBHAV HARDWARE AND SPARE PARTS", "phone": "", "city": "Bari", "gst": "23AHUPJ5139Q1ZL", "address": "main road 01 jj road bari", "type": "Registered Dealer"},
-  {"id": "pty_162", "name": "VAIBHAV TRADERS", "firm": "VAIBHAV TRADERS", "phone": "", "city": "Bhopal", "gst": "23AHWPJ0907E1ZI", "address": "VILLAGE- DEHGAON 01 SAGAR BHOPAL ROAD TEH- GAIRATGANJ DIST- RAISEN", "type": "Registered Dealer"},
-  {"id": "pty_163", "name": "VIKAS SANITARY PLAZA", "firm": "VIKAS SANITARY PLAZA", "phone": "", "city": "", "gst": "23AORPJ8767Q1ZT", "address": "FINE AVENUE COMPLEX SHOP NO.-4 KOLAR ROAD NAYAPURA", "type": "Registered Dealer"},
-  {"id": "pty_164", "name": "VINAYAK TRADERS", "firm": "VINAYAK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
-  {"id": "pty_165", "name": "WATERFLO PIPING SYSTEM", "firm": "WATERFLO PIPING SYSTEM", "phone": "", "city": "Bhopal", "gst": "23AABFW0415G1ZQ", "address": "BUILDING NO.4D, RAMESH MALIK SCIENTIFIC WAREHOUSING AND LOGISTICS COMPLEXS, GOVINDPURA INDUSTRIAL AREA, J.K.ROAD, BHOPAL  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_166", "name": "YAKSHA ENTERPRISES", "firm": "YAKSHA ENTERPRISES", "phone": "", "city": "", "gst": "23CIDPR3352M1Z2", "address": "Shop No 2 and 3 Ward No 1 Murti Wali Puliya Sultanpur", "type": "Registered Dealer"},
-  {"id": "pty_167", "name": "YASH ELECTRICAL", "firm": "YASH ELECTRICAL", "phone": "", "city": "Raisen", "gst": "23AYBPS8557R1ZI", "address": "GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
-  {"id": "pty_168", "name": "YASH HARDWAREAND ELECTRICALS", "firm": "YASH HARDWAREAND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "ANAND NAGAR BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_169", "name": "YASHODA CERAMICS", "firm": "YASHODA CERAMICS", "phone": "", "city": "Bhopal", "gst": "23BQHPP6954Q1ZZ", "address": "SHOP NO - 01 SAHYOG VIHAR HOUSING SOCIETY BAWADIYA KALAN Bhopal  Bhopal, Madhya Pradesh-462026 India", "type": "Registered Dealer"},
-  {"id": "pty_170", "name": "ZARA TRADERS", "firm": "ZARA TRADERS", "phone": "", "city": "Bhopal", "gst": "23BEDPH0336A1ZH", "address": "SHOP NO G-03 Vironika Khushi Heights Raja Bhoj Airport Road Bhopal Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"}
+  {"id": "pty_038", "name": "GRASIM INDUSTRIES LIMITED", "firm": "GRASIM INDUSTRIES LIMITED", "phone": "", "city": "", "gst": "29AAACG4464B1ZU", "address": "GRASIM INDUSTRIES LIMITED  P.B.ROAD KUMARAPATNAM", "type": "Registered Dealer"},
+  {"id": "pty_039", "name": "GUPTA HARDWARE AND PAINTS", "firm": "GUPTA HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23FAVPS3981Q1ZE", "address": "ASHOK VIHAR COLONY H.NO. 222 HATAIKHEDA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_040", "name": "GURU NANAK PRABANDHAN COMMITTEE", "firm": "GURU NANAK PRABANDHAN COMMITTEE", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Hamidia Road Bhopal", "type": "Unregistered (URP)"},
+  {"id": "pty_041", "name": "HARI OM TRADERS", "firm": "HARI OM TRADERS", "phone": "", "city": "", "gst": "23AAGPL0257Q1ZI", "address": "shop no 58 railway  station road bairagarh", "type": "Registered Dealer"},
+  {"id": "pty_042", "name": "HEMADRI INFRASTRUCTURE", "firm": "HEMADRI INFRASTRUCTURE", "phone": "", "city": "Bhopal", "gst": "23AAMFH8955K1ZS", "address": "INDRAPURI C-61 INDRAPURI BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_043", "name": "HIND CHEMICAL", "firm": "HIND CHEMICAL", "phone": "", "city": "Bhopal", "gst": "23ADLPT4284B1ZJ", "address": "SHOP NO 02 ALARK ARCADE DATA COLONY, AIR PORT ROAD BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
+  {"id": "pty_044", "name": "HOME ENTERPRISES", "firm": "HOME ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AUDPP0256E1Z2", "address": "Bhawna Nagar Plot No.-1, Shop No.-07-08 Vikas Kunj Society, Near Tanatan Dhaba Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_045", "name": "JAI MANGLANI", "firm": "JAI MANGLANI", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_046", "name": "JAIN ENTERPRISES", "firm": "JAIN ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFTPJ7113B2ZQ", "address": "146 b ashoka garden bhopal", "type": "Registered Dealer"},
+  {"id": "pty_047", "name": "JAIN TRADERS", "firm": "JAIN TRADERS", "phone": "", "city": "Bhopal", "gst": "23AEIPJ1356C1Z1", "address": "1/1  BUS STAND GANDHI NAGAR  Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"},
+  {"id": "pty_048", "name": "JOHAR HARDWARE", "firm": "JOHAR HARDWARE", "phone": "", "city": "Sironj", "gst": "23BFJPJ5812A1Z0", "address": "WARD NO 06 SIRONJ  TALAIYA Sironj", "type": "Registered Dealer"},
+  {"id": "pty_049", "name": "JP SONS", "firm": "JP SONS", "phone": "", "city": "Bhopal", "gst": "23ALRPM6831B1Z6", "address": "SHOP NO. 10  PATWA MARKET BHARAT TALKIES  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_050", "name": "JYOTI ENTERPRISES", "firm": "JYOTI ENTERPRISES", "phone": "", "city": "", "gst": "23AVQPV0733L1Z4", "address": "811 AYODHYA BY PASS ROAD G SECTOR AYODHYA NAGAR", "type": "Registered Dealer"},
+  {"id": "pty_051", "name": "KHANDELWAL ELECTRICALS", "firm": "KHANDELWAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23ASDPK1661L1ZT", "address": "MAIN ROAD BHOPAL INDORE ROAD KHAJURI SADAK KHAJURI  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
+  {"id": "pty_052", "name": "KHANDELWAL TRADERS", "firm": "KHANDELWAL TRADERS", "phone": "", "city": "Raisen", "gst": "23EOQPK1785A1ZY", "address": "25 GRAM DEEWANGANJ BHAWANI CHOWK RAISEN DEEWANGANJ", "type": "Registered Dealer"},
+  {"id": "pty_053", "name": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "firm": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "phone": "", "city": "Indore", "gst": "23AAACK7078B2ZT", "address": "8 TH FLOOR APARTMENT NO. 801 AND 802 BRILLIANT SAPPHIRE PLOT NO. 10, PSP, IDA SCHEME NO. 78, PART II INDORE", "type": "Registered Dealer"},
+  {"id": "pty_054", "name": "KRITI INDUSTRIES (INDIA) LTD.", "firm": "KRITI INDUSTRIES (INDIA) LTD.", "phone": "", "city": "Indore", "gst": "23AAACK7078B1ZU", "address": "8th  FLOOR APARTMENT 801-802 BRILLIANT SAPPHIRE PLOT NO.10, PSP,IDA SCHMEM NO 78, PART -II INDORE", "type": "Registered Dealer"},
+  {"id": "pty_055", "name": "KUSHWAHA TRADERS", "firm": "KUSHWAHA TRADERS", "phone": "", "city": "Govindpura", "gst": "23APXPK8696L1ZQ", "address": "30c semra road govindpura shubhash colony", "type": "Registered Dealer"},
+  {"id": "pty_056", "name": "LAXMI INDUSTRIES", "firm": "LAXMI INDUSTRIES", "phone": "", "city": "Silwani", "gst": "23DDBPG5788N1Z3", "address": "0 GRAM MANKAPUR MAHGANWA KALAN Silwani", "type": "Registered Dealer"},
+  {"id": "pty_057", "name": "M/S AGRAWAL TRADERS", "firm": "M/S AGRAWAL TRADERS", "phone": "", "city": "Berasia", "gst": "23ACSPA6696E1ZF", "address": "AGRAWAL TRADERS TAHKUR COMPLEX BERASIA ROAD PIPAL CHORAHA KAROND", "type": "Registered Dealer"},
+  {"id": "pty_058", "name": "M/S ANKUR TRADERS", "firm": "M/S ANKUR TRADERS", "phone": "", "city": "Bhopal", "gst": "23AMXPJ9866G1ZA", "address": "00 WORD NO.13 BHOPAL SAGAR ROAD NANDANI NAGAR GAIRATGANJ", "type": "Registered Dealer"},
+  {"id": "pty_059", "name": "M/S BALKRISHNA BANSAL", "firm": "M/S BALKRISHNA BANSAL", "phone": "", "city": "Sabalgarh", "gst": "23ACBPB7900R1ZN", "address": "0  NEAR KHAR NALA M.S. ROAD SABALGARH", "type": "Registered Dealer"},
+  {"id": "pty_060", "name": "M/S CHINTAMANI HARDWARE", "firm": "M/S CHINTAMANI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23AIIPJ1472D2ZO", "address": "00 BHOPAL SAGAR ROAD VIDISHA Raisen, Madhya Pradesh-464884 India", "type": "Registered Dealer"},
+  {"id": "pty_061", "name": "M/S G.S MACHINERY", "firm": "M/S G.S MACHINERY", "phone": "", "city": "Bhopal", "gst": "23AGZPR6997G1ZB", "address": "PUNJAB BOOT HOUSE KE UPAR 30 SHAH BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_062", "name": "M/S JEET HOMES", "firm": "M/S JEET HOMES", "phone": "", "city": "Bhopal", "gst": "23AAIFJ4506A3ZY", "address": "17  DURGA CHOUK, NARELA SHANKARI BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_063", "name": "M/S MEENA AGRO INDUSTRIES", "firm": "M/S MEENA AGRO INDUSTRIES", "phone": "", "city": "Bhopal", "gst": "23BQYPS2454K1Z4", "address": "01  BHOPAL ROAD RAISEN", "type": "Registered Dealer"},
+  {"id": "pty_064", "name": "M/S PRABHAT STORES", "firm": "M/S PRABHAT STORES", "phone": "", "city": "Berasia", "gst": "23ATMPP0154H1ZS", "address": "SHOP NO 08 MANDI COMPLEX BUS STAND BERASIA", "type": "Registered Dealer"},
+  {"id": "pty_065", "name": "MAA KARMA TRADERS", "firm": "MAA KARMA TRADERS", "phone": "", "city": "", "gst": "23DEBPS8018L1Z8", "address": "00 WD NO 10 00 BAMHORI TAH BAMHORI", "type": "Registered Dealer"},
+  {"id": "pty_066", "name": "MAA NAMAMI TRADERS", "firm": "MAA NAMAMI TRADERS", "phone": "", "city": "", "gst": "23ASAPL5864B1Z3", "address": "WORD NO 08  J J ROAD BRAMHA NAGAR UDAYPURA UDAYPURA", "type": "Registered Dealer"},
+  {"id": "pty_067", "name": "MAA VAISHNAVI ELECTRICALS", "firm": "MAA VAISHNAVI ELECTRICALS", "phone": "", "city": "Sehore", "gst": "Unregistered", "address": "SHYAMPUR CHANDBAD DIST SEHORE", "type": "Unregistered (URP)"},
+  {"id": "pty_068", "name": "MADHAV ENTERPRISES", "firm": "MADHAV ENTERPRISES", "phone": "", "city": "", "gst": "23BHQPS0236J1Z5", "address": "H. No. 338 Main Road Ahmadpur Ahmadpur", "type": "Registered Dealer"},
+  {"id": "pty_069", "name": "MAHAVIR ENTERPRISES", "firm": "MAHAVIR ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AHYPJ1616J2Z4", "address": "17 AREDI AYODHYA BY PASS ROAD Bhopal Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_070", "name": "MAMTA ELECTRICALS", "firm": "MAMTA ELECTRICALS", "phone": "", "city": "Narsinghgarh", "gst": "23AFUPC3578C1ZI", "address": "PAL ROAD  NARSINGHGARH NARSINGHGARH", "type": "Registered Dealer"},
+  {"id": "pty_071", "name": "MANAS TRADERS", "firm": "MANAS TRADERS", "phone": "", "city": "Bhopal", "gst": "23AYPPP8753N1ZH", "address": "01  Mubarakpura Choraha new indore by pass shati nagar bhopal bhopal  Sehore, Madhya Pradesh-462016 India", "type": "Registered Dealer"},
+  {"id": "pty_072", "name": "MANISHA ENTERPEISES", "firm": "MANISHA ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ADBPA8015H1Z7", "address": "SHOP NO 14 HAMIDIA ROAD BHOPAL TALKIES", "type": "Registered Dealer"},
+  {"id": "pty_073", "name": "MANISHA PUMPS AND PIPES", "firm": "MANISHA PUMPS AND PIPES", "phone": "", "city": "Bhopal", "gst": "23CQYPA7603P1ZA", "address": "SAI PARISAR PUNJABI BAGH H.NO 5B PUNJABI BAGH Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_074", "name": "MATESHWARI SANITARY", "firm": "MATESHWARI SANITARY", "phone": "", "city": "Bhopal", "gst": "23AQDPR9202N1ZL", "address": "INFRONT OF CANARA BANK WARD NO 26 194/1 NEELBAD TEH HUZUR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_075", "name": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "firm": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "", "gst": "23AAZPP4981G1Z1", "address": "SHOP No. 1-B SHAHPURA MANISHA MARKET SHAHPURA", "type": "Registered Dealer"},
+  {"id": "pty_076", "name": "MEGA DISTRIBUTER", "firm": "MEGA DISTRIBUTER", "phone": "", "city": "Bhopal", "gst": "23AEOPF2262H1ZQ", "address": "SEC F-22  INDUSTRIAL AREA GOVINDPURA BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_077", "name": "METER HOUSE & ELECTRICAL", "firm": "METER HOUSE & ELECTRICAL", "phone": "", "city": "Bhopal", "gst": "23ADBPK7430Q1ZD", "address": "SHOP NO.13 GURU DWARA LANE HAMIDIA ROAD BHOPAL Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_078", "name": "MINI KISAN SEWA KENDRA", "firm": "MINI KISAN SEWA KENDRA", "phone": "", "city": "", "gst": "23CJAPS1853E1ZH", "address": "KHASRA NO.410/3/1/1,  VILLAGE HATHODA GANJ BASODA", "type": "Registered Dealer"},
+  {"id": "pty_079", "name": "MIRACLE  BUILDCON", "firm": "MIRACLE  BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II MP NAGAR BHOPAL Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
+  {"id": "pty_080", "name": "MODI HOME DECOR", "firm": "MODI HOME DECOR", "phone": "", "city": "Bhopal", "gst": "23BDEPM9378R1ZM", "address": "GROUND FLOOR SHOP NO - 07, PLOT NO -40 MANDAKNI COLONY KOLAR ROAD Bhopal, Madhya Pradesh-462042 India", "type": "Registered Dealer"},
+  {"id": "pty_081", "name": "MODI TRADERS", "firm": "MODI TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACVPJ6070C1ZN", "address": "56 moditraders zone-2 mp nagar bhopal", "type": "Registered Dealer"},
+  {"id": "pty_082", "name": "MOHAMMAD TRADERS", "firm": "MOHAMMAD TRADERS", "phone": "", "city": "Shyampur", "gst": "23EPCPK4992A1Z3", "address": "0  MAIN ROAD BARKHEDA HASAN SHYAMPUR", "type": "Registered Dealer"},
+  {"id": "pty_083", "name": "MP HARDWARE", "firm": "MP HARDWARE", "phone": "", "city": "Bhopal", "gst": "23ACCPT3946J1ZE", "address": "29  zone 11 M P NAGAR BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_084", "name": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "firm": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "phone": "", "city": "Bhopal", "gst": "23BVRPJ3531L1ZC", "address": "SAINT THOMAS SCHOOL VIVER KE PASS SHOP NO. 3 HIG 397 AYODHYA NAGAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_085", "name": "MUKEEM KHAN", "firm": "MUKEEM KHAN", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "SHYAMPUR", "type": "Unregistered (URP)"},
+  {"id": "pty_086", "name": "N.S TRADERS", "firm": "N.S TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Ashoka Garden Bhopal", "type": "Unregistered (URP)"},
+  {"id": "pty_087", "name": "NAINA HARDWARE", "firm": "NAINA HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CESPV7145D2Z3", "address": "SHOP NO 18 CHHOLA HANUMAN MANDIR COLONY CHHOLA ROAD Bhopal  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_088", "name": "NATRAJ UNITED LIMITED", "firm": "NATRAJ UNITED LIMITED", "phone": "", "city": "Indore", "gst": "Unregistered", "address": "INDORE", "type": "Unregistered (URP)"},
+  {"id": "pty_089", "name": "NeelamTraders", "firm": "NeelamTraders", "phone": "", "city": "Bhopal", "gst": "23ADGPJ4952P2Z5", "address": "NEARSANKALP NETRALAYA 106 M.P. NAGAR ZONE 2 BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_090", "name": "NEELESHWARI ENTERPRISE", "firm": "NEELESHWARI ENTERPRISE", "phone": "", "city": "Bhopal", "gst": "23ABFPM0382D2Z4", "address": "A-47, ALKAPURI HABIBGANJ BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_091", "name": "NEW  REASONABLE ELECTRICALS", "firm": "NEW  REASONABLE ELECTRICALS", "phone": "", "city": "Indore", "gst": "23AKSPD8612M1ZU", "address": "0 INDORE ROAD NASRULLANGANJ", "type": "Registered Dealer"},
+  {"id": "pty_092", "name": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "firm": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "Bhopal", "gst": "23DXKPR6077L1ZQ", "address": "VILLAGE PHANDA KALAN  POST PHANDA KALAN PHANDA BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
+  {"id": "pty_093", "name": "NIKHIL TTRADERS", "firm": "NIKHIL TTRADERS", "phone": "", "city": "Bhopal", "gst": "23BUQPD2642N1ZF", "address": "AMBIKA GRAH NIRMAN SOCIETY IN FRONT OF IPS SCHOOL SHOP NO. 01 A HOSHANGABAD ROAD Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_094", "name": "OCEANBLUE POLYPLAST", "firm": "OCEANBLUE POLYPLAST", "phone": "", "city": "Bhopal", "gst": "23AAIFO3207D1ZT", "address": "C 68  Opposite janta Quarter Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_095", "name": "OM TRADERS", "firm": "OM TRADERS", "phone": "", "city": "", "gst": "23GCVPS5739B1Z4", "address": "MITTAL PETROL PUMP WARD NO.15 Ubaidullahganj Main Road Ubaidullahganj", "type": "Registered Dealer"},
+  {"id": "pty_096", "name": "ONE SHOP HARDWARE & ELECTRICALS", "firm": "ONE SHOP HARDWARE & ELECTRICALS", "phone": "", "city": "Raisen", "gst": "23ATTPC4710H1ZW", "address": "NH-12 NEAR GP PALACE NH-12, GOHARGANJ ROAD OBAIDULLAGANJ  Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
+  {"id": "pty_097", "name": "PANKAJ PLASTO INDUSTRY", "firm": "PANKAJ PLASTO INDUSTRY", "phone": "", "city": "", "gst": "23ALDPG3408N2Z9", "address": "- VILL- KANSOR KALA,POST- BARKHEDA,TEHSIL- BIAORA Rajgarh", "type": "Registered Dealer"},
+  {"id": "pty_098", "name": "PATEL HARDWARE STORE", "firm": "PATEL HARDWARE STORE", "phone": "", "city": "", "gst": "23BEVPP7158G1ZX", "address": "1-2 TAGORE NAGAR KHAJURI KALA", "type": "Registered Dealer"},
+  {"id": "pty_099", "name": "PAYAL ELECTRICALS", "firm": "PAYAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23AWTPP6236A1ZI", "address": "MANHINDRA PALAZA 01 GULMOHAR BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_100", "name": "PRACHI TRADERS", "firm": "PRACHI TRADERS", "phone": "", "city": "Bhopal", "gst": "23JKIPK1766E1Z4", "address": "H NO. 367 SECTOR-B  SHIV SHAKTI NAGAR Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_101", "name": "PRAKASH TRADERS", "firm": "PRAKASH TRADERS", "phone": "", "city": "", "gst": "23AYLPL3999A1ZA", "address": "Prakash Traders Near- H P Petrol Pump Main Road Banapura", "type": "Registered Dealer"},
+  {"id": "pty_102", "name": "PREMNARAYAN SHARMA", "firm": "PREMNARAYAN SHARMA", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_103", "name": "PRIME CLEANING SERVICES", "firm": "PRIME CLEANING SERVICES", "phone": "", "city": "", "gst": "09AANFP5691F1ZP", "address": "SECOND FLOOR GOVINDA BHAWAN 25 NAWAL KISHORE ROAD HAZRATGANJ", "type": "Registered Dealer"},
+  {"id": "pty_104", "name": "PRIYANSH TRADERS", "firm": "PRIYANSH TRADERS", "phone": "", "city": "Bhopal", "gst": "23AFIPJ4758H1ZD", "address": "56 zone-2 m p nagar Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
+  {"id": "pty_105", "name": "R M ENTERPRISES", "firm": "R M ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CGMPB1408H1ZW", "address": "SHOP NO.1 PLOT NO.36-D MAHARANA PRATAP NAGAR ZONE-2 BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_106", "name": "R.D TRADERS", "firm": "R.D TRADERS", "phone": "", "city": "Bhopal", "gst": "23FOWPS8643A1ZG", "address": "74 Raisen Road Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_107", "name": "R.S INTERNATIONAL", "firm": "R.S INTERNATIONAL", "phone": "", "city": "Bhopal", "gst": "23AYAPR1511M2ZL", "address": "PLOT NO 52 HOTEL TAJ  NEAR ALPANA TALKIES HAMIDIA ROAD Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_108", "name": "Radheshyam Ji", "firm": "Radheshyam Ji", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "Berasia", "type": "Unregistered (URP)"},
+  {"id": "pty_109", "name": "RAGHU TRADERS", "firm": "RAGHU TRADERS", "phone": "", "city": "Lateri", "gst": "23CZIPR5626Q1ZM", "address": "AMAAN SINGH RAGHUVANSHI  MADHUSUDAN GARH ROAD LATERI", "type": "Registered Dealer"},
+  {"id": "pty_110", "name": "RAI SHREE MACHINERY HOUSE", "firm": "RAI SHREE MACHINERY HOUSE", "phone": "", "city": "Bhopal", "gst": "23BDWPC9501N1Z5", "address": "SHOP NO 3 Hoshangabad Road IN FRONT OF SKODA SHOWROOM Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_111", "name": "RAJ ENTERPRISES", "firm": "RAJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23ADMPN3168P1ZY", "address": "MAGIT MARKET 5 BERASIA ROAD KAROD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_112", "name": "RAJDHANI ENTERPRISES", "firm": "RAJDHANI ENTERPRISES", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_113", "name": "RAJI ENTERPRISES", "firm": "RAJI ENTERPRISES", "phone": "", "city": "Vidisha", "gst": "23FPTPS9771F1Z0", "address": "0  Lateri Anandpur Bandipur Road Lateri  Vidisha, Madhya Pradesh-464114 India", "type": "Registered Dealer"},
+  {"id": "pty_114", "name": "RAJIV KIRANA STORES", "firm": "RAJIV KIRANA STORES", "phone": "", "city": "Raisen", "gst": "23CIQPR3656B1Z5", "address": "WARD NO 8  SHIKSHA BIBHAG COLONY RAISEN  Raisen, Madhya Pradesh-464551 India", "type": "Registered Dealer"},
+  {"id": "pty_115", "name": "RAJNEESH AGRAWAL", "firm": "RAJNEESH AGRAWAL", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "HAMIDIA ROAD BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_116", "name": "RAMA TRADERS", "firm": "RAMA TRADERS", "phone": "", "city": "", "gst": "23ADCPC2697Q1Z9", "address": "6 J.K BUILDING HAMIDIA ROAD", "type": "Registered Dealer"},
+  {"id": "pty_117", "name": "RAMESH PATHAK", "firm": "RAMESH PATHAK", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
+  {"id": "pty_118", "name": "RAMJI TRADERS", "firm": "RAMJI TRADERS", "phone": "", "city": "Goharganj", "gst": "Unregistered", "address": "GOHARGANJ", "type": "Unregistered (URP)"},
+  {"id": "pty_119", "name": "RATHORE GROUP C/O MUKESH RATHORE", "firm": "RATHORE GROUP C/O MUKESH RATHORE", "phone": "", "city": "", "gst": "Unregistered", "address": "20 IMAMI GATE MAIN ROAD", "type": "Unregistered (URP)"},
+  {"id": "pty_120", "name": "S A INFOTECH", "firm": "S A INFOTECH", "phone": "", "city": "Bhopal", "gst": "23ACRPS3067J1Z4", "address": "118  MALVIYA NAGAR BHOPAL Bhopal, Madhya Pradesh-462003 India", "type": "Registered Dealer"},
+  {"id": "pty_121", "name": "S.K. PIPIES", "firm": "S.K. PIPIES", "phone": "", "city": "Bhopal", "gst": "23BTRPM9060M1ZZ", "address": "PLOT NO 136 S.K.PIPES ACHARPURA INDUSTRIAL AREA BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_122", "name": "SAAVLI ENTERPRISES", "firm": "SAAVLI ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFWPM9249Q1Z9", "address": "BHOPAL TALKIES CHOURAHA 5 BERASIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_123", "name": "SACHIN HARDWARE STORE", "firm": "SACHIN HARDWARE STORE", "phone": "", "city": "Vidisha", "gst": "23ARCPG8041J1Z0", "address": "18 bus stand complex vidisha road, bustand berasia", "type": "Registered Dealer"},
+  {"id": "pty_124", "name": "SADGURU KRIPA TRADERS", "firm": "SADGURU KRIPA TRADERS", "phone": "", "city": "Raisen", "gst": "23ARUPG9176C1ZJ", "address": "WARD NO. 15  SAINKHEDA ROAD Silwani  Raisen, Madhya Pradesh-464886 India", "type": "Registered Dealer"},
+  {"id": "pty_125", "name": "SAHIL HARDWARE AND ELECTRICALS", "firm": "SAHIL HARDWARE AND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23EGIPS4281K1ZX", "address": "SHOP NO 3 PLOT NO 2 AND 5 RAJIV PALACE BDA COLONY AWADHPURI  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_126", "name": "SAI CONSTRICTIONS", "firm": "SAI CONSTRICTIONS", "phone": "", "city": "Indore", "gst": "23AACFS6772M1ZS", "address": "2 MANAS BHAWAN 215 11 RNT MARG INDORE", "type": "Registered Dealer"},
+  {"id": "pty_127", "name": "SAI NATH", "firm": "SAI NATH", "phone": "", "city": "Bhopal", "gst": "23AEWPC7953C2ZE", "address": "75 AHIRPURA CHURCH ROAD BHOPAL  Bhopal, Madhya Pradesh-462008 India", "type": "Registered Dealer"},
+  {"id": "pty_128", "name": "SANDHYA ENTERPRISES", "firm": "SANDHYA ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23DZFPR5351N1ZW", "address": "NEW SABJI MANDI, KAROND 01 80 FIT ROAD Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_129", "name": "SANJAY TRADERS", "firm": "SANJAY TRADERS", "phone": "", "city": "Dehgaon", "gst": "23BOCPK6173D1Z9", "address": "01  BAMHORI ROAD DEHGAON", "type": "Registered Dealer"},
+  {"id": "pty_130", "name": "SARAF ENTERPRISES", "firm": "SARAF ENTERPRISES", "phone": "", "city": "", "gst": "23AAZPJ7585J1ZU", "address": "14  hamidia road bal vihar ke samne", "type": "Registered Dealer"},
+  {"id": "pty_131", "name": "SATYAM TRADERS", "firm": "SATYAM TRADERS", "phone": "", "city": "Kurawar", "gst": "23CNKPA9832P1ZJ", "address": "0 ward no 08 0 BANK OGF INDIA KE SAMNE KURAWAR", "type": "Registered Dealer"},
+  {"id": "pty_132", "name": "SATYENDRA VYAS", "firm": "SATYENDRA VYAS", "phone": "", "city": "", "gst": "Unregistered", "address": "BAGHSEVANIYA NEAR ASHIMA MALL", "type": "Unregistered (URP)"},
+  {"id": "pty_133", "name": "SHANTI HARDWARE", "firm": "SHANTI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CBYPP8983N1Z9", "address": "LEELA ARCADE PLOT NO. 335, SHOP NO. 1&2 SECTOR - E PHASE 2 Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_134", "name": "SHIV SHAKTI TRADERS", "firm": "SHIV SHAKTI TRADERS", "phone": "", "city": "Raisen", "gst": "23AUKPB0943K1ZU", "address": "OLD NH 12 UDAIPURA DIST. RAISEN (M.P)", "type": "Registered Dealer"},
+  {"id": "pty_135", "name": "SHIVAM TRADERS", "firm": "SHIVAM TRADERS", "phone": "", "city": "", "gst": "23BJUPL1911P1ZR", "address": "SHOP AT JHULELAL MARKET GANDHI NAGAR", "type": "Registered Dealer"},
+  {"id": "pty_136", "name": "SHIVIKA TRADERS", "firm": "SHIVIKA TRADERS", "phone": "", "city": "", "gst": "23ACDPY9836H1Z4", "address": "SHOP NO. 7 PATWA MARKET NEAR BHARAT TALKIES", "type": "Registered Dealer"},
+  {"id": "pty_137", "name": "SHREE HARDWARE", "firm": "SHREE HARDWARE", "phone": "", "city": "Vidisha", "gst": "23AHTPJ2029G1ZG", "address": "29/1 VIDISHA ROAD BHANPUR", "type": "Registered Dealer"},
+  {"id": "pty_138", "name": "SHREE SHIVAAY HARDWARE", "firm": "SHREE SHIVAAY HARDWARE", "phone": "", "city": "Bhopal", "gst": "23BABPC9869F1ZQ", "address": "mahendra plaza E-8 36 & 37 Bawadiya Kalan Road Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_139", "name": "SHREE SHYAM TRADERS", "firm": "SHREE SHYAM TRADERS", "phone": "", "city": "Bhopal", "gst": "23CSFPM6553F1ZR", "address": "House No. 30 Transport Area New Itwara Road Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_140", "name": "SHRI  ADVERTISING AND MARKETING", "firm": "SHRI  ADVERTISING AND MARKETING", "phone": "", "city": "Bhopal", "gst": "23AKKPM9285H1ZP", "address": "B-48  GOVINDPURA BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
+  {"id": "pty_141", "name": "SHRI BALAJI MARKETING CO(MFG UNIT)", "firm": "SHRI BALAJI MARKETING CO(MFG UNIT)", "phone": "", "city": "", "gst": "23APDPM4839B1Z8", "address": "87/2  Tel Gali Corner, Siyaganj", "type": "Registered Dealer"},
+  {"id": "pty_142", "name": "SHRI SAINATH TRADERS", "firm": "SHRI SAINATH TRADERS", "phone": "", "city": "", "gst": "23BPUPS3323A1Z1", "address": "CHANDRIKA HOUSING SOCEITY PLOT NO . 88 SHOP NO. 1 R S NAGAR ROHIT NAGAR -1 BAWADIYAKALAN", "type": "Registered Dealer"},
+  {"id": "pty_143", "name": "SHRI SAROJ ENTERPRISES", "firm": "SHRI SAROJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CCPPS7555B1ZC", "address": "House no 279 Rohit Nagar Gram Nirman samiti Phase II shop No 2 Gram Bawadia kalan Ward no 52 Bhopal", "type": "Registered Dealer"},
+  {"id": "pty_144", "name": "SHRI SHANKAR MACHINERY STORES", "firm": "SHRI SHANKAR MACHINERY STORES", "phone": "", "city": "Bhopal", "gst": "23AAUPA6758M1Z5", "address": "29/4 opposite bal vihar hamidia road bhopal", "type": "Registered Dealer"},
+  {"id": "pty_145", "name": "SHRI SHIV SAI TRADER", "firm": "SHRI SHIV SAI TRADER", "phone": "", "city": "Seoni Malwa", "gst": "23AYMPK2325G2ZN", "address": "01  RUNIVHA DHAM COLONY SEONI MALWA  Narmadapuram, Madhya Pradesh-461223 India", "type": "Registered Dealer"},
+  {"id": "pty_146", "name": "SIDDHI VINAYAK TRADERS", "firm": "SIDDHI VINAYAK TRADERS", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "KHAJURIA KALAN SHYAMPUR ROAD", "type": "Unregistered (URP)"},
+  {"id": "pty_147", "name": "SIMARIYA HARDWARE", "firm": "SIMARIYA HARDWARE", "phone": "", "city": "Raisen", "gst": "23BMOPS3691E1ZQ", "address": "00 00 00 NEAR UDAIPURA NAKA J J ROAD BARELI TAH BARELI  Raisen, Madhya Pradesh-464668 India", "type": "Registered Dealer"},
+  {"id": "pty_148", "name": "SINGH TRADERS", "firm": "SINGH TRADERS", "phone": "", "city": "Bhopal", "gst": "23ASUPS0024J1ZL", "address": "9- A  Awadhpuri Road Bhopal  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_150", "name": "SK ENTERPRISES", "firm": "SK ENTERPRISES", "phone": "", "city": "Sironj", "gst": "23ALNPJ1907H1ZA", "address": "RAVJI PURA 0 RAVJI PATH Sironj", "type": "Registered Dealer"},
+  {"id": "pty_151", "name": "SONAKSHI INTERPRISES", "firm": "SONAKSHI INTERPRISES", "phone": "", "city": "", "gst": "23EPBPS7456Q1Z2", "address": "Plot No - 68 Sewaniya Kanasaiya Bilkhiriya Khurd", "type": "Registered Dealer"},
+  {"id": "pty_152", "name": "SP ENTERPRISE", "firm": "SP ENTERPRISE", "phone": "7000512025", "city": "Bhopal", "gst": "23CAMPK5961L1Z8", "address": "H. NO. 211 VIJAY NAGAR NEAR VIJAY NAGAR SQUARE CHANDBAD , BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_153", "name": "SSK INTERIO", "firm": "SSK INTERIO", "phone": "", "city": "", "gst": "23ASJPV1911C1Z2", "address": "FIRST FLOOR PLOT NO 03  AYODHYA BY PASS ROAD SANTOSHI VIHAR", "type": "Registered Dealer"},
+  {"id": "pty_154", "name": "SUNIL TRADING COMPANY", "firm": "SUNIL TRADING COMPANY", "phone": "", "city": "", "gst": "Unregistered", "address": "MANGALWARA TRANSPORT NAGAR", "type": "Unregistered (URP)"},
+  {"id": "pty_155", "name": "SUSHILA INDUSTRY", "firm": "SUSHILA INDUSTRY", "phone": "", "city": "", "gst": "23AKPPK0844F1ZB", "address": "PLOT NO 37, INDUSTRIAL AREA RICHHAI RICHHAI RICHHAI JABALPUR", "type": "Registered Dealer"},
+  {"id": "pty_156", "name": "SWASTIK TRADERS", "firm": "SWASTIK TRADERS", "phone": "", "city": "Obaidullaganj", "gst": "23ADQPU6302A1ZS", "address": "Gokul Dham Ward No 01 PH No 08 Shop No A-03, A-04, Near NH -12 Main Road Obaidullaganj", "type": "Registered Dealer"},
+  {"id": "pty_157", "name": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "firm": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "phone": "", "city": "Bhopal", "gst": "23ABDCS5083N1ZZ", "address": "DELUX HIG 16 BHEEM KUNG  KOLAR ROAD BHOPAL  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
+  {"id": "pty_158", "name": "TARUN HARDWARE STORE", "firm": "TARUN HARDWARE STORE", "phone": "", "city": "", "gst": "23ACKPT2879E1ZB", "address": "PLOT NO 03  SANTOSHI VIHAR AYODHYA NAGAR", "type": "Registered Dealer"},
+  {"id": "pty_159", "name": "UDAY HARDWEARE & ELECTRICALS", "firm": "UDAY HARDWEARE & ELECTRICALS", "phone": "", "city": "", "gst": "23ASBPD4059P1ZO", "address": "mayur vihar calony e 23 mayur vihar calony ashoka gaden ashoka gaden", "type": "Registered Dealer"},
+  {"id": "pty_160", "name": "VAIBHAV HARDWARE AND SPARE PARTS", "firm": "VAIBHAV HARDWARE AND SPARE PARTS", "phone": "", "city": "Bari", "gst": "23AHUPJ5139Q1ZL", "address": "main road 01 jj road bari", "type": "Registered Dealer"},
+  {"id": "pty_161", "name": "VAIBHAV TRADERS", "firm": "VAIBHAV TRADERS", "phone": "", "city": "Bhopal", "gst": "23AHWPJ0907E1ZI", "address": "VILLAGE- DEHGAON 01 SAGAR BHOPAL ROAD TEH- GAIRATGANJ DIST- RAISEN", "type": "Registered Dealer"},
+  {"id": "pty_162", "name": "VIKAS SANITARY PLAZA", "firm": "VIKAS SANITARY PLAZA", "phone": "", "city": "", "gst": "23AORPJ8767Q1ZT", "address": "FINE AVENUE COMPLEX SHOP NO.-4 KOLAR ROAD NAYAPURA", "type": "Registered Dealer"},
+  {"id": "pty_163", "name": "VINAYAK TRADERS", "firm": "VINAYAK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
+  {"id": "pty_164", "name": "WATERFLO PIPING SYSTEM", "firm": "WATERFLO PIPING SYSTEM", "phone": "", "city": "Bhopal", "gst": "23AABFW0415G1ZQ", "address": "BUILDING NO.4D, RAMESH MALIK SCIENTIFIC WAREHOUSING AND LOGISTICS COMPLEXS, GOVINDPURA INDUSTRIAL AREA, J.K.ROAD, BHOPAL  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
+  {"id": "pty_165", "name": "YAKSHA ENTERPRISES", "firm": "YAKSHA ENTERPRISES", "phone": "", "city": "", "gst": "23CIDPR3352M1Z2", "address": "Shop No 2 and 3 Ward No 1 Murti Wali Puliya Sultanpur", "type": "Registered Dealer"},
+  {"id": "pty_166", "name": "YASH ELECTRICAL", "firm": "YASH ELECTRICAL", "phone": "", "city": "Raisen", "gst": "23AYBPS8557R1ZI", "address": "GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
+  {"id": "pty_167", "name": "YASH HARDWAREAND ELECTRICALS", "firm": "YASH HARDWAREAND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "ANAND NAGAR BHOPAL", "type": "Unregistered (URP)"},
+  {"id": "pty_168", "name": "YASHODA CERAMICS", "firm": "YASHODA CERAMICS", "phone": "", "city": "Bhopal", "gst": "23BQHPP6954Q1ZZ", "address": "SHOP NO - 01 SAHYOG VIHAR HOUSING SOCIETY BAWADIYA KALAN Bhopal  Bhopal, Madhya Pradesh-462026 India", "type": "Registered Dealer"},
+  {"id": "pty_169", "name": "ZARA TRADERS", "firm": "ZARA TRADERS", "phone": "", "city": "Bhopal", "gst": "23BEDPH0336A1ZH", "address": "SHOP NO G-03 Vironika Khushi Heights Raja Bhoj Airport Road Bhopal Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"}
 ];
 
     const PIPE_CATEGORIES = [
@@ -956,7 +997,7 @@
       "General Hardware / Solvents"
     ];
 
-    const FITTINGS_CATALOG = {
+    const BASE_FITTINGS_CATALOG = {
       "PVC Agri / Irrigation Fittings": [
         "Agri Coupler / Socket (Fabricated / Molded)",
         "Agri Elbow 90°",
@@ -1078,6 +1119,25 @@
       "General Hardware / Solvents": ["Solvent Can", "Teflon Tape", "Rubber Washer", "Hacksaw Blade", "Clamp"]
     };
 
+    let FITTINGS_CATALOG = JSON.parse(JSON.stringify(BASE_FITTINGS_CATALOG));
+
+    function loadCustomProducts() {
+      try {
+        const customProds = JSON.parse(localStorage.getItem('airen_pipe_custom_products') || '{}');
+        for (const cat in customProds) {
+          if (!FITTINGS_CATALOG[cat]) {
+            FITTINGS_CATALOG[cat] = [];
+            if (!PIPE_CATEGORIES.includes(cat)) PIPE_CATEGORIES.push(cat);
+          }
+          customProds[cat].forEach(item => {
+            if (!FITTINGS_CATALOG[cat].includes(item)) {
+              FITTINGS_CATALOG[cat].unshift(item);
+            }
+          });
+        }
+      } catch(e) {}
+    }
+
     const PIPE_BRANDS = [
       "KASTA",
     ];
@@ -1166,10 +1226,15 @@
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v3_parties_167_clean";
+    const PARTIES_DATA_VERSION = "2026_v4_parties_167_pin1379";
 
     function getMasterPin() {
-      return localStorage.getItem('airen_pipe_master_pin') || "1234";
+      let pin = localStorage.getItem('airen_pipe_master_pin');
+      if (!pin || pin === "1234") {
+        pin = "1379";
+        localStorage.setItem('airen_pipe_master_pin', "1379");
+      }
+      return pin;
     }
 
     function setMasterPin(newPin) {
@@ -1228,8 +1293,65 @@
       showToast("Security PIN updated successfully!", "success");
     }
 
+    /* ==========================================================
+       CUSTOM PRODUCT MANAGEMENT
+       ========================================================== */
+    function openProductModal() {
+      const catSelect = document.getElementById('new-prod-category');
+      catSelect.innerHTML = PIPE_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+      document.getElementById('new-prod-name').value = "";
+      document.getElementById('productModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('new-prod-name').focus(), 100);
+    }
+
+    function closeProductModal() {
+      document.getElementById('productModal').classList.add('hidden');
+    }
+
+    function handleSaveCustomProduct(event) {
+      event.preventDefault();
+      const category = document.getElementById('new-prod-category').value;
+      const prodName = document.getElementById('new-prod-name').value.trim();
+
+      if (!prodName) {
+        showToast("Please enter product name.", "error");
+        return;
+      }
+
+      let customProds = {};
+      try {
+        customProds = JSON.parse(localStorage.getItem('airen_pipe_custom_products') || '{}');
+      } catch(e) { customProds = {}; }
+
+      if (!customProds[category]) customProds[category] = [];
+      if (!customProds[category].includes(prodName)) {
+        customProds[category].unshift(prodName);
+      }
+      localStorage.setItem('airen_pipe_custom_products', JSON.stringify(customProds));
+
+      loadCustomProducts();
+
+      // Add as a new row in current order with this product selected
+      addOrderItemRow({
+        category: category,
+        itemName: prodName,
+        brand: "Airen Pipe",
+        size: PIPE_SIZES[0],
+        specClass: "None",
+        length: category.includes('Fitting') ? "None / N.A. (Fittings)" : "6 Meters (20 ft)",
+        qty: 10,
+        unit: category.includes('Fitting') ? "Pcs (Pieces)" : "Lengths (Pipes)",
+        remarks: "Custom Added Item"
+      });
+
+      closeProductModal();
+      showToast(`Added "${prodName}" to ${category}!`, "success");
+    }
+
     function initDataStore() {
-      // Auto-load 167 fresh parties from new excel file
+      loadCustomProducts();
+      getMasterPin(); // Ensure default pin is migrated to 1379
+
       const savedVersion = localStorage.getItem('airen_parties_version');
       if (savedVersion !== PARTIES_DATA_VERSION) {
         parties = [...DEFAULT_PARTIES];
@@ -1261,7 +1383,6 @@
       const webhookEl = document.getElementById('google-webhook-url');
       if (webhookEl) webhookEl.value = webhook;
 
-      // Auto-load remembered salesperson on this phone
       const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
       const spSelect = document.getElementById('form-salesperson');
       if (spSelect && savedSalesperson) spSelect.value = savedSalesperson;
@@ -1625,7 +1746,6 @@
         return;
       }
 
-      // Remember Salesperson on this device
       localStorage.setItem('airen_pipe_default_salesperson', salesperson);
 
       if (!partyId) {
@@ -1738,7 +1858,6 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('form-order-date').value = today;
 
-      // Keep remembered salesperson
       const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
       if (savedSalesperson) document.getElementById('form-salesperson').value = savedSalesperson;
 
