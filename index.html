@@ -1245,7 +1245,7 @@
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v5_parties_167_gst_autofetch";
+    const PARTIES_DATA_VERSION = "2026_v5_clean167_pin1379_gstfetch";
 
     function getMasterPin() {
       let pin = localStorage.getItem('airen_pipe_master_pin');
@@ -1320,7 +1320,6 @@
       const statusEl = document.getElementById('gst-fetch-status');
       if (gstin.length === 15) {
         statusEl.innerHTML = `<span class="text-brand-600 font-medium">✓ 15-digit GSTIN ready. Click "Auto-Fetch" or check match.</span>`;
-        // Check if existing in local database
         const local = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
         if (local) {
           statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Record matched: ${local.name}</span>`;
@@ -1344,7 +1343,7 @@
         return;
       }
 
-      // Step 1: Instant match in local database (0.01 sec)
+      // Step 1: Match in 167 verified local records (Instant)
       const localMatch = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
       if (localMatch) {
         document.getElementById('party-name').value = localMatch.name;
@@ -1356,7 +1355,7 @@
         return;
       }
 
-      // Step 2: Query Live GST Server via Apps Script
+      // Step 2: Query Live GST via Google Apps Script
       label.textContent = "Fetching...";
       btn.disabled = true;
       statusEl.innerHTML = `<span class="text-brand-600 animate-pulse font-medium">Connecting to GST server for address...</span>`;
@@ -1369,7 +1368,6 @@
         btn.disabled = false;
       };
 
-      // Set timeout
       const timer = setTimeout(() => {
         cleanup();
         statusEl.innerHTML = `<span class="text-amber-700">Online server busy. State auto-detected. Fill shop name manually.</span>`;
@@ -1789,7 +1787,6 @@
         );
       });
 
-      // If user typed 15 chars resembling a new GSTIN not in list, show quick add prompt
       if (gstPrompt) {
         if (q.length === 15 && filtered.length === 0) {
           gstPrompt.classList.remove('hidden');
@@ -2259,6 +2256,7 @@
         orders = orders.filter(o => o.id !== orderId);
         saveOrders();
         renderOrdersList();
+        syncOrderToGoogleSheet({ id: orderId, action: "delete" });
         showToast(`Order #${orderId} deleted by Admin PIN.`, "info");
       }, `Authorize Deletion of Order #${orderId}`);
     }
@@ -2411,7 +2409,6 @@
         saveParties();
         showToast(`Party "${name}" registered successfully!`, "success");
         
-        // If on order punching screen, select this newly registered party automatically
         const formPartySelect = document.getElementById('form-party-id');
         if (formPartySelect) {
           populatePartyDropdowns();
