@@ -300,7 +300,7 @@
               <div id="quick-gst-add-prompt" class="hidden mb-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between">
                 <span class="text-[11px] text-indigo-900 font-medium">New GST Number detected!</span>
                 <button type="button" onclick="quickOpenGstModal()" class="text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded-md shadow-xs">
-                  + Auto-Fetch Details
+                  + Register from GST
                 </button>
               </div>
               <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
@@ -761,29 +761,39 @@
       <div class="flex justify-between items-center pb-3 border-b border-slate-100">
         <div>
           <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">Type 15-digit GSTIN to auto-fetch details from records.</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">15-digit GSTIN parses State & Entity Type automatically.</p>
         </div>
         <button onclick="closePartyModal()" class="text-slate-400 hover:text-slate-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
       </div>
 
-      <form id="partyForm" onsubmit="handleSaveParty(event)" class="space-y-3.5">
+      <form id="partyForm" onsubmit="handleSaveParty(event)" class="space-y-3">
         <input type="hidden" id="edit-party-id" value="">
         
         <div>
           <label class="block text-xs font-bold text-brand-800 uppercase mb-1 flex items-center justify-between">
             <span>GST Number (GSTIN)</span>
-            <span class="text-[10px] text-slate-400 lowercase font-normal">(optional for URP)</span>
+            <span class="text-[10px] text-slate-400 lowercase font-normal">(Leave blank if URP)</span>
           </label>
           <div class="flex gap-2">
             <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
-            <button type="button" id="btn-fetch-gst" onclick="fetchAddressFromGST()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              <span id="fetch-gst-btn-label">Auto-Fetch</span>
+            <button type="button" onclick="openOfficialGstPortal()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Copies GST Number and opens official government search portal">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              <span>Verify Portal</span>
             </button>
           </div>
-          <span id="gst-fetch-status" class="text-[11px] text-slate-500 mt-1 block"></span>
+          <div id="gst-parsed-badge" class="hidden mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200 text-[11px] leading-relaxed text-slate-700"></div>
+        </div>
+
+        <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-200/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] font-bold text-indigo-950 flex items-center gap-1">
+              <span>📋 Smart Auto-Fill from GST Portal</span>
+            </span>
+            <span class="text-[10px] text-indigo-600 font-medium">Auto-Extracts name & address</span>
+          </div>
+          <input type="text" id="gst-smart-paste" oninput="handleSmartGstPaste(this.value)" placeholder="Paste copied GST result text here to auto-fill..." class="w-full px-3 py-1.5 text-xs bg-white border border-indigo-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800">
         </div>
 
         <div>
@@ -1239,13 +1249,13 @@
     ];
 
     /* ==========================================================
-       STORAGE, PIN SECURITY & AUTO-SYNC
+       STORAGE & MASTER PIN 1379
        ========================================================== */
     let parties = [];
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v5_clean167_pin1379_gstfetch";
+    const PARTIES_DATA_VERSION = "2026_v6_clean167_pin1379_smart_portal";
 
     function getMasterPin() {
       let pin = localStorage.getItem('airen_pipe_master_pin');
@@ -1313,95 +1323,152 @@
     }
 
     /* ==========================================================
-       AUTOMATIC GST ADDRESS FETCHING LOGIC
+       SMART GST PARSER & 1-CLICK VERIFICATION
        ========================================================== */
+    const GST_STATE_MAP = {
+      "01": "Jammu and Kashmir", "02": "Himachal Pradesh", "03": "Punjab", "04": "Chandigarh",
+      "05": "Uttarakhand", "06": "Haryana", "07": "Delhi", "08": "Rajasthan",
+      "09": "Uttar Pradesh", "10": "Bihar", "11": "Sikkim", "12": "Arunachal Pradesh",
+      "13": "Nagaland", "14": "Manipur", "15": "Mizoram", "16": "Tripura",
+      "17": "Meghalaya", "18": "Assam", "19": "West Bengal", "20": "Jharkhand",
+      "21": "Odisha", "22": "Chhattisgarh", "23": "Madhya Pradesh", "24": "Gujarat",
+      "27": "Maharashtra", "29": "Karnataka", "30": "Goa", "32": "Kerala",
+      "33": "Tamil Nadu", "36": "Telangana", "37": "Andhra Pradesh"
+    };
+
+    const GST_ENTITY_MAP = {
+      'P': 'Individual / Proprietorship',
+      'C': 'Company / Pvt Ltd / Ltd',
+      'F': 'Partnership Firm / LLP',
+      'H': 'HUF (Hindu Undivided Family)',
+      'A': 'AOP (Association of Persons)',
+      'T': 'Trust',
+      'B': 'BOI (Body of Individuals)',
+      'G': 'Government Agency',
+      'J': 'Artificial Juridical Person',
+      'L': 'Local Authority'
+    };
+
+    function parseGstin(gstin) {
+      gstin = (gstin || "").trim().toUpperCase();
+      if (gstin.length < 2) return null;
+      const stateCode = gstin.substring(0, 2);
+      const stateName = GST_STATE_MAP[stateCode] || "Other State";
+      let pan = "";
+      let entityType = "";
+      if (gstin.length >= 12) {
+        pan = gstin.substring(2, 12);
+        const entityChar = gstin.charAt(5);
+        entityType = GST_ENTITY_MAP[entityChar] || "Business Entity";
+      }
+      return { gstin, stateCode, stateName, pan, entityType };
+    }
+
     function handleGstinInput(val) {
       const gstin = (val || "").trim().toUpperCase();
-      const statusEl = document.getElementById('gst-fetch-status');
-      if (gstin.length === 15) {
-        statusEl.innerHTML = `<span class="text-brand-600 font-medium">✓ 15-digit GSTIN ready. Click "Auto-Fetch" or check match.</span>`;
-        const local = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
-        if (local) {
-          statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Record matched: ${local.name}</span>`;
-          fetchAddressFromGST();
+      const badgeEl = document.getElementById('gst-parsed-badge');
+      
+      if (!gstin || gstin.length < 2) {
+        badgeEl.classList.add('hidden');
+        return;
+      }
+
+      // Check if matches 167 verified local records
+      const local = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
+      if (local) {
+        document.getElementById('party-name').value = local.name;
+        document.getElementById('party-city').value = local.city || "";
+        document.getElementById('party-address').value = local.address || "";
+        if (local.phone) document.getElementById('party-phone').value = local.phone;
+        badgeEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Matched in 167 Verified Dealers: ${local.name}</span>`;
+        badgeEl.classList.remove('hidden');
+        showToast(`✓ Auto-filled: ${local.name}`, "success");
+        return;
+      }
+
+      const info = parseGstin(gstin);
+      if (info) {
+        let text = `📍 <strong>State:</strong> ${info.stateName} (${info.stateCode})`;
+        if (info.pan) text += ` | <strong>PAN:</strong> ${info.pan}`;
+        if (info.entityType) text += ` | <strong>Type:</strong> ${info.entityType}`;
+
+        badgeEl.innerHTML = text;
+        badgeEl.classList.remove('hidden');
+
+        // Auto-fill state if city is empty
+        const cityInput = document.getElementById('party-city');
+        if (!cityInput.value) {
+          cityInput.value = info.stateName;
         }
       } else {
-        statusEl.textContent = "";
+        badgeEl.classList.add('hidden');
       }
     }
 
-    function fetchAddressFromGST() {
-      const gstinInput = document.getElementById('party-gst');
-      const gstin = gstinInput.value.trim().toUpperCase();
-      const btn = document.getElementById('btn-fetch-gst');
-      const label = document.getElementById('fetch-gst-btn-label');
-      const statusEl = document.getElementById('gst-fetch-status');
-
-      if (!gstin || gstin.length !== 15) {
-        showToast("Please enter a valid 15-character GSTIN.", "warning");
-        gstinInput.focus();
+    function openOfficialGstPortal() {
+      const gstin = document.getElementById('party-gst').value.trim().toUpperCase();
+      if (!gstin) {
+        showToast("Please enter 15-digit GSTIN first.", "warning");
+        document.getElementById('party-gst').focus();
         return;
       }
 
-      // Step 1: Match in 167 verified local records (Instant)
-      const localMatch = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
-      if (localMatch) {
-        document.getElementById('party-name').value = localMatch.name;
-        document.getElementById('party-city').value = localMatch.city || "";
-        document.getElementById('party-address').value = localMatch.address || "";
-        if (localMatch.phone) document.getElementById('party-phone').value = localMatch.phone;
-        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Auto-filled from verified records!</span>`;
-        showToast(`✓ Auto-filled: ${localMatch.name}`, "success");
-        return;
+      // Copy to clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(gstin);
+      }
+      showToast(`GSTIN ${gstin} copied to clipboard! Opening GST portal...`, "info");
+
+      // Open official portal
+      window.open("[https://services.gst.gov.in/services/searchtp](https://services.gst.gov.in/services/searchtp)", "_blank");
+    }
+
+    function handleSmartGstPaste(val) {
+      if (!val || val.length < 10) return;
+
+      let tradeName = "";
+      let legalName = "";
+      let address = "";
+      let city = "";
+
+      const tradeMatch = val.match(/Trade Name\s*[:\-]?\s*([^\n\r]+)/i);
+      if (tradeMatch && tradeMatch[1]) tradeName = tradeMatch[1].trim();
+
+      const legalMatch = val.match(/Legal Name(?: of Business)?\s*[:\-]?\s*([^\n\r]+)/i);
+      if (legalMatch && legalMatch[1]) legalName = legalMatch[1].trim();
+
+      const addrMatch = val.match(/Principal Place of Business\s*[:\-]?\s*([^\n\r]+(?:[\n\r]+[^\n\r:]+)*)/i);
+      if (addrMatch && addrMatch[1]) {
+        address = addrMatch[1].trim().replace(/[\r\n]+/g, ' ');
       }
 
-      // Step 2: Query Live GST via Google Apps Script
-      label.textContent = "Fetching...";
-      btn.disabled = true;
-      statusEl.innerHTML = `<span class="text-brand-600 animate-pulse font-medium">Connecting to GST server for address...</span>`;
+      const finalName = tradeName || legalName;
+      if (finalName) document.getElementById('party-name').value = finalName;
+      if (address) document.getElementById('party-address').value = address;
 
-      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
-      const callbackName = "gst_lookup_" + Date.now();
+      // Detect city from address or text
+      const knownCities = [
+        'Bhopal', 'Indore', 'Vidisha', 'Sehore', 'Raisen', 'Sironj', 'Obaidullaganj',
+        'Seoni Malwa', 'Seoni', 'Hoshangabad', 'Lateri', 'Udaipura', 'Doraha', 'Shivpuri',
+        'Dehgaon', 'Shyampur', 'Berasia', 'Narsinghgarh', 'Ashta', 'Nasrullaganj',
+        'Govindpura', 'Mandideep', 'Ahmedabad', 'Goharganj', 'Bareli', 'Bari', 'Pipariya',
+        'Itarsi', 'Begumganj', 'Silwani', 'Gairatganj', 'Sabalgarh', 'Kurawar', 'Dewanganj'
+      ];
 
-      const cleanup = () => {
-        label.textContent = "Auto-Fetch";
-        btn.disabled = false;
-      };
-
-      const timer = setTimeout(() => {
-        cleanup();
-        statusEl.innerHTML = `<span class="text-amber-700">Online server busy. State auto-detected. Fill shop name manually.</span>`;
-      }, 9000);
-
-      window[callbackName] = function(resp) {
-        clearTimeout(timer);
-        cleanup();
-        delete window[callbackName];
-        if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
-
-        if (resp && resp.success) {
-          if (resp.name) document.getElementById('party-name').value = resp.name;
-          if (resp.city) document.getElementById('party-city').value = resp.city;
-          if (resp.address) document.getElementById('party-address').value = resp.address;
-          statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Details fetched successfully from GST Portal!</span>`;
-          showToast(`✓ Fetched: ${resp.name}`, "success");
-        } else {
-          if (resp && resp.state) {
-            document.getElementById('party-city').value = resp.state;
-          }
-          statusEl.innerHTML = `<span class="text-slate-600">${resp && resp.message ? resp.message : "State detected. Please complete shop name."}</span>`;
-          showToast(resp && resp.message ? resp.message : "Online portal offline. Enter name manually.", "info");
+      for (const c of knownCities) {
+        const regex = new RegExp('\\b' + c + '\\b', 'i');
+        if (regex.test(address) || regex.test(val)) {
+          city = c;
+          break;
         }
-      };
+      }
 
-      const scriptEl = document.createElement('script');
-      scriptEl.src = `${webhookUrl}?action=fetch_gst&gstin=${encodeURIComponent(gstin)}&callback=${callbackName}`;
-      scriptEl.onerror = function() {
-        clearTimeout(timer);
-        cleanup();
-        statusEl.innerHTML = `<span class="text-amber-700">Could not reach GST script. Fill address manually.</span>`;
-      };
-      document.body.appendChild(scriptEl);
+      if (city) document.getElementById('party-city').value = city;
+
+      if (finalName || address) {
+        showToast("✓ Details auto-filled from pasted text!", "success");
+        document.getElementById('gst-smart-paste').value = "";
+      }
     }
 
     function quickOpenGstModal() {
@@ -1409,7 +1476,7 @@
       openPartyModal();
       if (searchVal && searchVal.length === 15) {
         document.getElementById('party-gst').value = searchVal;
-        fetchAddressFromGST();
+        handleGstinInput(searchVal);
       }
     }
 
@@ -1838,7 +1905,7 @@
     }
 
     /* ==========================================================
-       ORDER SAVE & LIVE GOOGLE SHEETS SYNC
+       ORDER SAVE & CENTRAL SHEET SYNC
        ========================================================== */
     async function syncOrderToGoogleSheet(order) {
       const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
@@ -2354,7 +2421,7 @@
       document.getElementById('partyForm').reset();
       document.getElementById('edit-party-id').value = "";
       document.getElementById('party-modal-title').textContent = "Register New Party";
-      document.getElementById('gst-fetch-status').textContent = "";
+      document.getElementById('gst-parsed-badge').classList.add('hidden');
       document.getElementById('partyModal').classList.remove('hidden');
       setTimeout(() => document.getElementById('party-gst').focus(), 100);
     }
@@ -2373,7 +2440,7 @@
       document.getElementById('party-phone').value = p.phone || "";
       document.getElementById('party-city').value = p.city || "";
       document.getElementById('party-address').value = p.address || "";
-      document.getElementById('gst-fetch-status').textContent = "";
+      document.getElementById('gst-parsed-badge').classList.add('hidden');
       document.getElementById('partyModal').classList.remove('hidden');
     }
 
