@@ -297,6 +297,12 @@
                 </button>
               </div>
               <input type="text" id="party-search-box" oninput="filterPartyDropdown(this.value)" placeholder="🔍 Type name / city / GST to filter..." class="w-full mb-1 px-3 py-1 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500">
+              <div id="quick-gst-add-prompt" class="hidden mb-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between">
+                <span class="text-[11px] text-indigo-900 font-medium">New GST Number detected!</span>
+                <button type="button" onclick="quickOpenGstModal()" class="text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded-md shadow-xs">
+                  + Auto-Fetch Details
+                </button>
+              </div>
               <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
                 <option value="">-- Select Party (167 Available) --</option>
               </select>
@@ -753,7 +759,10 @@
   <div id="partyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
       <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-        <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
+        <div>
+          <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">Type 15-digit GSTIN to auto-fetch details from records.</p>
+        </div>
         <button onclick="closePartyModal()" class="text-slate-400 hover:text-slate-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
@@ -763,13 +772,23 @@
         <input type="hidden" id="edit-party-id" value="">
         
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name <span class="text-red-500">*</span></label>
-          <input type="text" id="party-name" required placeholder="e.g. Balaji Hardware / Rajesh Traders" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <label class="block text-xs font-bold text-brand-800 uppercase mb-1 flex items-center justify-between">
+            <span>GST Number (GSTIN)</span>
+            <span class="text-[10px] text-slate-400 lowercase font-normal">(optional for URP)</span>
+          </label>
+          <div class="flex gap-2">
+            <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
+            <button type="button" id="btn-fetch-gst" onclick="fetchAddressFromGST()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <span id="fetch-gst-btn-label">Auto-Fetch</span>
+            </button>
+          </div>
+          <span id="gst-fetch-status" class="text-[11px] text-slate-500 mt-1 block"></span>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">GST Number (GSTIN)</label>
-          <input type="text" id="party-gst" maxlength="15" placeholder="e.g. 23AAAAA0000A1Z5 (Leave blank if URP)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase font-mono">
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name <span class="text-red-500">*</span></label>
+          <input type="text" id="party-name" required placeholder="e.g. Balaji Hardware / Rajesh Traders" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-semibold text-slate-900">
         </div>
 
         <div class="grid grid-cols-2 gap-2">
@@ -785,14 +804,14 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Address / Location Details</label>
-          <textarea id="party-address" rows="2" placeholder="Market, ward, landmark..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+          <textarea id="party-address" rows="2" placeholder="Market, ward, landmark, street..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none leading-relaxed"></textarea>
         </div>
 
         <div class="pt-2 flex justify-end space-x-2">
           <button type="button" onclick="closePartyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
             Cancel
           </button>
-          <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl">
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition-colors">
             Save Party
           </button>
         </div>
@@ -1226,7 +1245,7 @@
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v4_parties_167_pin1379";
+    const PARTIES_DATA_VERSION = "2026_v5_parties_167_gst_autofetch";
 
     function getMasterPin() {
       let pin = localStorage.getItem('airen_pipe_master_pin');
@@ -1294,6 +1313,109 @@
     }
 
     /* ==========================================================
+       AUTOMATIC GST ADDRESS FETCHING LOGIC
+       ========================================================== */
+    function handleGstinInput(val) {
+      const gstin = (val || "").trim().toUpperCase();
+      const statusEl = document.getElementById('gst-fetch-status');
+      if (gstin.length === 15) {
+        statusEl.innerHTML = `<span class="text-brand-600 font-medium">✓ 15-digit GSTIN ready. Click "Auto-Fetch" or check match.</span>`;
+        // Check if existing in local database
+        const local = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
+        if (local) {
+          statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Record matched: ${local.name}</span>`;
+          fetchAddressFromGST();
+        }
+      } else {
+        statusEl.textContent = "";
+      }
+    }
+
+    function fetchAddressFromGST() {
+      const gstinInput = document.getElementById('party-gst');
+      const gstin = gstinInput.value.trim().toUpperCase();
+      const btn = document.getElementById('btn-fetch-gst');
+      const label = document.getElementById('fetch-gst-btn-label');
+      const statusEl = document.getElementById('gst-fetch-status');
+
+      if (!gstin || gstin.length !== 15) {
+        showToast("Please enter a valid 15-character GSTIN.", "warning");
+        gstinInput.focus();
+        return;
+      }
+
+      // Step 1: Instant match in local database (0.01 sec)
+      const localMatch = parties.find(p => p.gst && p.gst.toUpperCase() === gstin);
+      if (localMatch) {
+        document.getElementById('party-name').value = localMatch.name;
+        document.getElementById('party-city').value = localMatch.city || "";
+        document.getElementById('party-address').value = localMatch.address || "";
+        if (localMatch.phone) document.getElementById('party-phone').value = localMatch.phone;
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Auto-filled from verified records!</span>`;
+        showToast(`✓ Auto-filled: ${localMatch.name}`, "success");
+        return;
+      }
+
+      // Step 2: Query Live GST Server via Apps Script
+      label.textContent = "Fetching...";
+      btn.disabled = true;
+      statusEl.innerHTML = `<span class="text-brand-600 animate-pulse font-medium">Connecting to GST server for address...</span>`;
+
+      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      const callbackName = "gst_lookup_" + Date.now();
+
+      const cleanup = () => {
+        label.textContent = "Auto-Fetch";
+        btn.disabled = false;
+      };
+
+      // Set timeout
+      const timer = setTimeout(() => {
+        cleanup();
+        statusEl.innerHTML = `<span class="text-amber-700">Online server busy. State auto-detected. Fill shop name manually.</span>`;
+      }, 9000);
+
+      window[callbackName] = function(resp) {
+        clearTimeout(timer);
+        cleanup();
+        delete window[callbackName];
+        if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+
+        if (resp && resp.success) {
+          if (resp.name) document.getElementById('party-name').value = resp.name;
+          if (resp.city) document.getElementById('party-city').value = resp.city;
+          if (resp.address) document.getElementById('party-address').value = resp.address;
+          statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Details fetched successfully from GST Portal!</span>`;
+          showToast(`✓ Fetched: ${resp.name}`, "success");
+        } else {
+          if (resp && resp.state) {
+            document.getElementById('party-city').value = resp.state;
+          }
+          statusEl.innerHTML = `<span class="text-slate-600">${resp && resp.message ? resp.message : "State detected. Please complete shop name."}</span>`;
+          showToast(resp && resp.message ? resp.message : "Online portal offline. Enter name manually.", "info");
+        }
+      };
+
+      const scriptEl = document.createElement('script');
+      scriptEl.src = `${webhookUrl}?action=fetch_gst&gstin=${encodeURIComponent(gstin)}&callback=${callbackName}`;
+      scriptEl.onerror = function() {
+        clearTimeout(timer);
+        cleanup();
+        statusEl.innerHTML = `<span class="text-amber-700">Could not reach GST script. Fill address manually.</span>`;
+      };
+      document.body.appendChild(scriptEl);
+    }
+
+    function quickOpenGstModal() {
+      const searchVal = document.getElementById('party-search-box').value.trim().toUpperCase();
+      openPartyModal();
+      if (searchVal && searchVal.length === 15) {
+        document.getElementById('party-gst').value = searchVal;
+        fetchAddressFromGST();
+      }
+    }
+
+    /* ==========================================================
        CUSTOM PRODUCT MANAGEMENT
        ========================================================== */
     function openProductModal() {
@@ -1331,7 +1453,6 @@
 
       loadCustomProducts();
 
-      // Add as a new row in current order with this product selected
       addOrderItemRow({
         category: category,
         itemName: prodName,
@@ -1350,7 +1471,7 @@
 
     function initDataStore() {
       loadCustomProducts();
-      getMasterPin(); // Ensure default pin is migrated to 1379
+      getMasterPin();
 
       const savedVersion = localStorage.getItem('airen_parties_version');
       if (savedVersion !== PARTIES_DATA_VERSION) {
@@ -1652,6 +1773,7 @@
     function filterPartyDropdown(query) {
       const select = document.getElementById('form-party-id');
       const filterSelect = document.getElementById('order-party-filter');
+      const gstPrompt = document.getElementById('quick-gst-add-prompt');
       const q = (query || "").toLowerCase().trim();
       const currentSelected = select.value;
 
@@ -1666,6 +1788,15 @@
           (p.address && p.address.toLowerCase().includes(q))
         );
       });
+
+      // If user typed 15 chars resembling a new GSTIN not in list, show quick add prompt
+      if (gstPrompt) {
+        if (q.length === 15 && filtered.length === 0) {
+          gstPrompt.classList.remove('hidden');
+        } else {
+          gstPrompt.classList.add('hidden');
+        }
+      }
 
       filtered.forEach(p => {
         const option = document.createElement('option');
@@ -1854,6 +1985,8 @@
       document.getElementById('save-order-btn-text').textContent = "Save & Record Order";
       document.getElementById('party-quick-info').classList.add('hidden');
       document.getElementById('party-search-box').value = "";
+      const gstPrompt = document.getElementById('quick-gst-add-prompt');
+      if (gstPrompt) gstPrompt.classList.add('hidden');
       
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('form-order-date').value = today;
@@ -2223,7 +2356,9 @@
       document.getElementById('partyForm').reset();
       document.getElementById('edit-party-id').value = "";
       document.getElementById('party-modal-title').textContent = "Register New Party";
+      document.getElementById('gst-fetch-status').textContent = "";
       document.getElementById('partyModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('party-gst').focus(), 100);
     }
 
     function closePartyModal() {
@@ -2240,6 +2375,7 @@
       document.getElementById('party-phone').value = p.phone || "";
       document.getElementById('party-city').value = p.city || "";
       document.getElementById('party-address').value = p.address || "";
+      document.getElementById('gst-fetch-status').textContent = "";
       document.getElementById('partyModal').classList.remove('hidden');
     }
 
@@ -2273,7 +2409,15 @@
         };
         parties.unshift(newParty);
         saveParties();
-        showToast(`Party "${name}" added!`, "success");
+        showToast(`Party "${name}" registered successfully!`, "success");
+        
+        // If on order punching screen, select this newly registered party automatically
+        const formPartySelect = document.getElementById('form-party-id');
+        if (formPartySelect) {
+          populatePartyDropdowns();
+          formPartySelect.value = newParty.id;
+          onPartySelected(newParty.id);
+        }
       }
 
       closePartyModal();
