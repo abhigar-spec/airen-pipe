@@ -219,6 +219,10 @@
         </div>
 
         <div class="flex items-center space-x-2">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders punched by all salespersons from Google Sheet">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>☁️ Sync All Orders</span>
+          </button>
           <button onclick="exportOrdersToCSV()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors flex items-center space-x-1.5" title="Export all orders to CSV">
             <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             <span>Export CSV</span>
@@ -2165,9 +2169,19 @@
           showToast(`Order #${editId} updated & synced!`, "success");
         }
       } else {
-        const timestamp = Date.now().toString().slice(-4);
-        const randomNum = Math.floor(100 + Math.random() * 900);
-        const newOrderId = `ORD-${timestamp}-${randomNum}`;
+        const prefixMap = {
+          "Sonam Jain": "SJ",
+          "Adil Beg": "AB",
+          "Ateeque Ahmed": "AA",
+          "Abhishek Agrawal": "AG",
+          "Office Counter": "OC"
+        };
+        const prefix = prefixMap[salesperson] || "ORD";
+        const spKey = `airen_seq_${prefix}`;
+        let currentSeq = parseInt(localStorage.getItem(spKey) || "1000", 10) + 1;
+        localStorage.setItem(spKey, currentSeq);
+        const newOrderId = `${prefix}-${currentSeq}`;
+
         const newOrder = {
           id: newOrderId,
           salesperson,
@@ -2637,6 +2651,34 @@
       if (totalPcsEl) totalPcsEl.textContent = totalPcs.toLocaleString();
     }
 
+    async function fetchOrdersFromCloud() {
+      requirePin(async () => {
+        const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+        const btn = document.getElementById('btn-cloud-sync');
+        if (btn) btn.innerHTML = `<span>⏳ Syncing...</span>`;
+
+        try {
+          const response = await fetch(webhookUrl);
+          const data = await response.json();
+          
+          if (data && data.orders) {
+            const localOnly = orders.filter(loc => !data.orders.some(rem => rem.id === loc.id));
+            orders = [...data.orders, ...localOnly];
+            saveOrders();
+            renderOrdersList();
+            updateGlobalKPIs();
+            showToast(`✓ ${data.orders.length} ऑर्डर्स Google Sheet से लोड हो गए!`, "success");
+          } else {
+            showToast("Sheet में कोई नया ऑर्डर नहीं मिला।", "info");
+          }
+        } catch (err) {
+          console.error("Cloud fetch failed", err);
+          showToast("Cloud sync failed. कृपया Apps Script deployment चेक करें।", "error");
+        } finally {
+          if (btn) btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span>☁️ Sync All Orders</span>`;
+        }
+      }, "Owner PIN Authorization: Sync All Orders");
+    }
     function exportOrdersToCSV() {
       if (orders.length === 0) {
         showToast("No orders available to export.", "warning");
