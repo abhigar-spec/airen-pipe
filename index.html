@@ -1788,4 +1788,982 @@
       
       let defaultClass = "None";
       if (category === 'Water Tank') defaultClass = "4 Layer (Puf Foam - Tank)";
-      else if (category.includes('Agri')) defaultClass = "4.0 kg/cm² (Class 2 -
+      else if (category.includes('Agri')) defaultClass = "4.0 kg/cm² (Class 2 - Agri)";
+      else if (category.includes('CPVC')) defaultClass = "SDR 11 (Class 1 - CPVC)";
+      const specClass = item.specClass !== undefined ? item.specClass : defaultClass;
+
+      let defaultLength = PIPE_LENGTHS[0];
+      if (category === 'Water Tank' || category.includes('Fitting')) defaultLength = "None / N.A. (Fittings)";
+      else if (category.includes('Agri')) defaultLength = PIPE_LENGTHS[1];
+      else if (category.includes('CPVC')) defaultLength = PIPE_LENGTHS[2];
+      const length = item.length || defaultLength;
+
+      const qty = item.qty !== undefined ? item.qty : (category === 'Water Tank' ? 1 : 0);
+      const unit = item.unit || (category === 'Water Tank' || category.includes('Fitting') ? "Nos (Numbers)" : "Lengths (Pipes)");
+      const remarks = item.remarks || "";
+
+      const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
+      const itemOptions = availableItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
+      const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
+      const sizeOptions = PIPE_SIZES.map(s => `<option value="${s}" ${s === size ? 'selected' : ''}>${s}</option>`).join('');
+      const classOptions = PIPE_CLASSES.map(cl => `<option value="${cl}" ${cl === specClass ? 'selected' : ''}>${cl}</option>`).join('');
+      const lengthOptions = PIPE_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
+      const unitOptions = PIPE_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
+
+      return `
+        <tr class="order-line-row hover:bg-slate-50 transition-colors">
+          <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
+          <td class="py-2.5 px-1.5">
+            <select onchange="onCategoryChange(this)" class="item-category w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
+              ${categoryOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-name w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-medium text-brand-900">
+              ${itemOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-brand w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
+              ${brandOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-size w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-900">
+              ${sizeOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-class w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-800 font-medium">
+              ${classOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-length w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
+              ${lengthOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <input type="number" min="1" step="1" required value="${qty}" oninput="recalculateFormTotals()" class="item-qty w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-bold text-slate-900 text-right">
+          </td>
+          <td class="py-2.5 px-1.5">
+            <select class="item-unit w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
+              ${unitOptions}
+            </select>
+          </td>
+          <td class="py-2.5 px-1.5">
+            <input type="text" value="${remarks}" placeholder="e.g. 4kg pressure, Brass bolt, 25-bag pack" class="item-remarks w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-600">
+          </td>
+          <td class="py-2.5 px-1.5 text-center">
+            <button type="button" onclick="removeOrderItemRow(this)" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors" title="Delete Row">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function onCategoryChange(selectEl) {
+      const row = selectEl.closest('tr');
+      const category = selectEl.value;
+      const itemSelect = row.querySelector('.item-name');
+      const sizeSelect = row.querySelector('.item-size');
+      const classSelect = row.querySelector('.item-class');
+      const lengthSelect = row.querySelector('.item-length');
+      const unitSelect = row.querySelector('.item-unit');
+
+      const items = getItemsForCategory(category);
+      itemSelect.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
+
+      if (category === 'Water Tank') {
+        sizeSelect.value = "1000 Ltr";
+        classSelect.value = "4 Layer (Puf Foam - Tank)";
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Nos (Numbers)";
+      } else if (category.includes('Agri / Irrigation Fittings')) {
+        sizeSelect.value = "2-1/2\" (65mm / 75mm OD)";
+        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Pcs (Pieces)";
+      } else if (category.includes('Agri / Column Pipe')) {
+        sizeSelect.value = "2-1/2\" (65mm / 75mm OD)";
+        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
+        lengthSelect.value = "6 Meters (20 ft)";
+        unitSelect.value = "Lengths (Pipes)";
+      } else if (category.includes('Fitting')) {
+        classSelect.value = "None";
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Pcs (Pieces)";
+      } else if (category.includes('Pipe')) {
+        if (category.includes('CPVC')) {
+          classSelect.value = "SDR 11 (Class 1 - CPVC)";
+          lengthSelect.value = "3 Meters (10 ft)";
+          unitSelect.value = "Lengths (Pipes)";
+        } else if (category.includes('UPVC')) {
+          classSelect.value = "SCH 40 (Plumbing / Pressure)";
+          lengthSelect.value = "6 Meters (20 ft)";
+          unitSelect.value = "Lengths (Pipes)";
+        } else if (category.includes('HDPE')) {
+          classSelect.value = "PN 6 (HDPE / Agri)";
+          lengthSelect.value = "100 Meter Coil";
+          unitSelect.value = "Coils";
+        }
+      }
+    }
+
+    function addOrderItemRow(itemData = null) {
+      const tbody = document.getElementById('order-items-tbody');
+      const tempWrapper = document.createElement('tbody');
+      tempWrapper.innerHTML = createPipeRowHTML(itemData || {});
+      const newRow = tempWrapper.firstElementChild;
+      tbody.appendChild(newRow);
+      renumberRowIndices();
+      recalculateFormTotals();
+    }
+
+    function removeOrderItemRow(btn) {
+      const tbody = document.getElementById('order-items-tbody');
+      if (tbody.children.length <= 1) {
+        showToast("At least one specification line is required.", "warning");
+        return;
+      }
+      const row = btn.closest('tr');
+      row.remove();
+      renumberRowIndices();
+      recalculateFormTotals();
+    }
+
+    function renumberRowIndices() {
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      rows.forEach((row, idx) => {
+        const indexEl = row.querySelector('.row-index');
+        if (indexEl) indexEl.textContent = idx + 1;
+      });
+      const badge = document.getElementById('line-items-count-badge');
+      if (badge) badge.textContent = `${rows.length} item${rows.length > 1 ? 's' : ''}`;
+    }
+
+    function recalculateFormTotals() {
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      let totalQty = 0;
+      rows.forEach(row => {
+        const qtyInput = row.querySelector('.item-qty');
+        const q = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+        totalQty += q;
+      });
+      document.getElementById('summary-total-lines').textContent = rows.length;
+      document.getElementById('summary-total-qty').textContent = totalQty.toLocaleString();
+    }
+
+    function insertQuickPreset(type) {
+      if (type === 'agri_fittings') {
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Coupler / Socket (Fabricated / Molded)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "4kg Agri socket" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Tee (Equal)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 25, unit: "Nos (Numbers)", remarks: "4kg Equal Tee" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Reducing Tee", brand: "KASTA", size: "2-1/2\" x 2\" (75x63mm)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "Branch reducer tee" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Service Saddle with Brass Insert", brand: "KASTA", size: "2-1/2\" x 2\" (75x63mm)", specClass: "6.0 kg/cm² (Class 3 - Agri)", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "For sprinkler take-off" });
+        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Ball Valve (Solid Handle)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "6.0 kg/cm² (Class 3 - Agri)", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Solid farm handle" });
+        addOrderItemRow({ category: "PVC Agri / Column Pipe", itemName: "Agri Delivery Pipe (Plain / Socketed)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "6 Meters (20 ft)", qty: 50, unit: "Lengths (Pipes)", remarks: "Farm mainline 4kg" });
+        showToast("Added Kasta Agricultural Pack!", "info");
+      } else if (type === 'cpvc_fittings') {
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Elbow 90°", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 100, unit: "Nos (Numbers)", remarks: "Standard 90 Elbow" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Tee (Equal)", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "Equal Tee" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Brass FTA (Female Threaded Adaptor)", brand: "KASTA", size: "3/4\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "Brass insert" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "CPVC Ball Valve", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Heavy handle" });
+        addOrderItemRow({ category: "CPVC Plumbing Pipe", itemName: "Standard CPVC Pipe", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "3 Meters (10 ft)", qty: 25, unit: "Lengths (Pipes)", remarks: "Hot/Cold pipe" });
+        showToast("Added CPVC Fittings & Pipe Pack!", "info");
+      } else if (type === 'upvc_fittings') {
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Elbow 90°", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "Pressure Elbow" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Tee (Equal)", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "Pressure Tee" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Brass MTA (Male)", brand: "KASTA", size: "1\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "Brass MTA" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "UPVC Ball Valve", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 12, unit: "Nos (Numbers)", remarks: "Solid handle" });
+        showToast("Added UPVC Pressure Fittings Pack!", "info");
+      } else if (type === 'swr_fittings') {
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Bend 87.5° (Plain)", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 25, unit: "Nos (Numbers)", remarks: "Ringfit 90 bend" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Single Tee with Door", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 15, unit: "Nos (Numbers)", remarks: "Inspection door" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Nahani Trap with Jali", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "With SS Jali" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "P-Trap (with/without vent)", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Water seal trap" });
+        addOrderItemRow({ category: "PVC SWR Drainage Pipe", itemName: "SWR Ringfit Pipe", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "3 Meters (10 ft)", qty: 20, unit: "Lengths (Pipes)", remarks: "Rubber ring joint" });
+        showToast("Added SWR Drainage Fittings Pack!", "info");
+      } else if (type === 'water_tank') {
+        addOrderItemRow({ category: "Water Tank", itemName: "Overhead Water Tank", brand: "KASTA", size: "500 Ltr", specClass: "4 Layer (Puf Foam - Tank)", length: "None / N.A. (Fittings)", qty: 2, unit: "Nos (Numbers)", remarks: "4 Layer PUF Tank" });
+        addOrderItemRow({ category: "Water Tank", itemName: "Overhead Water Tank", brand: "KASTA", size: "1000 Ltr", specClass: "4 Layer (Puf Foam - Tank)", length: "None / N.A. (Fittings)", qty: 2, unit: "Nos (Numbers)", remarks: "4 Layer PUF Tank" });
+        addOrderItemRow({ category: "Water Tank", itemName: "Loft Tank", brand: "KASTA", size: "500 Ltr", specClass: "3 Layer (Water Tank)", length: "None / N.A. (Fittings)", qty: 1, unit: "Nos (Numbers)", remarks: "Indoor Loft Tank" });
+        showToast("Added Water Tank Pack!", "info");
+      }
+    }
+
+    function populatePartyDropdowns() {
+      filterPartyDropdown("");
+    }
+
+    function filterPartyDropdown(query) {
+      const select = document.getElementById('form-party-id');
+      const filterSelect = document.getElementById('order-party-filter');
+      const gstPrompt = document.getElementById('quick-gst-add-prompt');
+      const q = (query || "").toLowerCase().trim();
+      const currentSelected = select.value;
+
+      select.innerHTML = '<option value="">-- Select Party (167 Available) --</option>';
+
+      const filtered = parties.filter(p => {
+        if (!q) return true;
+        return (
+          p.name.toLowerCase().includes(q) ||
+          (p.city && p.city.toLowerCase().includes(q)) ||
+          (p.gst && p.gst.toLowerCase().includes(q)) ||
+          (p.address && p.address.toLowerCase().includes(q))
+        );
+      });
+
+      if (gstPrompt) {
+        if (q.length === 15 && filtered.length === 0) {
+          gstPrompt.classList.remove('hidden');
+        } else {
+          gstPrompt.classList.add('hidden');
+        }
+      }
+
+      filtered.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        const gstBadge = (p.gst && p.gst !== 'Unregistered') ? ` [${p.gst}]` : ' [URP]';
+        const cityBadge = p.city ? ` - ${p.city}` : '';
+        option.textContent = `${p.name}${cityBadge}${gstBadge}`;
+        select.appendChild(option);
+      });
+
+      if (filterSelect && (!q || filterSelect.children.length <= 1)) {
+        const currentFilter = filterSelect.value;
+        filterSelect.innerHTML = '<option value="ALL">All Parties (167)</option>';
+        parties.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.name;
+          filterSelect.appendChild(opt);
+        });
+        if (currentFilter) filterSelect.value = currentFilter;
+      }
+
+      if (currentSelected && filtered.some(p => p.id === currentSelected)) {
+        select.value = currentSelected;
+      }
+    }
+
+    function onPartySelected(partyId) {
+      const infoEl = document.getElementById('party-quick-info');
+      if (!partyId) {
+        infoEl.classList.add('hidden');
+        return;
+      }
+      const party = parties.find(p => p.id === partyId);
+      if (party) {
+        const gstText = (party.gst && party.gst !== 'Unregistered') ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">GST: ${party.gst}</span>` : `<span class="bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Unregistered (URP)</span>`;
+        const phoneText = party.phone ? ` • 📞 ${party.phone}` : '';
+        const locText = party.address ? ` • 📍 ${party.address}` : (party.city ? ` • 📍 ${party.city}` : '');
+        infoEl.innerHTML = `${gstText}${phoneText}${locText}`;
+        infoEl.classList.remove('hidden');
+      }
+    }
+
+    /* ==========================================================
+       ORDER SAVE & CENTRAL SHEET SYNC
+       ========================================================== */
+    async function syncOrderToGoogleSheet(order) {
+      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      if (!webhookUrl) return;
+
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(order)
+        });
+      } catch (err) {
+        console.warn("Google webhook sync skipped or network unavailable", err);
+      }
+    }
+
+    async function handleSaveOrder(event) {
+      event.preventDefault();
+      
+      const editId = document.getElementById('edit-order-id').value;
+      const salesperson = document.getElementById('form-salesperson').value;
+      const partyId = document.getElementById('form-party-id').value;
+      const orderDate = document.getElementById('form-order-date').value;
+      const targetDate = document.getElementById('form-target-date').value;
+      const status = document.getElementById('form-order-status').value;
+      const partyRef = document.getElementById('form-party-ref').value.trim();
+      const deliverySite = document.getElementById('form-delivery-site').value.trim();
+      const notes = document.getElementById('form-order-notes').value.trim();
+
+      if (!salesperson) {
+        showToast("Please select the salesperson who is punching this order.", "error");
+        return;
+      }
+
+      localStorage.setItem('airen_pipe_default_salesperson', salesperson);
+
+      if (!partyId) {
+        showToast("Please register/select a party first.", "error");
+        return;
+      }
+
+      const party = parties.find(p => p.id === partyId);
+      if (!party) {
+        showToast("Selected party does not exist.", "error");
+        return;
+      }
+
+      const rows = document.querySelectorAll('#order-items-tbody tr');
+      if (rows.length === 0) {
+        showToast("Please add at least one line item.", "error");
+        return;
+      }
+
+      const items = [];
+      for (const row of rows) {
+        const category = row.querySelector('.item-category').value;
+        const itemName = row.querySelector('.item-name') ? row.querySelector('.item-name').value : "Item";
+        const brand = row.querySelector('.item-brand').value;
+        const size = row.querySelector('.item-size').value;
+        const specClass = row.querySelector('.item-class').value || "None";
+        const length = row.querySelector('.item-length').value;
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const unit = row.querySelector('.item-unit').value;
+        const remarks = row.querySelector('.item-remarks').value.trim();
+
+        if (qty <= 0) {
+          showToast("Quantity must be greater than zero for all rows.", "error");
+          return;
+        }
+
+        items.push({ category, itemName, brand, size, specClass, length, qty, unit, remarks });
+      }
+
+      let savedOrderObj = null;
+
+      if (editId) {
+        const index = orders.findIndex(o => o.id === editId);
+        if (index !== -1) {
+          orders[index] = {
+            ...orders[index],
+            salesperson,
+            partyId,
+            partyName: party.name,
+            partyGst: party.gst || "Unregistered",
+            partyPhone: party.phone || "",
+            partyCity: party.city || "",
+            partyAddress: party.address || "",
+            orderDate,
+            targetDate,
+            status,
+            partyRef,
+            deliverySite,
+            notes,
+            items
+          };
+          savedOrderObj = orders[index];
+          saveOrders();
+          showToast(`Order #${editId} updated & synced!`, "success");
+        }
+      } else {
+        const timestamp = Date.now().toString().slice(-4);
+        const randomNum = Math.floor(100 + Math.random() * 900);
+        const newOrderId = `ORD-${timestamp}-${randomNum}`;
+        const newOrder = {
+          id: newOrderId,
+          salesperson,
+          partyId,
+          partyName: party.name,
+          partyGst: party.gst || "Unregistered",
+          partyPhone: party.phone || "",
+          partyCity: party.city || "",
+          partyAddress: party.address || "",
+          orderDate,
+          targetDate,
+          status,
+          partyRef,
+          deliverySite,
+          notes,
+          items,
+          createdAt: new Date().toISOString()
+        };
+        orders.unshift(newOrder);
+        savedOrderObj = newOrder;
+        saveOrders();
+        showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
+
+        const sendWA = confirm(`Order #${newOrderId} सेव हो गया!\n\nक्या इसे डिस्ट्रीब्यूटर WhatsApp पर तुरंत भेजना है?`);
+        if (sendWA) {
+          activeModalOrder = newOrder;
+          shareOrderWhatsApp();
+        }
+      }
+
+      if (savedOrderObj) {
+        syncOrderToGoogleSheet(savedOrderObj);
+      }
+
+      resetOrderForm();
+      switchTab('orders');
+      updateGlobalKPIs();
+    }
+
+    function resetOrderForm() {
+      document.getElementById('orderForm').reset();
+      document.getElementById('edit-order-id').value = "";
+      document.getElementById('order-form-title').textContent = "Record Airen Pipe & Fittings Order";
+      document.getElementById('save-order-btn-text').textContent = "Save & Record Order";
+      document.getElementById('party-quick-info').classList.add('hidden');
+      document.getElementById('party-search-box').value = "";
+      const gstPrompt = document.getElementById('quick-gst-add-prompt');
+      if (gstPrompt) gstPrompt.classList.add('hidden');
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('form-order-date').value = today;
+
+      const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
+      if (savedSalesperson) document.getElementById('form-salesperson').value = savedSalesperson;
+
+      populatePartyDropdowns();
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      addOrderItemRow();
+    }
+
+    function renderOrdersList() {
+      const container = document.getElementById('orders-container');
+      const emptyState = document.getElementById('orders-empty-state');
+      const searchQuery = document.getElementById('order-search-input').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('order-status-filter').value;
+      const salespersonFilter = document.getElementById('order-salesperson-filter').value;
+      const partyFilter = document.getElementById('order-party-filter').value;
+
+      populatePartyDropdowns();
+
+      const filtered = orders.filter(order => {
+        if (statusFilter !== 'ALL' && order.status !== statusFilter) return false;
+        if (salespersonFilter !== 'ALL' && order.salesperson !== salespersonFilter) return false;
+        if (partyFilter !== 'ALL' && order.partyId !== partyFilter) return false;
+        if (searchQuery) {
+          const matchId = order.id.toLowerCase().includes(searchQuery);
+          const matchSalesperson = (order.salesperson || "").toLowerCase().includes(searchQuery);
+          const matchParty = (order.partyName || "").toLowerCase().includes(searchQuery);
+          const matchGst = (order.partyGst || "").toLowerCase().includes(searchQuery);
+          const matchRef = (order.partyRef || "").toLowerCase().includes(searchQuery);
+          const matchCity = (order.partyCity || "").toLowerCase().includes(searchQuery);
+          const matchItems = order.items.some(it => 
+            (it.category || "").toLowerCase().includes(searchQuery) ||
+            (it.itemName || "").toLowerCase().includes(searchQuery) ||
+            (it.brand || "").toLowerCase().includes(searchQuery) ||
+            (it.size || "").toLowerCase().includes(searchQuery) ||
+            (it.specClass || "").toLowerCase().includes(searchQuery) ||
+            (it.remarks || "").toLowerCase().includes(searchQuery)
+          );
+          return matchId || matchSalesperson || matchParty || matchGst || matchRef || matchCity || matchItems;
+        }
+        return true;
+      });
+
+      document.getElementById('filtered-count-badge').textContent = `${filtered.length} Orders`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      container.innerHTML = filtered.map(order => {
+        const totalItemsCount = order.items.reduce((sum, it) => sum + (it.qty || 0), 0);
+        const previewItemsText = order.items.slice(0, 3).map(it => {
+          const itemLabel = it.itemName ? `${it.itemName}` : it.category;
+          const classText = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass.split(' ')[0]}]` : '';
+          return `${it.qty} ${it.unit.split(' ')[0]} ${it.brand} ${itemLabel} ${it.size}${classText}`;
+        }).join(' • ');
+        const extraItemsBadge = order.items.length > 3 ? `<span class="text-xs text-brand-600 font-semibold">+${order.items.length - 3} more items</span>` : '';
+
+        let statusBadge = `<span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full">Draft</span>`;
+        if (order.status === 'Confirmed') {
+          statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full">Confirmed</span>`;
+        } else if (order.status === 'Hold') {
+          statusBadge = `<span class="bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full">On Hold</span>`;
+        } else if (order.status === 'Cancelled') {
+          statusBadge = `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-full">Cancelled</span>`;
+        }
+
+        const gstDisplay = (order.partyGst && order.partyGst !== 'Unregistered') ? `<span class="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold px-1.5 py-0.5 rounded">${order.partyGst}</span>` : '';
+
+        return `
+          <div class="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex-1 space-y-1.5 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${order.id}</span>
+                <span class="font-bold text-sm text-slate-900 truncate">${order.partyName}</span>
+                ${gstDisplay}
+                ${statusBadge}
+                <span class="text-xs bg-blue-50 text-brand-800 font-bold px-2 py-0.5 rounded border border-blue-200">👤 ${order.salesperson || 'Staff'}</span>
+                <span class="text-xs text-slate-400 font-medium">📅 ${order.orderDate}</span>
+              </div>
+
+              <p class="text-xs text-slate-600 leading-relaxed truncate">
+                <strong class="text-slate-700">Items:</strong> ${previewItemsText} ${extraItemsBadge}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                <span>Total Quantity: <strong class="text-brand-700 font-bold font-mono">${totalItemsCount.toLocaleString()}</strong> units</span>
+                ${order.partyRef ? `<span>Ref: <strong class="text-slate-700">${order.partyRef}</strong></span>` : ''}
+                ${order.deliverySite ? `<span>Site: <strong class="text-slate-700">${order.deliverySite}</strong></span>` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 self-end md:self-center shrink-0">
+              <button onclick="viewOrderSlip('${order.id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold text-xs rounded-xl border border-brand-200 transition-colors flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                <span>View Slip</span>
+              </button>
+              <button onclick="editOrderDirect('${order.id}')" class="p-1.5 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Order">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="deleteOrderPrompt('${order.id}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Order (Requires PIN)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateGlobalKPIs();
+    }
+
+    function viewOrderSlip(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      activeModalOrder = order;
+
+      document.getElementById('slip-order-id').textContent = `#${order.id}`;
+      document.getElementById('slip-order-date').textContent = order.orderDate || "--";
+      document.getElementById('slip-salesperson').textContent = order.salesperson || "Counter / Direct";
+      document.getElementById('slip-footer-salesperson').textContent = `(${order.salesperson || 'Airen Pipe Desk'})`;
+      document.getElementById('slip-party-name').textContent = order.partyName;
+      document.getElementById('slip-party-gst').textContent = (order.partyGst && order.partyGst !== 'Unregistered') ? `GSTIN: ${order.partyGst}` : 'GSTIN: Unregistered (URP)';
+      document.getElementById('slip-party-phone').textContent = `Phone: ${order.partyPhone || 'N/A'}`;
+      document.getElementById('slip-party-city').textContent = `Location: ${order.partyAddress || order.partyCity || 'N/A'}`;
+      document.getElementById('slip-party-ref').textContent = order.partyRef || "None / Direct";
+      document.getElementById('slip-target-date').textContent = order.targetDate || "Immediate / ASAP";
+      document.getElementById('slip-delivery-site').textContent = order.deliverySite || "Godown counter";
+      document.getElementById('slip-notes').textContent = order.notes || "No special instructions.";
+
+      const statusBadge = document.getElementById('slip-status-badge');
+      statusBadge.textContent = order.status;
+      statusBadge.className = order.status === 'Confirmed' ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold';
+
+      const tbody = document.getElementById('slip-items-tbody');
+      let totalQty = 0;
+      tbody.innerHTML = order.items.map((item, idx) => {
+        totalQty += (item.qty || 0);
+        const itemDesc = item.itemName ? `<strong>${item.itemName}</strong>` : `<strong>${item.category}</strong>`;
+        const lengthDisplay = (item.length && !item.length.includes('N.A.')) ? item.length : '-';
+        const classDisplay = (item.specClass && item.specClass !== 'None') ? item.specClass : '-';
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2 px-2 border border-slate-200 text-center font-mono">${idx + 1}</td>
+            <td class="py-2 px-3 border border-slate-200 text-slate-700 text-[11px]">${item.category}</td>
+            <td class="py-2 px-3 border border-slate-200 text-slate-900">
+              ${itemDesc}
+              ${item.remarks ? `<span class="block text-[10px] text-slate-500 font-normal italic">${item.remarks}</span>` : ''}
+            </td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-700">${item.brand}</td>
+            <td class="py-2 px-3 border border-slate-200 font-bold text-slate-900">${item.size}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-800 font-medium">${classDisplay}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-600">${lengthDisplay}</td>
+            <td class="py-2 px-3 border border-slate-200 text-right font-black font-mono text-slate-900">${item.qty}</td>
+            <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.unit}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('slip-total-qty').textContent = totalQty.toLocaleString();
+      document.getElementById('orderDetailModal').classList.remove('hidden');
+    }
+
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').classList.add('hidden');
+      activeModalOrder = null;
+    }
+
+    function shareOrderWhatsApp() {
+      if (!activeModalOrder) return;
+      const order = activeModalOrder;
+
+      let msg = `📦 *AIREN PIPE - NEW ORDER DISPATCH SLIP*\n`;
+      msg += `*Order #:* ${order.id}\n`;
+      msg += `*Booked By (Sales):* ${order.salesperson || 'Staff'}\n`;
+      msg += `*Party Name:* ${order.partyName}\n`;
+      if (order.partyCity) msg += `*City/Mandi:* ${order.partyCity}\n`;
+      if (order.partyGst && order.partyGst !== 'Unregistered') msg += `*GSTIN:* ${order.partyGst}\n`;
+      if (order.partyPhone) msg += `*Party Phone:* ${order.partyPhone}\n`;
+      msg += `*Date:* ${order.orderDate}\n`;
+      if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
+      if (order.partyRef) msg += `*Ref/PO:* ${order.partyRef}\n`;
+      msg += `--------------------------------\n`;
+      msg += `*ITEMS TO LOAD & BILL:*\n`;
+
+      order.items.forEach((it, i) => {
+        const itemTitle = it.itemName ? `${it.itemName}` : it.category;
+        const classStr = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass}]` : '';
+        const lenStr = (it.length && !it.length.includes('N.A.')) ? ` (${it.length})` : '';
+        msg += `${i+1}. [${it.brand}] *${itemTitle}* - ${it.size}${classStr}${lenStr} : *${it.qty} ${it.unit}* ${it.remarks ? `(${it.remarks})` : ''}\n`;
+      });
+
+      const totalUnits = order.items.reduce((s, it) => s + (it.qty || 0), 0);
+      msg += `--------------------------------\n`;
+      msg += `*Total Units:* ${totalUnits}\n`;
+      if (order.notes) msg += `*Dispatch Notes:* ${order.notes}\n`;
+      msg += `*Status:* ${order.status} (Forwarded to Distributor Desk)`;
+
+      const encoded = encodeURIComponent(msg);
+      
+      let distPhone = localStorage.getItem('airen_pipe_distributor_phone') || "9993310609";
+      distPhone = distPhone.replace(/[^0-9]/g, '');
+      if (distPhone.length === 10) distPhone = '91' + distPhone;
+
+      const url = "[https://api.whatsapp.com/send?phone=](https://api.whatsapp.com/send?phone=)" + distPhone + "&text=" + encoded;
+      window.open(url, '_blank');
+    }
+
+    function cloneOrderFromModal() {
+      if (!activeModalOrder) return;
+      const order = activeModalOrder;
+      closeOrderDetailModal();
+      
+      resetOrderForm();
+      document.getElementById('form-salesperson').value = order.salesperson || "";
+      document.getElementById('form-party-id').value = order.partyId || "";
+      onPartySelected(order.partyId);
+      document.getElementById('form-party-ref').value = order.partyRef ? `Re-order of ${order.id}` : "";
+      document.getElementById('form-delivery-site').value = order.deliverySite || "";
+      document.getElementById('form-order-notes').value = order.notes || "";
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      order.items.forEach(it => {
+        addOrderItemRow(it);
+      });
+
+      switchTab('new-order');
+      showToast("Order items cloned into new order form. Ready to punch!", "info");
+    }
+
+    function editOrderFromModal() {
+      if (!activeModalOrder) return;
+      const id = activeModalOrder.id;
+      closeOrderDetailModal();
+      editOrderDirect(id);
+    }
+
+    function editOrderDirect(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      resetOrderForm();
+      document.getElementById('edit-order-id').value = order.id;
+      document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
+      document.getElementById('save-order-btn-text').textContent = "Update Order Details";
+
+      document.getElementById('form-salesperson').value = order.salesperson || "";
+      document.getElementById('form-party-id').value = order.partyId || "";
+      onPartySelected(order.partyId);
+      document.getElementById('form-order-date').value = order.orderDate || "";
+      document.getElementById('form-target-date').value = order.targetDate || "";
+      document.getElementById('form-order-status').value = order.status || "Recorded";
+      document.getElementById('form-party-ref').value = order.partyRef || "";
+      document.getElementById('form-delivery-site').value = order.deliverySite || "";
+      document.getElementById('form-order-notes').value = order.notes || "";
+
+      const tbody = document.getElementById('order-items-tbody');
+      tbody.innerHTML = '';
+      order.items.forEach(it => {
+        addOrderItemRow(it);
+      });
+
+      switchTab('new-order');
+    }
+
+    function deleteOrderPrompt(orderId) {
+      requirePin(() => {
+        orders = orders.filter(o => o.id !== orderId);
+        saveOrders();
+        renderOrdersList();
+        syncOrderToGoogleSheet({ id: orderId, action: "delete" });
+        showToast(`Order #${orderId} deleted by Admin PIN.`, "info");
+      }, `Authorize Deletion of Order #${orderId}`);
+    }
+
+    /* ==========================================================
+       PARTIES DIRECTORY & CRUD
+       ========================================================== */
+    function renderPartiesList() {
+      const grid = document.getElementById('parties-grid-container');
+      const searchQuery = document.getElementById('party-search-input').value.toLowerCase().trim();
+
+      const filtered = parties.filter(p => {
+        if (!searchQuery) return true;
+        return (
+          p.name.toLowerCase().includes(searchQuery) ||
+          (p.gst && p.gst.toLowerCase().includes(searchQuery)) ||
+          (p.phone && p.phone.includes(searchQuery)) ||
+          (p.city && p.city.toLowerCase().includes(searchQuery)) ||
+          (p.address && p.address.toLowerCase().includes(searchQuery))
+        );
+      });
+
+      if (parties.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 px-4 text-center bg-white rounded-2xl border border-slate-200">
+            <h3 class="text-sm font-bold text-slate-700">No Parties Available</h3>
+            <button onclick="openPartyModal()" class="mt-3.5 inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
+              + Add Party
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-slate-500">
+            <p class="text-sm font-medium">No parties found matching "${searchQuery}".</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const partyOrders = orders.filter(o => o.partyId === p.id);
+        const totalPcs = partyOrders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+        const isGst = p.gst && p.gst !== 'Unregistered';
+
+        return `
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <h3 class="font-bold text-slate-900 text-base">${p.name}</h3>
+                  <p class="text-xs font-mono font-bold ${isGst ? 'text-emerald-700' : 'text-slate-500'} mt-0.5">
+                    ${isGst ? 'GST: ' + p.gst : 'URP (Unregistered)'}
+                  </p>
+                </div>
+                <span class="text-[10px] ${isGst ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'} font-semibold px-2 py-0.5 rounded border">${isGst ? 'GST Registered' : 'URP'}</span>
+              </div>
+
+              <div class="mt-3 space-y-1 text-xs text-slate-600">
+                ${p.phone ? `<p class="flex items-center space-x-1.5"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg><span>${p.phone}</span></p>` : ''}
+                <p class="text-[11px] text-slate-500 mt-1">${p.address || p.city || 'Address not specified'}</p>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">History</span>
+                <span class="font-bold text-slate-800">${partyOrders.length} Orders (${totalPcs.toLocaleString()} pcs)</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <button onclick="quickOrderForParty('${p.id}')" class="px-2.5 py-1 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition-colors">
+                  + Book Order
+                </button>
+                <button onclick="editPartyModal('${p.id}')" class="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100" title="Edit Party">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickOrderForParty(partyId) {
+      resetOrderForm();
+      document.getElementById('form-party-id').value = partyId;
+      onPartySelected(partyId);
+      switchTab('new-order');
+    }
+
+    function openPartyModal() {
+      document.getElementById('partyForm').reset();
+      document.getElementById('edit-party-id').value = "";
+      document.getElementById('party-modal-title').textContent = "Register New Party";
+      document.getElementById('gst-parsed-badge').classList.add('hidden');
+      document.getElementById('partyModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('party-gst').focus(), 100);
+    }
+
+    function closePartyModal() {
+      document.getElementById('partyModal').classList.add('hidden');
+    }
+
+    function editPartyModal(partyId) {
+      const p = parties.find(item => item.id === partyId);
+      if (!p) return;
+      document.getElementById('edit-party-id').value = p.id;
+      document.getElementById('party-modal-title').textContent = `Edit Party - ${p.name}`;
+      document.getElementById('party-name').value = p.name || "";
+      document.getElementById('party-gst').value = (p.gst && p.gst !== 'Unregistered') ? p.gst : "";
+      document.getElementById('party-phone').value = p.phone || "";
+      document.getElementById('party-city').value = p.city || "";
+      document.getElementById('party-address').value = p.address || "";
+      document.getElementById('gst-parsed-badge').classList.add('hidden');
+      document.getElementById('partyModal').classList.remove('hidden');
+    }
+
+    function handleSaveParty(event) {
+      event.preventDefault();
+      const editId = document.getElementById('edit-party-id').value;
+      const name = document.getElementById('party-name').value.trim();
+      const rawGst = document.getElementById('party-gst').value.trim().toUpperCase();
+      const gst = rawGst || "Unregistered";
+      const phone = document.getElementById('party-phone').value.trim();
+      const city = document.getElementById('party-city').value.trim();
+      const address = document.getElementById('party-address').value.trim();
+
+      if (editId) {
+        const idx = parties.findIndex(p => p.id === editId);
+        if (idx !== -1) {
+          parties[idx] = { ...parties[idx], name, gst, phone, city, address, type: gst !== 'Unregistered' ? 'Registered Dealer' : 'Unregistered (URP)' };
+          saveParties();
+          showToast(`Party "${name}" updated!`, "success");
+        }
+      } else {
+        const newParty = {
+          id: `pty_${Date.now()}`,
+          name,
+          firm: name,
+          phone,
+          city,
+          gst,
+          address,
+          type: gst !== 'Unregistered' ? 'Registered Dealer' : 'Unregistered (URP)'
+        };
+        parties.unshift(newParty);
+        saveParties();
+        showToast(`Party "${name}" registered successfully!`, "success");
+        
+        const formPartySelect = document.getElementById('form-party-id');
+        if (formPartySelect) {
+          populatePartyDropdowns();
+          formPartySelect.value = newParty.id;
+          onPartySelected(newParty.id);
+        }
+      }
+
+      closePartyModal();
+      populatePartyDropdowns();
+      renderPartiesList();
+    }
+
+    /* ==========================================================
+       KPIS & EXPORT
+       ========================================================== */
+    function updateGlobalKPIs() {
+      const totalOrdersEl = document.getElementById('stat-total-orders');
+      const pendingOrdersEl = document.getElementById('stat-pending-orders');
+      const confirmedOrdersEl = document.getElementById('stat-confirmed-orders');
+      const totalPcsEl = document.getElementById('stat-total-pcs');
+
+      const totalCount = orders.length;
+      const pendingCount = orders.filter(o => o.status === 'Recorded' || o.status === 'Hold').length;
+      const confirmedCount = orders.filter(o => o.status === 'Confirmed').length;
+      const totalPcs = orders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+
+      if (totalOrdersEl) totalOrdersEl.textContent = totalCount;
+      if (pendingOrdersEl) pendingOrdersEl.textContent = pendingCount;
+      if (confirmedOrdersEl) confirmedOrdersEl.textContent = confirmedCount;
+      if (totalPcsEl) totalPcsEl.textContent = totalPcs.toLocaleString();
+    }
+
+    function exportOrdersToCSV() {
+      if (orders.length === 0) {
+        showToast("No orders available to export.", "warning");
+        return;
+      }
+
+      let csv = "Order ID,Order Date,Salesperson,Party Name,GSTIN,Party Phone,City,Status,Party PO Ref,Delivery Site,Category,Fitting Item,Brand,Size,Pressure/Kg/Class,Length,Quantity,Unit,Line Remarks\n";
+
+      orders.forEach(o => {
+        o.items.forEach(it => {
+          const row = [
+            o.id,
+            o.orderDate || "",
+            `"${(o.salesperson || "").replace(/"/g, '""')}"`,
+            `"${(o.partyName || "").replace(/"/g, '""')}"`,
+            `"${(o.partyGst || "").replace(/"/g, '""')}"`,
+            `"${o.partyPhone || ""}"`,
+            `"${o.partyCity || ""}"`,
+            o.status || "",
+            `"${(o.partyRef || "").replace(/"/g, '""')}"`,
+            `"${(o.deliverySite || "").replace(/"/g, '""')}"`,
+            `"${it.category}"`,
+            `"${(it.itemName || "").replace(/"/g, '""')}"`,
+            `"${it.brand}"`,
+            `"${it.size}"`,
+            `"${it.specClass}"`,
+            `"${it.length}"`,
+            it.qty,
+            `"${it.unit}"`,
+            `"${(it.remarks || "").replace(/"/g, '""')}"`
+          ];
+          csv += row.join(",") + "\n";
+        });
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Airen_Pipe_Orders_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Airen Pipe orders CSV exported successfully!", "success");
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let bg = "bg-slate-900 text-white";
+      let icon = `<svg class="w-4 h-4 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+      if (type === "success") {
+        bg = "bg-emerald-900 text-emerald-50 border border-emerald-700";
+        icon = `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+      } else if (type === "warning" || type === "error") {
+        bg = "bg-red-900 text-red-50 border border-red-700";
+        icon = `<svg class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+      }
+
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs font-medium flex items-center space-x-2.5 transition-all duration-300 pointer-events-auto max-w-xs`;
+      toast.innerHTML = `${icon}<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    window.onload = function() {
+      initDataStore();
+      populatePartyDropdowns();
+      renderOrdersList();
+      resetOrderForm();
+      updateGlobalKPIs();
+      initManageCatalogUI();
+    };
+  </script>
+</body>
+</html>
