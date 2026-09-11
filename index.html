@@ -685,9 +685,6 @@
           <h3 class="font-bold text-sm sm:text-base tracking-tight" id="modal-order-title">Airen Pipe Order Requisition Slip</h3>
         </div>
         <div class="flex items-center space-x-2">
-          <button onclick="shareOrderWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
-            <span>WhatsApp Slip</span>
-          </button>
           <button onclick="window.print()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
             <span>Print / PDF</span>
           </button>
@@ -2194,11 +2191,7 @@
         saveOrders();
         showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
 
-        const sendWA = confirm(`Order #${newOrderId} सेव हो गया!\n\nक्या इसे डिस्ट्रीब्यूटर WhatsApp पर तुरंत भेजना है?`);
-        if (sendWA) {
-          activeModalOrder = newOrder;
-          shareOrderWhatsApp();
-        }
+        alert(`✅ ऑर्डर सफलतापूर्वक दर्ज हो गया है!\n\nOrder #: ${newOrderId}\nSalesperson: ${salesperson}\nParty: ${party.name}`);
       }
 
       if (savedOrderObj) {
@@ -2393,46 +2386,6 @@
     function closeOrderDetailModal() {
       document.getElementById('orderDetailModal').classList.add('hidden');
       activeModalOrder = null;
-    }
-
-    function shareOrderWhatsApp() {
-      if (!activeModalOrder) return;
-      const order = activeModalOrder;
-
-      let msg = `📦 *AIREN PIPE - NEW ORDER DISPATCH SLIP*\n`;
-      msg += `*Order #:* ${order.id}\n`;
-      msg += `*Booked By (Sales):* ${order.salesperson || 'Staff'}\n`;
-      msg += `*Party Name:* ${order.partyName}\n`;
-      if (order.partyCity) msg += `*City/Mandi:* ${order.partyCity}\n`;
-      if (order.partyGst && order.partyGst !== 'Unregistered') msg += `*GSTIN:* ${order.partyGst}\n`;
-      if (order.partyPhone) msg += `*Party Phone:* ${order.partyPhone}\n`;
-      msg += `*Date:* ${order.orderDate}\n`;
-      if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
-      if (order.partyRef) msg += `*Ref/PO:* ${order.partyRef}\n`;
-      msg += `--------------------------------\n`;
-      msg += `*ITEMS TO LOAD & BILL:*\n`;
-
-      order.items.forEach((it, i) => {
-        const itemTitle = it.itemName ? `${it.itemName}` : it.category;
-        const classStr = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass}]` : '';
-        const lenStr = (it.length && !it.length.includes('N.A.')) ? ` (${it.length})` : '';
-        msg += `${i+1}. [${it.brand}] *${itemTitle}* - ${it.size}${classStr}${lenStr} : *${it.qty} ${it.unit}* ${it.remarks ? `(${it.remarks})` : ''}\n`;
-      });
-
-      const totalUnits = order.items.reduce((s, it) => s + (it.qty || 0), 0);
-      msg += `--------------------------------\n`;
-      msg += `*Total Units:* ${totalUnits}\n`;
-      if (order.notes) msg += `*Dispatch Notes:* ${order.notes}\n`;
-      msg += `*Status:* ${order.status} (Forwarded to Distributor Desk)`;
-
-      const encoded = encodeURIComponent(msg);
-      
-      let distPhone = localStorage.getItem('airen_pipe_distributor_phone') || "9993310609";
-      distPhone = distPhone.replace(/[^0-9]/g, '');
-      if (distPhone.length === 10) distPhone = '91' + distPhone;
-
-      const url = "[https://api.whatsapp.com/send?phone=](https://api.whatsapp.com/send?phone=)" + distPhone + "&text=" + encoded;
-      window.open(url, '_blank');
     }
 
     function cloneOrderFromModal() {
