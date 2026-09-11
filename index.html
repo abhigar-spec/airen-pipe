@@ -2436,9 +2436,8 @@
       distPhone = distPhone.replace(/[^0-9]/g, '');
       if (distPhone.length === 10) distPhone = '91' + distPhone;
 
-      const url = `https://api.whatsapp.com/send?phone=${distPhone}&text=${encoded}`;
-      window.open(url, '_blank');
-    }
+      const url = "https://api.whatsapp.com/send?phone=919993310609&text=" + encoded;
+      window.open(url, '_blank');    }
       if (!activeModalOrder) return;
       const order = activeModalOrder;
 
