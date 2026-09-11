@@ -2174,8 +2174,9 @@
           showToast(`Order #${editId} updated & synced!`, "success");
         }
       } else {
-        const nextNum = orders.length + 1001;
-        const newOrderId = `ORD-${nextNum}`;
+        const timestamp = Date.now().toString().slice(-4);
+        const randomNum = Math.floor(100 + Math.random() * 900);
+        const newOrderId = `ORD-${timestamp}-${randomNum}`;
         const newOrder = {
           id: newOrderId,
           salesperson,
@@ -2199,7 +2200,11 @@
         saveOrders();
         showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
       }
-
+        const sendWA = confirm(`Order #${newOrderId} सेव हो गया!\n\nक्या इसे डिस्ट्रीब्यूटर WhatsApp पर तुरंत भेजना है?`);
+        if (sendWA) {
+          activeModalOrder = newOrder;
+          shareOrderWhatsApp();
+        }
       if (savedOrderObj) {
         syncOrderToGoogleSheet(savedOrderObj);
       }
@@ -2395,6 +2400,45 @@
     }
 
     function shareOrderWhatsApp() {
+      if (!activeModalOrder) return;
+      const order = activeModalOrder;
+
+      let msg = `📦 *AIREN PIPE - NEW ORDER DISPATCH SLIP*\n`;
+      msg += `*Order #:* ${order.id}\n`;
+      msg += `*Booked By (Sales):* ${order.salesperson || 'Staff'}\n`;
+      msg += `*Party Name:* ${order.partyName}\n`;
+      if (order.partyCity) msg += `*City/Mandi:* ${order.partyCity}\n`;
+      if (order.partyGst && order.partyGst !== 'Unregistered') msg += `*GSTIN:* ${order.partyGst}\n`;
+      if (order.partyPhone) msg += `*Party Phone:* ${order.partyPhone}\n`;
+      msg += `*Date:* ${order.orderDate}\n`;
+      if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
+      if (order.partyRef) msg += `*Ref/PO:* ${order.partyRef}\n`;
+      msg += `--------------------------------\n`;
+      msg += `*ITEMS TO LOAD & BILL:*\n`;
+
+      order.items.forEach((it, i) => {
+        const itemTitle = it.itemName ? `${it.itemName}` : it.category;
+        const classStr = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass}]` : '';
+        const lenStr = (it.length && !it.length.includes('N.A.')) ? ` (${it.length})` : '';
+        msg += `${i+1}. [${it.brand}] *${itemTitle}* - ${it.size}${classStr}${lenStr} : *${it.qty} ${it.unit}* ${it.remarks ? `(${it.remarks})` : ''}\n`;
+      });
+
+      const totalUnits = order.items.reduce((s, it) => s + (it.qty || 0), 0);
+      msg += `--------------------------------\n`;
+      msg += `*Total Units:* ${totalUnits}\n`;
+      if (order.notes) msg += `*Dispatch Notes:* ${order.notes}\n`;
+      msg += `*Status:* ${order.status} (Forwarded to Distributor Desk)`;
+
+      const encoded = encodeURIComponent(msg);
+      
+      // डिस्ट्रीब्यूटर का 10-अंकों का नंबर (अगर दूसरा नंबर लगाना हो तो यहाँ 9993310609 की जगह लिख दें)
+      let distPhone = localStorage.getItem('airen_pipe_distributor_phone') || "9993310609";
+      distPhone = distPhone.replace(/[^0-9]/g, '');
+      if (distPhone.length === 10) distPhone = '91' + distPhone;
+
+      const url = `https://api.whatsapp.com/send?phone=${distPhone}&text=${encoded}`;
+      window.open(url, '_blank');
+    }
       if (!activeModalOrder) return;
       const order = activeModalOrder;
 
