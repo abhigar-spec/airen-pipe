@@ -451,7 +451,6 @@
     </div>
 
     <div id="view-catalog" class="tab-view hidden space-y-6">
-      <!-- NEW: PRODUCT CATALOG MANAGEMENT (REMOVE / RESTORE TOOL) -->
       <div class="bg-white p-5 rounded-2xl shadow-xs border-2 border-indigo-200 space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-slate-100 gap-2">
           <div>
@@ -504,11 +503,11 @@
           <div class="p-4 bg-cyan-50/70 rounded-xl border border-cyan-300 space-y-2">
             <div class="flex justify-between items-center">
               <span class="font-bold text-sm text-cyan-900">Water Tanks & Storage</span>
-              <span class="text-[10px] bg-cyan-200 text-cyan-900 px-2 py-0.5 rounded font-bold">300L - 5000L</span>
+              <span class="text-[10px] bg-cyan-200 text-cyan-900 px-2 py-0.5 rounded font-bold">100L - 5000L</span>
             </div>
             <p class="text-xs text-slate-700"><strong>Types:</strong> Overhead Water Tank, Loft Tank, Underground Sump Tank</p>
             <p class="text-xs text-slate-700"><strong>Layers & Quality:</strong> 3 Layer, 4 Layer (Puf Foam), 5 Layer Anti-Bacterial, Heavy Duty Extra Rib</p>
-            <p class="text-xs text-slate-700"><strong>Capacities:</strong> 300L, 500L, 750L, 1000L, 1500L, 2000L, 3000L, 5000L</p>
+            <p class="text-xs text-slate-700"><strong>Capacities:</strong> 100L, 200L, 300L, 500L, 750L, 1000L, 1500L, 2000L, 3000L, 5000L</p>
           </div>
 
           <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-2">
@@ -1201,10 +1200,8 @@
         const customProds = JSON.parse(localStorage.getItem('airen_pipe_custom_products') || '{}');
         const removedProds = JSON.parse(localStorage.getItem('airen_pipe_removed_products') || '{}');
         
-        // Reset base catalog
         FITTINGS_CATALOG = JSON.parse(JSON.stringify(BASE_FITTINGS_CATALOG));
 
-        // Add custom additions
         for (const cat in customProds) {
           if (!FITTINGS_CATALOG[cat]) {
             FITTINGS_CATALOG[cat] = [];
@@ -1217,7 +1214,6 @@
           });
         }
 
-        // Filter out removed items
         for (const cat in removedProds) {
           if (FITTINGS_CATALOG[cat]) {
             FITTINGS_CATALOG[cat] = FITTINGS_CATALOG[cat].filter(it => !removedProds[cat].includes(it));
@@ -1584,7 +1580,6 @@
       }
       localStorage.setItem('airen_pipe_custom_products', JSON.stringify(customProds));
 
-      // Remove from removed_products list if it was deleted previously
       let removedProds = JSON.parse(localStorage.getItem('airen_pipe_removed_products') || '{}');
       if (removedProds[category]) {
         removedProds[category] = removedProds[category].filter(it => it !== prodName);
@@ -1654,7 +1649,6 @@
         }
         localStorage.setItem('airen_pipe_removed_products', JSON.stringify(removedProds));
 
-        // Remove from custom additions as well if present
         let customProds = JSON.parse(localStorage.getItem('airen_pipe_custom_products') || '{}');
         if (customProds[category]) {
           customProds[category] = customProds[category].filter(it => it !== itemName);
@@ -2199,12 +2193,14 @@
         savedOrderObj = newOrder;
         saveOrders();
         showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
-      }
+
         const sendWA = confirm(`Order #${newOrderId} सेव हो गया!\n\nक्या इसे डिस्ट्रीब्यूटर WhatsApp पर तुरंत भेजना है?`);
         if (sendWA) {
           activeModalOrder = newOrder;
           shareOrderWhatsApp();
         }
+      }
+
       if (savedOrderObj) {
         syncOrderToGoogleSheet(savedOrderObj);
       }
@@ -2431,42 +2427,11 @@
 
       const encoded = encodeURIComponent(msg);
       
-      // डिस्ट्रीब्यूटर का 10-अंकों का नंबर (अगर दूसरा नंबर लगाना हो तो यहाँ 9993310609 की जगह लिख दें)
       let distPhone = localStorage.getItem('airen_pipe_distributor_phone') || "9993310609";
       distPhone = distPhone.replace(/[^0-9]/g, '');
       if (distPhone.length === 10) distPhone = '91' + distPhone;
 
-      const url = "https://api.whatsapp.com/send?phone=919993310609&text=" + encoded;
-      window.open(url, '_blank');    }
-      if (!activeModalOrder) return;
-      const order = activeModalOrder;
-
-      let msg = `*AIREN PIPE - ORDER REQUISITION SLIP*\n`;
-      msg += `*Order #:* ${order.id}\n`;
-      msg += `*Booked By (Sales):* ${order.salesperson || 'Airen Desk'}\n`;
-      msg += `*Party:* ${order.partyName}\n`;
-      if (order.partyGst && order.partyGst !== 'Unregistered') msg += `*GSTIN:* ${order.partyGst}\n`;
-      msg += `*Date:* ${order.orderDate}\n`;
-      if (order.partyRef) msg += `*Ref PO:* ${order.partyRef}\n`;
-      if (order.deliverySite) msg += `*Delivery Site:* ${order.deliverySite}\n`;
-      msg += `--------------------------------\n`;
-      msg += `*ITEMS BOOKED:*\n`;
-
-      order.items.forEach((it, i) => {
-        const itemTitle = it.itemName ? `${it.itemName}` : it.category;
-        const classStr = (it.specClass && it.specClass !== 'None') ? ` | Pressure/Rating: ${it.specClass}` : '';
-        const lenStr = (it.length && !it.length.includes('N.A.')) ? ` | Len: ${it.length}` : '';
-        msg += `${i+1}. [${it.brand}] *${itemTitle}* | Size: *${it.size}*${classStr}${lenStr} | *Qty: ${it.qty} ${it.unit}* ${it.remarks ? `(${it.remarks})` : ''}\n`;
-      });
-
-      const totalUnits = order.items.reduce((s, it) => s + (it.qty || 0), 0);
-      msg += `--------------------------------\n`;
-      msg += `*Total Units:* ${totalUnits}\n`;
-      if (order.notes) msg += `*Notes:* ${order.notes}\n`;
-      msg += `Status: ${order.status} (Recorded for godown packing & loading)`;
-
-      const encoded = encodeURIComponent(msg);
-      const url = `[https://api.whatsapp.com/send?text=$](https://api.whatsapp.com/send?text=$){encoded}`;
+      const url = "[https://api.whatsapp.com/send?phone=](https://api.whatsapp.com/send?phone=)" + distPhone + "&text=" + encoded;
       window.open(url, '_blank');
     }
 
@@ -2701,7 +2666,7 @@
 
     /* ==========================================================
        KPIS & EXPORT
-       ========================================================= */
+       ========================================================== */
     function updateGlobalKPIs() {
       const totalOrdersEl = document.getElementById('stat-total-orders');
       const pendingOrdersEl = document.getElementById('stat-pending-orders');
