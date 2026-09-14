@@ -5,1276 +5,200 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Airen Pipe - Order Desk & Distribution Booking</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              200: '#bae0fd',
-              500: '#0284c7',
-              600: '#0369a1',
-              700: '#075985',
-              800: '#0c4a6e',
-              900: '#082f49',
-            },
-            accent: {
-              500: '#f97316',
-              600: '#ea580c',
-            }
-          }
-        }
-      }
-    }
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printOrderModal, #printOrderModal * {
-        visibility: visible;
-      }
-      #printOrderModal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background: white !important;
-      }
-      .no-print {
-        display: none !important;
-      }
+      body * { visibility: hidden; }
+      #printOrderModal, #printOrderModal * { visibility: visible; }
+      #printOrderModal { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white !important; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
 
   <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-500 flex items-center justify-center shadow-inner">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" stroke-width="2.5" stroke-dasharray="2 3"/>
-              <circle cx="12" cy="12" r="5" stroke-width="2"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18"/>
-            </svg>
-          </div>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-orange-500 flex items-center justify-center font-black text-xl">A</div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-accent-500">Pipe</span></span>
-              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                Sheet Live Linked
-              </span>
+              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-orange-500">Pipe</span></span>
+              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full">Sheet Live Linked</span>
             </div>
-            <p class="text-xs text-slate-400 hidden sm:block">Airen Pipe Distribution & Order Booking Desk</p>
           </div>
         </div>
-
-        <nav class="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
-          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab active px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            <span>Order Book</span>
-          </button>
-          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Punch Order</span>
-          </button>
-          <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            <span>Parties (167)</span>
-          </button>
-          <button onclick="switchTab('catalog')" id="tab-catalog-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-            <span>Specs & Catalog</span>
-          </button>
-          <button onclick="switchTab('settings')" id="tab-settings-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <span>Owner PIN & Sync</span>
-          </button>
+        <nav class="flex items-center space-x-2 bg-slate-800 p-1 rounded-xl">
+          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white">Order Book</button>
+          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white">+ Punch Order</button>
         </nav>
-
-        <div class="flex items-center space-x-2">
-          <button onclick="quickOpenNewOrder()" class="bg-accent-500 hover:bg-accent-600 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            <span class="hidden sm:inline">New Order</span>
-            <span class="sm:hidden">New</span>
-          </button>
-        </div>
       </div>
     </div>
   </header>
 
-  <div class="md:hidden bg-slate-800 border-b border-slate-700 text-slate-300 text-xs flex justify-around p-1.5 sticky top-16 z-30 shadow-sm">
-    <button onclick="switchTab('orders')" id="m-tab-orders" class="m-nav-tab flex-1 py-1.5 text-center font-medium text-white bg-brand-600 rounded">Orders</button>
-    <button onclick="switchTab('new-order')" id="m-tab-new-order" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">+ Punch</button>
-    <button onclick="switchTab('parties')" id="m-tab-parties" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Parties</button>
-    <button onclick="switchTab('catalog')" id="m-tab-catalog" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Specs</button>
-    <button onclick="switchTab('settings')" id="m-tab-settings" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded text-emerald-400">Security</button>
-  </div>
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
 
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
-
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
-        <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Orders</p>
-          <h3 id="stat-total-orders" class="text-xl sm:text-2xl font-bold text-slate-800">0</h3>
-        </div>
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
-        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Confirmation</p>
-          <h3 id="stat-pending-orders" class="text-xl sm:text-2xl font-bold text-amber-600">0</h3>
-        </div>
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
-        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Confirmed Orders</p>
-          <h3 id="stat-confirmed-orders" class="text-xl sm:text-2xl font-bold text-emerald-600">0</h3>
-        </div>
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
-        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Quantity (Pcs/Coils)</p>
-          <h3 id="stat-total-pcs" class="text-xl sm:text-2xl font-bold text-indigo-700">0</h3>
-        </div>
-      </div>
-    </section>
-
+    <!-- ORDER BOOK VIEW -->
     <div id="view-orders" class="tab-view space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div class="flex-1 flex flex-col sm:flex-row gap-2">
-          <div class="relative flex-1">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </span>
-            <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search by Salesperson, Party, GST, City, Order #..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition-all">
-          </div>
-
-          <select id="order-status-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="ALL">All Statuses</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Recorded">Recorded (Draft)</option>
-            <option value="Hold">On Hold</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-
-          <select id="order-salesperson-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="ALL">All Salespersons</option>
-            <option value="Sonam Jain">Sonam Jain</option>
-            <option value="Adil Beg">Adil Beg</option>
-            <option value="Ateeque Ahmed">Ateeque Ahmed</option>
-            <option value="Abhishek Agrawal">Abhishek Agrawal</option>
-            <option value="Office Counter">Office Counter</option>
-          </select>
-
-          <select id="order-party-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none max-w-xs truncate">
-            <option value="ALL">All Parties (167)</option>
-          </select>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders from Google Sheet">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+        <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="🔍 Search Order ID, Party Name..." class="w-72 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none">
+        <div class="flex gap-2">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-1.5">
             <span>☁️ Sync All Orders</span>
           </button>
-          <button onclick="exportOrdersToCSV()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors flex items-center space-x-1.5" title="Export all orders to CSV">
-            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            <span>Export CSV</span>
-          </button>
-          <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm flex items-center space-x-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Punch Order</span>
+          <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-sm">
+            + New Order
           </button>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-          <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-            <span>Airen Pipe Recorded Orders</span>
-            <span id="filtered-count-badge" class="bg-brand-100 text-brand-700 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
-          </h2>
-          <span class="text-xs text-slate-500">Sorted by newest order</span>
+          <h2 class="font-bold text-slate-800 text-sm">Recorded Orders (<span id="filtered-count-badge">0</span>)</h2>
         </div>
-
         <div id="orders-container" class="divide-y divide-slate-100"></div>
-
-        <div id="orders-empty-state" class="py-12 px-4 text-center">
-          <div class="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-3">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
-          <h3 class="text-base font-semibold text-slate-700">No Orders Recorded Yet</h3>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Select from 167 verified dealer parties and punch your first order.</p>
-          <div class="mt-4 flex justify-center gap-2">
-            <button onclick="quickOpenNewOrder()" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-xl hover:bg-brand-700">
-              Punch First Order
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 
+    <!-- PUNCH / EDIT ORDER FORM -->
     <div id="view-new-order" class="tab-view hidden space-y-6">
       <form id="orderForm" onsubmit="handleSaveOrder(event)" class="space-y-6">
         <input type="hidden" id="edit-order-id" value="">
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
           <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <div>
-              <h2 id="order-form-title" class="text-lg font-bold text-slate-900">Record Airen Pipe & Fittings Order</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Select salesperson, choose party, sizes, class/pressure rating (kg), and quantities.</p>
-            </div>
-            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live Sheet Connected
-            </span>
+            <h2 id="order-form-title" class="text-lg font-bold text-slate-900">Record Airen Pipe Order</h2>
+            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold">Live Sheet Connected</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label class="block text-xs font-bold text-brand-700 uppercase mb-1 flex items-center gap-1">
-                <span>👤 Salesperson / Booked By</span>
-                <span class="text-red-500">*</span>
-              </label>
-              <select id="form-salesperson" required class="w-full px-3.5 py-2.5 text-sm bg-blue-50/70 border border-blue-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none font-bold text-slate-800">
-                <option value="">-- Select Salesperson --</option>
-                <option value="Sonam Jain">Sonam Jain</option>
-                <option value="Adil Beg">Adil Beg</option>
-                <option value="Ateeque Ahmed">Ateeque Ahmed</option>
-                <option value="Abhishek Agrawal">Abhishek Agrawal</option>
-                <option value="Office Counter">Office / Counter</option>
-              </select>
-              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this device</span>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Booked By / Salesperson *</label>
+              <input type="text" id="form-salesperson" required placeholder="Salesperson Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
             </div>
 
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="block text-xs font-bold text-slate-700 uppercase">Party / Dealer Name <span class="text-red-500">*</span></label>
-                <button type="button" onclick="openPartyModal()" class="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
-                  <span>+ Add New</span>
-                </button>
-              </div>
-              <input type="text" id="party-search-box" oninput="filterPartyDropdown(this.value)" placeholder="🔍 Type name / city / GST to filter..." class="w-full mb-1 px-3 py-1 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500">
-              <div id="quick-gst-add-prompt" class="hidden mb-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between">
-                <span class="text-[11px] text-indigo-900 font-medium">New GST Number detected!</span>
-                <button type="button" onclick="quickOpenGstModal()" class="text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded-md shadow-xs">
-                  + Register from GST
-                </button>
-              </div>
-              <select id="form-party-id" required onchange="onPartySelected(this.value)" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
-                <option value="">-- Select Party (167 Available) --</option>
-              </select>
-              <div id="party-quick-info" class="text-xs text-slate-600 mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200 hidden leading-relaxed"></div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name *</label>
+              <input type="text" id="form-party-name" required placeholder="Type Party Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900">
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Order Date <span class="text-red-500">*</span></label>
-              <input type="date" id="form-order-date" required class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Order Date *</label>
+              <input type="date" id="form-order-date" required class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target / Req. Date</label>
-              <input type="date" id="form-target-date" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Order Status</label>
-              <select id="form-order-status" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
-                <option value="Confirmed" selected>Confirmed (Party Approved)</option>
-                <option value="Recorded">Recorded (Draft / Tentative)</option>
-                <option value="Hold">On Hold (Awaiting Spec confirmation)</option>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status</label>
+              <select id="form-order-status" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                <option value="Confirmed" selected>Confirmed</option>
+                <option value="Recorded">Recorded (Draft)</option>
+                <option value="Hold">Hold</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party PO / Ref Slip #</label>
-              <input type="text" id="form-party-ref" placeholder="e.g. WhatsApp / Verbal / PO-882" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
-            </div>
-
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Delivery Destination / Site Remarks</label>
-              <input type="text" id="form-delivery-site" placeholder="e.g. Site Godown, Transport Nagar, or Party self-pickup" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
             </div>
           </div>
         </div>
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-            <div>
-              <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
-                <span>Pipes & Fittings Specification Line Items</span>
-                <span id="line-items-count-badge" class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">1 item</span>
-              </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Category select karte hi item, size, pressure aur length automatically adjust ho jayenge.</p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <button type="button" onclick="openProductModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded-lg border border-indigo-200 transition-colors font-bold flex items-center space-x-1">
-                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                <span>+ Add Product</span>
-              </button>
-              <button type="button" onclick="insertQuickPreset('agri_fittings')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-2.5 py-1.5 rounded-lg border border-emerald-300 transition-colors font-semibold">
-                🌾 + Agri Pack
-              </button>
-              <button type="button" onclick="insertQuickPreset('cpvc_fittings')" class="text-xs bg-red-50 hover:bg-red-100 text-red-700 px-2.5 py-1.5 rounded-lg border border-red-200 transition-colors font-medium">
-                ⚡ + CPVC Pack
-              </button>
-              <button type="button" onclick="insertQuickPreset('upvc_fittings')" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2.5 py-1.5 rounded-lg border border-blue-200 transition-colors font-medium">
-                ⚡ + UPVC Pack
-              </button>
-              <button type="button" onclick="insertQuickPreset('swr_fittings')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg border border-amber-200 transition-colors font-medium">
-                ⚡ + SWR Pack
-              </button>
-              <button type="button" onclick="insertQuickPreset('water_tank')" class="text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-800 px-2.5 py-1.5 rounded-lg border border-cyan-300 transition-colors font-semibold">
-                💧 + Water Tank
-              </button>
-              <button type="button" onclick="addOrderItemRow()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm flex items-center space-x-1 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                <span>+ Add Row</span>
-              </button>
-            </div>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-900">Line Items (<span id="summary-total-lines">0</span>)</h3>
+            <button type="button" onclick="addOrderItemRow()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm">
+              + Add Row
+            </button>
           </div>
 
-          <div class="overflow-x-auto -mx-5 sm:mx-0">
-            <table class="w-full text-left text-xs text-slate-700 min-w-[980px]">
-              <thead class="bg-slate-100/90 text-slate-600 uppercase font-semibold text-[11px] tracking-wider border-y border-slate-200">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700 min-w-[950px]">
+              <thead class="bg-slate-100 uppercase font-semibold text-[11px] border-y border-slate-200">
                 <tr>
                   <th class="py-3 px-2 w-8 text-center">#</th>
                   <th class="py-3 px-2 w-48">Category</th>
-                  <th class="py-3 px-2 w-52">Fitting Type / Item</th>
-                  <th class="py-3 px-2 w-28">Brand</th>
-                  <th class="py-3 px-2 w-40">Size / Dia</th>
-                  <th class="py-3 px-2 w-40">Kg / Class / Pressure</th>
-                  <th class="py-3 px-2 w-28">Length / Pkg</th>
+                  <th class="py-3 px-2 w-56">Item / Fitting Name</th>
+                  <th class="py-3 px-2 w-24">Brand</th>
+                  <th class="py-3 px-2 w-32">Size / Dia</th>
+                  <th class="py-3 px-2 w-36">Class / Pressure</th>
+                  <th class="py-3 px-2 w-28">Length</th>
                   <th class="py-3 px-2 w-24 text-right">Quantity</th>
                   <th class="py-3 px-2 w-24">Unit</th>
-                  <th class="py-3 px-2">Remarks / Specs</th>
-                  <th class="py-3 px-2 w-10 text-center">Action</th>
+                  <th class="py-3 px-2 w-10 text-center">Del</th>
                 </tr>
               </thead>
               <tbody id="order-items-tbody" class="divide-y divide-slate-100 font-normal"></tbody>
             </table>
           </div>
 
-          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/80 p-3 rounded-xl gap-3">
-            <div class="text-xs text-slate-600 flex items-center space-x-4">
-              <span>Total Line Items: <strong id="summary-total-lines" class="text-slate-900 font-bold">0</strong></span>
-              <span>Total Pieces/Units: <strong id="summary-total-qty" class="text-brand-700 font-bold text-sm">0</strong></span>
-            </div>
-            <div class="flex items-center space-x-3">
-              <button type="button" onclick="openProductModal()" class="text-xs font-semibold text-indigo-700 hover:text-indigo-900 flex items-center space-x-1">
-                <span>+ Need a product not in list? Add here</span>
-              </button>
-              <span class="text-slate-300">|</span>
-              <button type="button" onclick="addOrderItemRow()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center space-x-1">
-                <span>+ Add another row</span>
-              </button>
-            </div>
+          <div class="pt-4 border-t border-slate-100 flex justify-between items-center bg-slate-50 p-3 rounded-xl font-bold text-xs">
+            <span>Total Quantity Booked: <span id="summary-total-qty" class="text-sky-700 text-sm font-black font-mono">0</span> units</span>
+            <button type="button" onclick="addOrderItemRow()" class="text-sky-600 hover:underline">+ Add another item</button>
           </div>
         </div>
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">General Order Notes / Remarks</label>
-          <textarea id="form-order-notes" rows="2" placeholder="e.g. Priority order for farm irrigation, Party requested standard 4kg / 6kg, Pack fittings in bags..." class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none"></textarea>
-
-          <div class="mt-6 flex flex-wrap items-center justify-end gap-3">
-            <button type="button" onclick="resetOrderForm()" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
-              Clear / Cancel
-            </button>
-            <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 rounded-xl shadow-md transition-all flex items-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-              <span id="save-order-btn-text">Save & Record Order</span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <div id="view-parties" class="tab-view hidden space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div class="relative flex-1">
-          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </span>
-          <input type="text" id="party-search-input" oninput="renderPartiesList()" placeholder="Search from 167 parties by name, GST, city, address..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
-        </div>
-        <button onclick="openPartyModal()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm flex items-center justify-center space-x-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          <span>Add Custom Party</span>
-        </button>
-      </div>
-
-      <div id="parties-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </div>
-
-    <div id="view-catalog" class="tab-view hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl shadow-xs border-2 border-indigo-200 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-slate-100 gap-2">
-          <div>
-            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-              <span>Manage Catalog & Remove Products</span>
-            </h2>
-            <p class="text-xs text-slate-500">Select a category and click "Remove" on any unwanted product. Requires Master PIN.</p>
-          </div>
-          <button type="button" onclick="resetCustomCatalogPrompt()" class="text-xs text-slate-500 hover:text-slate-800 border border-slate-300 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition font-medium">
-            Reset to Factory Defaults
+        <div class="flex justify-end gap-3">
+          <button type="button" onclick="resetOrderForm(); switchTab('orders');" class="px-5 py-2.5 text-sm font-semibold bg-slate-100 hover:bg-slate-200 rounded-xl">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-md">
+            <span id="save-order-btn-text">Save & Update Order</span>
           </button>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="sm:col-span-1">
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Select Category to Manage</label>
-            <select id="manage-category-select" onchange="renderManageCatalogTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 font-bold text-slate-800">
-            </select>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto border border-slate-200 rounded-xl">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[10px]">
-              <tr>
-                <th class="py-2.5 px-3 w-12 text-center">#</th>
-                <th class="py-2.5 px-3">Product / Item Name</th>
-                <th class="py-2.5 px-3 w-28 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody id="manage-catalog-tbody" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="view-settings" class="tab-view hidden space-y-6">
-      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-          <div class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          </div>
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Airen Pipe Owner Security PIN</h2>
-            <p class="text-xs text-slate-500">Protects database against unauthorized deletions of orders, products, parties, and cloud sync.</p>
-          </div>
-        </div>
-
-        <form onsubmit="handleChangePin(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Current Master PIN</label>
-            <input type="password" id="pin-current" maxlength="8" required placeholder="Enter current PIN" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">New 4 to 6 Digit PIN</label>
-            <input type="password" id="pin-new" maxlength="8" required placeholder="Enter new PIN" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          </div>
-          <div class="flex items-end">
-            <button type="submit" class="w-full px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl shadow-xs transition-colors">
-              Update Security PIN
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
-        <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          </div>
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Google Sheets Central Sync</h2>
-            <p class="text-xs text-slate-500">Every order punched automatically records to your central Google Sheet.</p>
-          </div>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Google Sheet Webhook URL (Pre-Configured)</label>
-            <div class="flex gap-2">
-              <input type="url" id="google-webhook-url" class="flex-1 px-3.5 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono text-slate-600">
-              <button onclick="saveGoogleWebhookUrl()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs">
-                Update URL
-              </button>
-            </div>
-            <p class="text-[11px] text-emerald-600 mt-1 font-medium">✓ Central Google Sheet live connection is active.</p>
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
   </main>
 
-  <div id="productModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
-      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-        <h3 class="font-bold text-slate-900 text-base flex items-center space-x-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-          <span>Add New Product / Fitting Spec</span>
-        </h3>
-        <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <form id="productForm" onsubmit="handleSaveCustomProduct(event)" class="space-y-3.5">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Category <span class="text-red-500">*</span></label>
-          <select id="new-prod-category" required class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-slate-800">
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Product / Pipe / Fitting Name <span class="text-red-500">*</span></label>
-          <input type="text" id="new-prod-name" required placeholder="e.g. 500L Triple Tank / CPVC Concealed Valve" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          <p class="text-[11px] text-slate-500 mt-1">This item will permanently appear in the order dropdown for this category.</p>
-        </div>
-
-        <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="closeProductModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-colors">
-            Save Product
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="pinModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-xs w-full p-5 border border-slate-200 text-center space-y-4">
-      <div class="w-12 h-12 mx-auto bg-slate-100 text-slate-700 rounded-full flex items-center justify-center">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-      </div>
-      <div>
-        <h3 class="font-bold text-slate-900 text-base" id="pin-modal-action-title">Owner Authorization Required</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Enter Master PIN to confirm this action.</p>
-      </div>
-
-      <input type="password" id="pin-input-field" maxlength="8" placeholder="••••" class="w-32 mx-auto text-center tracking-widest text-lg font-bold py-2 bg-slate-50 border-2 border-slate-300 rounded-xl focus:border-brand-500 focus:outline-none">
-
-      <div class="flex justify-center space-x-2 pt-1">
-        <button onclick="cancelPinModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
-          Cancel
-        </button>
-        <button onclick="confirmPinModal()" class="px-5 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl">
-          Authorize
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="orderDetailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
+  <!-- ORDER DETAIL MODAL -->
+  <div id="orderDetailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center no-print">
-        <div class="flex items-center space-x-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <h3 class="font-bold text-sm sm:text-base tracking-tight" id="modal-order-title">Airen Pipe Order Requisition Slip</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="window.print()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
-            <span>Print / PDF</span>
-          </button>
-          <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
+        <h3 class="font-bold text-sm">Order Requisition Slip</h3>
+        <div class="flex gap-2">
+          <button onclick="window.print()" class="bg-sky-600 px-3 py-1 text-xs font-bold rounded-lg">Print</button>
+          <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white">✕</button>
         </div>
       </div>
-
-      <div id="printOrderModal" class="p-6 sm:p-8 overflow-y-auto flex-1 text-slate-800 space-y-6">
-        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4">
+      <div id="printOrderModal" class="p-6 overflow-y-auto flex-1 space-y-4">
+        <div class="flex justify-between border-b pb-3">
           <div>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">AIREN PIPE ORDER REQUISITION</h1>
-            <p class="text-xs text-slate-500 font-semibold tracking-wide uppercase mt-0.5">Godown Loading & Picking Requisition</p>
-            <p class="text-[11px] text-amber-700 font-medium mt-1 bg-amber-50 inline-block px-2 py-0.5 rounded border border-amber-200">Notice: Internal Order Booking Record (Non-Tax/Non-Invoice)</p>
+            <h1 class="text-xl font-black">AIREN PIPE ORDER REQUISITION</h1>
+            <p class="text-xs text-slate-500">Party: <strong id="slip-party-name" class="text-slate-900 text-sm"></strong></p>
           </div>
-          <div class="text-right">
-            <div class="inline-block bg-slate-100 px-3 py-1 rounded-lg border border-slate-300">
-              <span class="text-[10px] text-slate-500 block uppercase font-bold">Order Number</span>
-              <span id="slip-order-id" class="text-sm font-black text-slate-900 font-mono">#ORD-0000</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-1">Date: <strong id="slip-order-date" class="text-slate-800">--</strong></p>
-            <p class="text-xs text-brand-700 font-bold mt-0.5">Booked By: <span id="slip-salesperson">--</span></p>
+          <div class="text-right text-xs">
+            <span id="slip-order-id" class="font-mono font-bold bg-slate-100 px-2 py-1 rounded"></span>
+            <p class="mt-1">Date: <strong id="slip-order-date"></strong></p>
           </div>
         </div>
-
-        <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-          <div>
-            <span class="text-slate-400 uppercase font-bold text-[10px] block mb-0.5">Party / Customer Details</span>
-            <h4 id="slip-party-name" class="font-bold text-sm text-slate-900">--</h4>
-            <p id="slip-party-gst" class="text-emerald-700 font-bold mt-0.5">GSTIN: --</p>
-            <p id="slip-party-phone" class="text-slate-600 mt-0.5">Phone: --</p>
-            <p id="slip-party-city" class="text-slate-600">Location: --</p>
-          </div>
-          <div>
-            <span class="text-slate-400 uppercase font-bold text-[10px] block mb-0.5">Order & Delivery Details</span>
-            <p class="text-slate-700">Status: <span id="slip-status-badge" class="font-bold">--</span></p>
-            <p class="text-slate-700">Party PO/Ref: <strong id="slip-party-ref" class="text-slate-900">--</strong></p>
-            <p class="text-slate-700">Req. Target Date: <span id="slip-target-date" class="text-slate-900">--</span></p>
-            <p class="text-slate-700">Delivery Site: <span id="slip-delivery-site" class="text-slate-900">--</span></p>
-          </div>
-        </div>
-
-        <div>
-          <table class="w-full text-left text-xs border border-slate-300">
-            <thead class="bg-slate-800 text-white uppercase text-[10px] font-bold">
-              <tr>
-                <th class="py-2.5 px-2 border border-slate-700 w-8 text-center">#</th>
-                <th class="py-2.5 px-3 border border-slate-700">Category</th>
-                <th class="py-2.5 px-3 border border-slate-700">Fitting Item / Pipe Description</th>
-                <th class="py-2.5 px-2 border border-slate-700">Brand</th>
-                <th class="py-2.5 px-3 border border-slate-700">Size / Dia</th>
-                <th class="py-2.5 px-2 border border-slate-700">Kg / Class / Pressure</th>
-                <th class="py-2.5 px-2 border border-slate-700">Length/Pkg</th>
-                <th class="py-2.5 px-3 border border-slate-700 text-right">Quantity</th>
-                <th class="py-2.5 px-2 border border-slate-700">Unit</th>
-              </tr>
-            </thead>
-            <tbody id="slip-items-tbody" class="divide-y border-b border-slate-200"></tbody>
-            <tfoot class="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-400">
-              <tr>
-                <td colspan="7" class="py-2 px-3 text-right text-xs uppercase">Total Quantity Booked:</td>
-                <td id="slip-total-qty" class="py-2 px-3 text-right text-sm font-black text-brand-700 font-mono">0</td>
-                <td class="py-2 px-3 text-xs">Pcs / Units</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-
-        <div class="space-y-4">
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
-            <span class="font-bold text-slate-700 block mb-0.5">Special Instructions / Remarks:</span>
-            <p id="slip-notes" class="text-slate-600 italic">No special instructions.</p>
-          </div>
-
-          <div class="grid grid-cols-2 pt-6 gap-8 text-xs text-center border-t border-slate-300">
-            <div>
-              <div class="h-10 border-b border-dashed border-slate-400"></div>
-              <p class="font-semibold text-slate-700 mt-1">Booked & Verified By</p>
-              <p class="text-[10px] text-slate-500 font-medium" id="slip-footer-salesperson">(Sales Desk)</p>
-            </div>
-            <div>
-              <div class="h-10 border-b border-dashed border-slate-400"></div>
-              <p class="font-semibold text-slate-700 mt-1">Party / Receiver Sign</p>
-              <p class="text-[10px] text-slate-400">(Acknowledgement)</p>
-            </div>
-          </div>
-        </div>
+        <table class="w-full text-left text-xs border border-slate-300">
+          <thead class="bg-slate-800 text-white font-bold">
+            <tr>
+              <th class="p-2 w-8 text-center">#</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">Item Name</th>
+              <th class="p-2">Brand</th>
+              <th class="p-2">Size</th>
+              <th class="p-2">Class</th>
+              <th class="p-2">Length</th>
+              <th class="p-2 text-right">Qty</th>
+              <th class="p-2">Unit</th>
+            </tr>
+          </thead>
+          <tbody id="slip-items-tbody" class="divide-y border-b"></tbody>
+        </table>
       </div>
-
-      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center no-print">
-        <div class="flex items-center space-x-2">
-          <button onclick="cloneOrderFromModal()" class="text-xs text-brand-700 font-semibold hover:underline">
-            🔄 Re-order (Clone This)
-          </button>
-          <span class="text-slate-300">|</span>
-          <button onclick="editOrderFromModal()" class="text-xs text-amber-700 font-semibold hover:underline">
-            ✏️ Edit Order
-          </button>
-        </div>
-        <button onclick="closeOrderDetailModal()" class="px-4 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg">
-          Close Slip
-        </button>
+      <div class="p-3 bg-slate-50 border-t flex justify-end no-print">
+        <button onclick="closeOrderDetailModal()" class="px-4 py-1.5 text-xs font-bold bg-slate-200 rounded-lg">Close</button>
       </div>
     </div>
   </div>
-
-  <div id="partyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
-      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-        <div>
-          <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">15-digit GSTIN parses State & Entity Type automatically.</p>
-        </div>
-        <button onclick="closePartyModal()" class="text-slate-400 hover:text-slate-600">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <form id="partyForm" onsubmit="handleSaveParty(event)" class="space-y-3">
-        <input type="hidden" id="edit-party-id" value="">
-        
-        <div>
-          <label class="block text-xs font-bold text-brand-800 uppercase mb-1 flex items-center justify-between">
-            <span>GST Number (GSTIN)</span>
-            <span class="text-[10px] text-slate-400 lowercase font-normal">(Leave blank if URP)</span>
-          </label>
-          <div class="flex gap-2">
-            <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
-            <button type="button" onclick="openOfficialGstPortal()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Copies GST Number and opens official portal">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-              <span>Verify Portal</span>
-            </button>
-          </div>
-          <div id="gst-parsed-badge" class="hidden mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200 text-[11px] leading-relaxed text-slate-700"></div>
-        </div>
-
-        <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-200/80 space-y-1">
-          <div class="flex justify-between items-center">
-            <span class="text-[11px] font-bold text-indigo-950 flex items-center gap-1">
-              <span>📋 Smart Auto-Fill from GST Portal</span>
-            </span>
-            <span class="text-[10px] text-indigo-600 font-medium">Auto-Extracts name & address</span>
-          </div>
-          <input type="text" id="gst-smart-paste" oninput="handleSmartGstPaste(this.value)" placeholder="Paste copied GST result text here to auto-fill..." class="w-full px-3 py-1.5 text-xs bg-white border border-indigo-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name <span class="text-red-500">*</span></label>
-          <input type="text" id="party-name" required placeholder="e.g. Balaji Hardware / Rajesh Traders" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-semibold text-slate-900">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
-            <input type="tel" id="party-phone" placeholder="e.g. 9876543210" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">City / Town</label>
-            <input type="text" id="party-city" placeholder="e.g. Bhopal, Sironj, Vidisha" class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Address / Location Details</label>
-          <textarea id="party-address" rows="2" placeholder="Market, ward, landmark, street..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none leading-relaxed"></textarea>
-        </div>
-
-        <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="closePartyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-xs transition-colors">
-            Save Party
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
   <script>
-    const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
-
-    const DEFAULT_PARTIES = [
-  {"id": "pty_001", "name": "A to Z HARDWARE", "firm": "A to Z HARDWARE", "phone": "", "city": "Sironj", "gst": "Unregistered", "address": "Sironj", "type": "Unregistered (URP)"},
-  {"id": "pty_002", "name": "A to Z TRADERS", "firm": "A to Z TRADERS", "phone": "", "city": "Vidisha", "gst": "23CNWPA4952Q1ZA", "address": "NEAR MANSHA POORAN MANDIR WARD NO. 21 LATERI ROAD Sironj Vidisha, Madhya Pradesh-464228 India", "type": "Registered Dealer"},
-  {"id": "pty_003", "name": "ABABIL ENTERPRISES", "firm": "ABABIL ENTERPRISES", "phone": "", "city": "Ahmedabad", "gst": "24ALFPM1205K1ZF", "address": "Ground Floor 74 Maulana Azad Park Society Sarkhej Raod Ahmedabad", "type": "Registered Dealer"},
-  {"id": "pty_004", "name": "AGRO TRADERS", "firm": "AGRO TRADERS", "phone": "", "city": "Bhopal", "gst": "23AIEPG8904D1ZP", "address": "GROUND FLOOR BHOPAL PLAZA SHOP NO 46-47-48-49 HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_005", "name": "AIREN POLYPIPES PVT LTD", "firm": "AIREN POLYPIPES PVT LTD", "phone": "", "city": "Bhopal", "gst": "23AABCA3944M1ZP", "address": "HOTEL RAJDOOT  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_006", "name": "AMIT TRADER", "firm": "AMIT TRADER", "phone": "", "city": "Seoni Malwa", "gst": "23DDVPR1849P1ZI", "address": "WARD NO 15 Main Road Seoni Malwa", "type": "Registered Dealer"},
-  {"id": "pty_007", "name": "AMIT TRADERS", "firm": "AMIT TRADERS", "phone": "", "city": "", "gst": "23ACWPC7424L1ZA", "address": "C SECTOR 23 RIASEN ROAD INDRAPURI", "type": "Registered Dealer"},
-  {"id": "pty_008", "name": "AMRIT ENTERPRISES", "firm": "AMRIT ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23BJHPD2812E1ZX", "address": "Amrit Villa 21 NEAR LAKE TOWER Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_009", "name": "ANIL STEELS", "firm": "ANIL STEELS", "phone": "", "city": "Obaidullaganj", "gst": "23CEUPM2388K1ZT", "address": "OBAIDULLAGANJ WARD NO.04, GOHARGANJ ROAD OBAIDULLAGANJ", "type": "Registered Dealer"},
-  {"id": "pty_010", "name": "ANMOL SANITATION", "firm": "ANMOL SANITATION", "phone": "", "city": "Bhopal", "gst": "23BYGPA2912L1ZR", "address": "PLOT NO 1A SHOPNO 1 80 FEET ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_011", "name": "ANOOP TRADERS", "firm": "ANOOP TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACFPM4877N1Z2", "address": "Ground Floor 0 Capital Hotel, Bharat Talkies BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_012", "name": "ARIHANT SALES", "firm": "ARIHANT SALES", "phone": "", "city": "Bhopal", "gst": "23AHNPJ0018P1ZA", "address": "SHOP NO. 01  HAMIDIA ROAD SHAH BUILDING COMPOUND KE ANDAR  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_013", "name": "ARIHANT TUBES", "firm": "ARIHANT TUBES", "phone": "", "city": "Bhopal", "gst": "23AANFA7516L1Z9", "address": "04 OPPOSITE BHOPAL TALKIES HAMIDIA ROAD BHOPAL  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_014", "name": "ARUN AGRAWAL", "firm": "ARUN AGRAWAL", "phone": "", "city": "", "gst": "23AARPA8699Q1ZO", "address": "B-62 PARASPAR COLONY KOLAR ROAD CHUNA BHATTI", "type": "Registered Dealer"},
-  {"id": "pty_015", "name": "BALAJI HARDWARE AND KRISHI SEVAKENDRA", "firm": "BALAJI HARDWARE AND KRISHI SEVAKENDRA", "phone": "", "city": "Sehore", "gst": "23ACOPL2323F1ZY", "address": "0 SEHORE SHYAMPUR ROAD CHANDBAD DHANKHEDI DHANKHEDI  Sehore, Madhya Pradesh-466001 India", "type": "Registered Dealer"},
-  {"id": "pty_016", "name": "BALAJI PIPE AND SANITARY STORE", "firm": "BALAJI PIPE AND SANITARY STORE", "phone": "", "city": "Shivpuri", "gst": "23CIYPS1748B1ZZ", "address": "BHERO BABA TEMPLE DHARAMLA ROAD SHIVPURI", "type": "Registered Dealer"},
-  {"id": "pty_017", "name": "BALAJI TRADERS", "firm": "BALAJI TRADERS", "phone": "", "city": "Raisen", "gst": "23JQGPK8563R1ZU", "address": "WARD NUMBER 09 UDAIPURA Udaipura Raisen, Madhya Pradesh-464770 India", "type": "Registered Dealer"},
-  {"id": "pty_018", "name": "BALAJI TRADERS & PLYWOOD", "firm": "BALAJI TRADERS & PLYWOOD", "phone": "", "city": "Bhopal", "gst": "23AKUPP2390J1ZN", "address": "HANUMAN NAGAR BALAJI TOWER PLOT NO 10 JATKHEDI ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_019", "name": "BARKHA TRADERS", "firm": "BARKHA TRADERS", "phone": "", "city": "Doraha", "gst": "Unregistered", "address": "DORAHA", "type": "Unregistered (URP)"},
-  {"id": "pty_020", "name": "BHOUMIK TRADERS", "firm": "BHOUMIK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
-  {"id": "pty_021", "name": "BOMBAY ELECTRIC & MACHINERY STORE", "firm": "BOMBAY ELECTRIC & MACHINERY STORE", "phone": "", "city": "", "gst": "23AEJPS5915D1ZK", "address": "WARD ITWARA ROAD ITWARA BAZAR", "type": "Registered Dealer"},
-  {"id": "pty_022", "name": "CHOUKSEY STONE CRUSHER", "firm": "CHOUKSEY STONE CRUSHER", "phone": "", "city": "Raisen", "gst": "23AEWPC9700K1Z9", "address": "POLICE CHOUKI KE SAMANE  RAISEN ROAD ANAND NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_023", "name": "CHOURASIYA TRADERS", "firm": "CHOURASIYA TRADERS", "phone": "", "city": "Bhopal", "gst": "23ADKPC0615J1Z1", "address": "SECTOR B 20 B ASHOKA GARDEN STATION ROAD BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
-  {"id": "pty_024", "name": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "firm": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "phone": "", "city": "Bhopal", "gst": "23AAKCC9454H1ZG", "address": "First Floor Gurudwara Gali Shop No 9, 7B Hamidia Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_025", "name": "DARWESH HARDWARE STORE", "firm": "DARWESH HARDWARE STORE", "phone": "", "city": "Bhopal", "gst": "23AFUPP5910K1Z0", "address": "21  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_026", "name": "DD ENTERPRISES", "firm": "DD ENTERPRISES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
-  {"id": "pty_027", "name": "DEEP TRADERS", "firm": "DEEP TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "AYODHYA BYPASS ROAD GEET BUNGLOWS BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_028", "name": "DEEVA LOGISTICS PVT LTD", "firm": "DEEVA LOGISTICS PVT LTD", "phone": "", "city": "Indore", "gst": "23AAECD4595L1ZC", "address": "309, Block B  Shalimar Corporate Centre, South Tukoganj INDORE", "type": "Registered Dealer"},
-  {"id": "pty_029", "name": "DHAKAD HARDWARE AND PAINTS", "firm": "DHAKAD HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23JPBPK7599B1ZO", "address": "KENRA BANK SHOP NO 02 BDA ROAD BHOPAL BDA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_030", "name": "DILIP TRADERS", "firm": "DILIP TRADERS", "phone": "", "city": "Obaidullaganj", "gst": "23AGXPM1973B1ZA", "address": "OBAIDULLAGANJ WARD NO 04 MAIN ROAD OBAIDULLAGANJ OBAIDULLAGANJ", "type": "Registered Dealer"},
-  {"id": "pty_031", "name": "DUBEY ENTERPRISES", "firm": "DUBEY ENTERPRISES", "phone": "", "city": "Vidisha", "gst": "23ARGPD4977Q1Z8", "address": "123  HOME GURAD OFFICE ROAD HEERA PURA VIDISHA", "type": "Registered Dealer"},
-  {"id": "pty_032", "name": "EMKAY INDIA", "firm": "EMKAY INDIA", "phone": "", "city": "", "gst": "23AAAFE3355N1ZH", "address": "5  HAMIDIA ROAD BEHIND MANOHAR DAIRY", "type": "Registered Dealer"},
-  {"id": "pty_033", "name": "FAST TRACK INFRASTRUCTURE", "firm": "FAST TRACK INFRASTRUCTURE", "phone": "", "city": "", "gst": "23AACFF2565P1Z8", "address": "SHOP NO 4 RAVIDAS MARKET NEAR NIZZAMUDDIN COLONY INDRAPURI", "type": "Registered Dealer"},
-  {"id": "pty_034", "name": "FOUR LAKES", "firm": "FOUR LAKES", "phone": "", "city": "", "gst": "23AAGFF5547B1ZT", "address": "JHAGARIYA KHURD", "type": "Registered Dealer"},
-  {"id": "pty_035", "name": "GAURAV ENTERPEISES", "firm": "GAURAV ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ANNPA1853D1ZI", "address": "28 behind hotel palace shop no 1 babal sai complex shahjahnabad bhopal", "type": "Registered Dealer"},
-  {"id": "pty_036", "name": "GAYATREE TRADING COMPANY", "firm": "GAYATREE TRADING COMPANY", "phone": "", "city": "Bhopal", "gst": "23ABOPM6445L1Z7", "address": "7 JK BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_037", "name": "GOURAV AGRO TECH", "firm": "GOURAV AGRO TECH", "phone": "", "city": "Bhopal", "gst": "23APKPV1693R1ZX", "address": "0 ASHTA INDORE BHOPAL ROAD ASHTA", "type": "Registered Dealer"},
-  {"id": "pty_038", "name": "GRASIM INDUSTRIES LIMITED", "firm": "GRASIM INDUSTRIES LIMITED", "phone": "", "city": "", "gst": "29AAACG4464B1ZU", "address": "GRASIM INDUSTRIES LIMITED  P.B.ROAD KUMARAPATNAM", "type": "Registered Dealer"},
-  {"id": "pty_039", "name": "GUPTA HARDWARE AND PAINTS", "firm": "GUPTA HARDWARE AND PAINTS", "phone": "", "city": "Bhopal", "gst": "23FAVPS3981Q1ZE", "address": "ASHOK VIHAR COLONY H.NO. 222 HATAIKHEDA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_040", "name": "GURU NANAK PRABANDHAN COMMITTEE", "firm": "GURU NANAK PRABANDHAN COMMITTEE", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Hamidia Road Bhopal", "type": "Unregistered (URP)"},
-  {"id": "pty_041", "name": "HARI OM TRADERS", "firm": "HARI OM TRADERS", "phone": "", "city": "", "gst": "23AAGPL0257Q1ZI", "address": "shop no 58 railway  station road bairagarh", "type": "Registered Dealer"},
-  {"id": "pty_042", "name": "HEMADRI INFRASTRUCTURE", "firm": "HEMADRI INFRASTRUCTURE", "phone": "", "city": "Bhopal", "gst": "23AAMFH8955K1ZS", "address": "INDRAPURI C-61 INDRAPURI BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_043", "name": "HIND CHEMICAL", "firm": "HIND CHEMICAL", "phone": "", "city": "Bhopal", "gst": "23ADLPT4284B1ZJ", "address": "SHOP NO 02 ALARK ARCADE DATA COLONY, AIR PORT ROAD BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_044", "name": "HOME ENTERPRISES", "firm": "HOME ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AUDPP0256E1Z2", "address": "Bhawna Nagar Plot No.-1, Shop No.-07-08 Vikas Kunj Society, Near Tanatan Dhaba Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_045", "name": "JAI MANGLANI", "firm": "JAI MANGLANI", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_046", "name": "JAIN ENTERPRISES", "firm": "JAIN ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFTPJ7113B2ZQ", "address": "146 b ashoka garden bhopal", "type": "Registered Dealer"},
-  {"id": "pty_047", "name": "JAIN TRADERS", "firm": "JAIN TRADERS", "phone": "", "city": "Bhopal", "gst": "23AEIPJ1356C1Z1", "address": "1/1  BUS STAND GANDHI NAGAR  Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"},
-  {"id": "pty_048", "name": "JOHAR HARDWARE", "firm": "JOHAR HARDWARE", "phone": "", "city": "Sironj", "gst": "23BFJPJ5812A1Z0", "address": "WARD NO 06 SIRONJ  TALAIYA Sironj", "type": "Registered Dealer"},
-  {"id": "pty_049", "name": "JP SONS", "firm": "JP SONS", "phone": "", "city": "Bhopal", "gst": "23ALRPM6831B1Z6", "address": "SHOP NO. 10  PATWA MARKET BHARAT TALKIES  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_050", "name": "JYOTI ENTERPRISES", "firm": "JYOTI ENTERPRISES", "phone": "", "city": "", "gst": "23AVQPV0733L1Z4", "address": "811 AYODHYA BY PASS ROAD G SECTOR AYODHYA NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_051", "name": "KHANDELWAL ELECTRICALS", "firm": "KHANDELWAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23ASDPK1661L1ZT", "address": "MAIN ROAD BHOPAL INDORE ROAD KHAJURI SADAK KHAJURI  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_052", "name": "KHANDELWAL TRADERS", "firm": "KHANDELWAL TRADERS", "phone": "", "city": "Raisen", "gst": "23EOQPK1785A1ZY", "address": "25 GRAM DEEWANGANJ BHAWANI CHOWK RAISEN DEEWANGANJ", "type": "Registered Dealer"},
-  {"id": "pty_053", "name": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "firm": "KRITI INDUSTRIES (INDIA) LTD UNIT II", "phone": "", "city": "Indore", "gst": "23AAACK7078B2ZT", "address": "8 TH FLOOR APARTMENT NO. 801 AND 802 BRILLIANT SAPPHIRE PLOT NO. 10, PSP, IDA SCHEME NO. 78, PART II INDORE", "type": "Registered Dealer"},
-  {"id": "pty_054", "name": "KRITI INDUSTRIES (INDIA) LTD.", "firm": "KRITI INDUSTRIES (INDIA) LTD.", "phone": "", "city": "Indore", "gst": "23AAACK7078B1ZU", "address": "8th  FLOOR APARTMENT 801-802 BRILLIANT SAPPHIRE PLOT NO.10, PSP,IDA SCHMEM NO 78, PART -II INDORE", "type": "Registered Dealer"},
-  {"id": "pty_055", "name": "KUSHWAHA TRADERS", "firm": "KUSHWAHA TRADERS", "phone": "", "city": "Govindpura", "gst": "23APXPK8696L1ZQ", "address": "30c semra road govindpura shubhash colony", "type": "Registered Dealer"},
-  {"id": "pty_056", "name": "LAXMI INDUSTRIES", "firm": "LAXMI INDUSTRIES", "phone": "", "city": "Silwani", "gst": "23DDBPG5788N1Z3", "address": "0 GRAM MANKAPUR MAHGANWA KALAN Silwani", "type": "Registered Dealer"},
-  {"id": "pty_057", "name": "M/S AGRAWAL TRADERS", "firm": "M/S AGRAWAL TRADERS", "phone": "", "city": "Berasia", "gst": "23ACSPA6696E1ZF", "address": "AGRAWAL TRADERS TAHKUR COMPLEX BERASIA ROAD PIPAL CHORAHA KAROND", "type": "Registered Dealer"},
-  {"id": "pty_058", "name": "M/S ANKUR TRADERS", "firm": "M/S ANKUR TRADERS", "phone": "", "city": "Bhopal", "gst": "23AMXPJ9866G1ZA", "address": "00 WORD NO.13 BHOPAL SAGAR ROAD NANDANI NAGAR GAIRATGANJ", "type": "Registered Dealer"},
-  {"id": "pty_059", "name": "M/S BALKRISHNA BANSAL", "firm": "M/S BALKRISHNA BANSAL", "phone": "", "city": "Sabalgarh", "gst": "23ACBPB7900R1ZN", "address": "0  NEAR KHAR NALA M.S. ROAD SABALGARH", "type": "Registered Dealer"},
-  {"id": "pty_060", "name": "M/S CHINTAMANI HARDWARE", "firm": "M/S CHINTAMANI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23AIIPJ1472D2ZO", "address": "00 BHOPAL SAGAR ROAD VIDISHA Raisen, Madhya Pradesh-464884 India", "type": "Registered Dealer"},
-  {"id": "pty_061", "name": "M/S G.S MACHINERY", "firm": "M/S G.S MACHINERY", "phone": "", "city": "Bhopal", "gst": "23AGZPR6997G1ZB", "address": "PUNJAB BOOT HOUSE KE UPAR 30 SHAH BUILDING HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_062", "name": "M/S JEET HOMES", "firm": "M/S JEET HOMES", "phone": "", "city": "Bhopal", "gst": "23AAIFJ4506A3ZY", "address": "17  DURGA CHOUK, NARELA SHANKARI BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_063", "name": "M/S MEENA AGRO INDUSTRIES", "firm": "M/S MEENA AGRO INDUSTRIES", "phone": "", "city": "Bhopal", "gst": "23BQYPS2454K1Z4", "address": "01  BHOPAL ROAD RAISEN", "type": "Registered Dealer"},
-  {"id": "pty_064", "name": "M/S PRABHAT STORES", "firm": "M/S PRABHAT STORES", "phone": "", "city": "Berasia", "gst": "23ATMPP0154H1ZS", "address": "SHOP NO 08 MANDI COMPLEX BUS STAND BERASIA", "type": "Registered Dealer"},
-  {"id": "pty_065", "name": "MAA KARMA TRADERS", "firm": "MAA KARMA TRADERS", "phone": "", "city": "", "gst": "23DEBPS8018L1Z8", "address": "00 WD NO 10 00 BAMHORI TAH BAMHORI", "type": "Registered Dealer"},
-  {"id": "pty_066", "name": "MAA NAMAMI TRADERS", "firm": "MAA NAMAMI TRADERS", "phone": "", "city": "", "gst": "23ASAPL5864B1Z3", "address": "WORD NO 08  J J ROAD BRAMHA NAGAR UDAYPURA UDAYPURA", "type": "Registered Dealer"},
-  {"id": "pty_067", "name": "MAA VAISHNAVI ELECTRICALS", "firm": "MAA VAISHNAVI ELECTRICALS", "phone": "", "city": "Sehore", "gst": "Unregistered", "address": "SHYAMPUR CHANDBAD DIST SEHORE", "type": "Unregistered (URP)"},
-  {"id": "pty_068", "name": "MADHAV ENTERPRISES", "firm": "MADHAV ENTERPRISES", "phone": "", "city": "", "gst": "23BHQPS0236J1Z5", "address": "H. No. 338 Main Road Ahmadpur Ahmadpur", "type": "Registered Dealer"},
-  {"id": "pty_069", "name": "MAHAVIR ENTERPRISES", "firm": "MAHAVIR ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AHYPJ1616J2Z4", "address": "17 AREDI AYODHYA BY PASS ROAD Bhopal Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_070", "name": "MAMTA ELECTRICALS", "firm": "MAMTA ELECTRICALS", "phone": "", "city": "Narsinghgarh", "gst": "23AFUPC3578C1ZI", "address": "PAL ROAD  NARSINGHGARH NARSINGHGARH", "type": "Registered Dealer"},
-  {"id": "pty_071", "name": "MANAS TRADERS", "firm": "MANAS TRADERS", "phone": "", "city": "Bhopal", "gst": "23AYPPP8753N1ZH", "address": "01  Mubarakpura Choraha new indore by pass shati nagar bhopal bhopal  Sehore, Madhya Pradesh-462016 India", "type": "Registered Dealer"},
-  {"id": "pty_072", "name": "MANISHA ENTERPEISES", "firm": "MANISHA ENTERPEISES", "phone": "", "city": "Bhopal", "gst": "23ADBPA8015H1Z7", "address": "SHOP NO 14 HAMIDIA ROAD BHOPAL TALKIES", "type": "Registered Dealer"},
-  {"id": "pty_073", "name": "MANISHA PUMPS AND PIPES", "firm": "MANISHA PUMPS AND PIPES", "phone": "", "city": "Bhopal", "gst": "23CQYPA7603P1ZA", "address": "SAI PARISAR PUNJABI BAGH H.NO 5B PUNJABI BAGH Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_074", "name": "MATESHWARI SANITARY", "firm": "MATESHWARI SANITARY", "phone": "", "city": "Bhopal", "gst": "23AQDPR9202N1ZL", "address": "INFRONT OF CANARA BANK WARD NO 26 194/1 NEELBAD TEH HUZUR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_075", "name": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "firm": "MATRACHHAYA HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "", "gst": "23AAZPP4981G1Z1", "address": "SHOP No. 1-B SHAHPURA MANISHA MARKET SHAHPURA", "type": "Registered Dealer"},
-  {"id": "pty_076", "name": "MEGA DISTRIBUTER", "firm": "MEGA DISTRIBUTER", "phone": "", "city": "Bhopal", "gst": "23AEOPF2262H1ZQ", "address": "SEC F-22  INDUSTRIAL AREA GOVINDPURA BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_077", "name": "METER HOUSE & ELECTRICAL", "firm": "METER HOUSE & ELECTRICAL", "phone": "", "city": "Bhopal", "gst": "23ADBPK7430Q1ZD", "address": "SHOP NO.13 GURU DWARA LANE HAMIDIA ROAD BHOPAL Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_078", "name": "MINI KISAN SEWA KENDRA", "firm": "MINI KISAN SEWA KENDRA", "phone": "", "city": "", "gst": "23CJAPS1853E1ZH", "address": "KHASRA NO.410/3/1/1,  VILLAGE HATHODA GANJ BASODA", "type": "Registered Dealer"},
-  {"id": "pty_079", "name": "MIRACLE BUILDCON", "firm": "MIRACLE BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II MP NAGAR BHOPAL Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
-  {"id": "pty_080", "name": "MODI HOME DECOR", "firm": "MODI HOME DECOR", "phone": "", "city": "Bhopal", "gst": "23BDEPM9378R1ZM", "address": "GROUND FLOOR SHOP NO - 07, PLOT NO -40 MANDAKNI COLONY KOLAR ROAD Bhopal, Madhya Pradesh-462042 India", "type": "Registered Dealer"},
-  {"id": "pty_081", "name": "MODI TRADERS", "firm": "MODI TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACVPJ6070C1ZN", "address": "56 moditraders zone-2 mp nagar bhopal", "type": "Registered Dealer"},
-  {"id": "pty_082", "name": "MOHAMMAD TRADERS", "firm": "MOHAMMAD TRADERS", "phone": "", "city": "Shyampur", "gst": "23EPCPK4992A1Z3", "address": "0  MAIN ROAD BARKHEDA HASAN SHYAMPUR", "type": "Registered Dealer"},
-  {"id": "pty_083", "name": "MP HARDWARE", "firm": "MP HARDWARE", "phone": "", "city": "Bhopal", "gst": "23ACCPT3946J1ZE", "address": "29  zone 11 M P NAGAR BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
-  {"id": "pty_084", "name": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "firm": "MS RAJPUT HARDWARE AND ELECTRICALS SANITARY", "phone": "", "city": "Bhopal", "gst": "23BVRPJ3531L1ZC", "address": "SAINT THOMAS SCHOOL VIVER KE PASS SHOP NO. 3 HIG 397 AYODHYA NAGAR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_085", "name": "MUKEEM KHAN", "firm": "MUKEEM KHAN", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "SHYAMPUR", "type": "Unregistered (URP)"},
-  {"id": "pty_086", "name": "N.S TRADERS", "firm": "N.S TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "Ashoka Garden Bhopal", "type": "Unregistered (URP)"},
-  {"id": "pty_087", "name": "NAINA HARDWARE", "firm": "NAINA HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CESPV7145D2Z3", "address": "SHOP NO 18 CHHOLA HANUMAN MANDIR COLONY CHHOLA ROAD Bhopal  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_088", "name": "NATRAJ UNITED LIMITED", "firm": "NATRAJ UNITED LIMITED", "phone": "", "city": "Indore", "gst": "Unregistered", "address": "INDORE", "type": "Unregistered (URP)"},
-  {"id": "pty_089", "name": "NeelamTraders", "firm": "NeelamTraders", "phone": "", "city": "Bhopal", "gst": "23ADGPJ4952P2Z5", "address": "NEARSANKALP NETRALAYA 106 M.P. NAGAR ZONE 2 BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_090", "name": "NEELESHWARI ENTERPRISE", "firm": "NEELESHWARI ENTERPRISE", "phone": "", "city": "Bhopal", "gst": "23ABFPM0382D2Z4", "address": "A-47, ALKAPURI HABIBGANJ BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_091", "name": "NEW  REASONABLE ELECTRICALS", "firm": "NEW  REASONABLE ELECTRICALS", "phone": "", "city": "Indore", "gst": "23AKSPD8612M1ZU", "address": "0 INDORE ROAD NASRULLANGANJ", "type": "Registered Dealer"},
-  {"id": "pty_092", "name": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "firm": "NEW MANISH HARDWARE AND BUILDING MATERIAL", "phone": "", "city": "Bhopal", "gst": "23DXKPR6077L1ZQ", "address": "VILLAGE PHANDA KALAN  POST PHANDA KALAN PHANDA BHOPAL  Bhopal, Madhya Pradesh-462030 India", "type": "Registered Dealer"},
-  {"id": "pty_093", "name": "NIKHIL TTRADERS", "firm": "NIKHIL TTRADERS", "phone": "", "city": "Bhopal", "gst": "23BUQPD2642N1ZF", "address": "AMBIKA GRAH NIRMAN SOCIETY IN FRONT OF IPS SCHOOL SHOP NO. 01 A HOSHANGABAD ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_094", "name": "OCEANBLUE POLYPLAST", "firm": "OCEANBLUE POLYPLAST", "phone": "", "city": "Bhopal", "gst": "23AAIFO3207D1ZT", "address": "C 68  Opposite janta Quarter Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_095", "name": "OM TRADERS", "firm": "OM TRADERS", "phone": "", "city": "", "gst": "23GCVPS5739B1Z4", "address": "MITTAL PETROL PUMP WARD NO.15 Ubaidullahganj Main Road Ubaidullahganj", "type": "Registered Dealer"},
-  {"id": "pty_096", "name": "ONE SHOP HARDWARE & ELECTRICALS", "firm": "ONE SHOP HARDWARE & ELECTRICALS", "phone": "", "city": "Raisen", "gst": "23ATTPC4710H1ZW", "address": "NH-12 NEAR GP PALACE NH-12, GOHARGANJ ROAD OBAIDULLAGANJ  Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
-  {"id": "pty_097", "name": "PANKAJ PLASTO INDUSTRY", "firm": "PANKAJ PLASTO INDUSTRY", "phone": "", "city": "", "gst": "23ALDPG3408N2Z9", "address": "- VILL- KANSOR KALA,POST- BARKHEDA,TEHSIL- BIAORA Rajgarh", "type": "Registered Dealer"},
-  {"id": "pty_098", "name": "PATEL HARDWARE STORE", "firm": "PATEL HARDWARE STORE", "phone": "", "city": "", "gst": "23BEVPP7158G1ZX", "address": "1-2 TAGORE NAGAR KHAJURI KALA", "type": "Registered Dealer"},
-  {"id": "pty_099", "name": "PAYAL ELECTRICALS", "firm": "PAYAL ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23AWTPP6236A1ZI", "address": "MANHINDRA PALAZA 01 GULMOHAR BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_100", "name": "PRACHI TRADERS", "firm": "PRACHI TRADERS", "phone": "", "city": "Bhopal", "gst": "23JKIPK1766E1Z4", "address": "H NO. 367 SECTOR-B  SHIV SHAKTI NAGAR Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_101", "name": "PRAKASH TRADERS", "firm": "PRAKASH TRADERS", "phone": "", "city": "", "gst": "23AYLPL3999A1ZA", "address": "Prakash Traders Near- H P Petrol Pump Main Road Banapura", "type": "Registered Dealer"},
-  {"id": "pty_102", "name": "PREMNARAYAN SHARMA", "firm": "PREMNARAYAN SHARMA", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_103", "name": "PRIME CLEANING SERVICES", "firm": "PRIME CLEANING SERVICES", "phone": "", "city": "", "gst": "09AANFP5691F1ZP", "address": "SECOND FLOOR GOVINDA BHAWAN 25 NAWAL KISHORE ROAD HAZRATGANJ", "type": "Registered Dealer"},
-  {"id": "pty_104", "name": "PRIYANSH TRADERS", "firm": "PRIYANSH TRADERS", "phone": "", "city": "Bhopal", "gst": "23AFIPJ4758H1ZD", "address": "56 zone-2 m p nagar Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
-  {"id": "pty_105", "name": "R M ENTERPRISES", "firm": "R M ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CGMPB1408H1ZW", "address": "SHOP NO.1 PLOT NO.36-D MAHARANA PRATAP NAGAR ZONE-2 BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_106", "name": "R.D TRADERS", "firm": "R.D TRADERS", "phone": "", "city": "Bhopal", "gst": "23FOWPS8643A1ZG", "address": "74 Raisen Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_107", "name": "R.S INTERNATIONAL", "firm": "R.S INTERNATIONAL", "phone": "", "city": "Bhopal", "gst": "23AYAPR1511M2ZL", "address": "PLOT NO 52 HOTEL TAJ  NEAR ALPANA TALKIES HAMIDIA ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_108", "name": "Radheshyam Ji", "firm": "Radheshyam Ji", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "Berasia", "type": "Unregistered (URP)"},
-  {"id": "pty_109", "name": "RAGHU TRADERS", "firm": "RAGHU TRADERS", "phone": "", "city": "Lateri", "gst": "23CZIPR5626Q1ZM", "address": "AMAAN SINGH RAGHUVANSHI  MADHUSUDAN GARH ROAD LATERI", "type": "Registered Dealer"},
-  {"id": "pty_110", "name": "RAI SHREE MACHINERY HOUSE", "firm": "RAI SHREE MACHINERY HOUSE", "phone": "", "city": "Bhopal", "gst": "23BDWPC9501N1Z5", "address": "SHOP NO 3 Hoshangabad Road IN FRONT OF SKODA SHOWROOM Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_111", "name": "RAJ ENTERPRISES", "firm": "RAJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23ADMPN3168P1ZY", "address": "MAGIT MARKET 5 BERASIA ROAD KAROD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_112", "name": "RAJDHANI ENTERPRISES", "firm": "RAJDHANI ENTERPRISES", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_113", "name": "RAJI ENTERPRISES", "firm": "RAJI ENTERPRISES", "phone": "", "city": "Vidisha", "gst": "23FPTPS9771F1Z0", "address": "0  Lateri Anandpur Bandipur Road Lateri  Vidisha, Madhya Pradesh-464114 India", "type": "Registered Dealer"},
-  {"id": "pty_114", "name": "RAJIV KIRANA STORES", "firm": "RAJIV KIRANA STORES", "phone": "", "city": "Raisen", "gst": "23CIQPR3656B1Z5", "address": "WARD NO 8  SHIKSHA BIBHAG COLONY RAISEN  Raisen, Madhya Pradesh-464551 India", "type": "Registered Dealer"},
-  {"id": "pty_115", "name": "RAJNEESH AGRAWAL", "firm": "RAJNEESH AGRAWAL", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "HAMIDIA ROAD BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_116", "name": "RAMA TRADERS", "firm": "RAMA TRADERS", "phone": "", "city": "", "gst": "23ADCPC2697Q1Z9", "address": "6 J.K BUILDING HAMIDIA ROAD", "type": "Registered Dealer"},
-  {"id": "pty_117", "name": "RAMESH PATHAK", "firm": "RAMESH PATHAK", "phone": "", "city": "Berasia", "gst": "Unregistered", "address": "BERASIA", "type": "Unregistered (URP)"},
-  {"id": "pty_118", "name": "RAMJI TRADERS", "firm": "RAMJI TRADERS", "phone": "", "city": "Goharganj", "gst": "Unregistered", "address": "GOHARGANJ", "type": "Unregistered (URP)"},
-  {"id": "pty_119", "name": "RATHORE GROUP C/O MUKESH RATHORE", "firm": "RATHORE GROUP C/O MUKESH RATHORE", "phone": "", "city": "", "gst": "Unregistered", "address": "20 IMAMI GATE MAIN ROAD", "type": "Unregistered (URP)"},
-  {"id": "pty_120", "name": "S A INFOTECH", "firm": "S A INFOTECH", "phone": "", "city": "Bhopal", "gst": "23ACRPS3067J1Z4", "address": "118  MALVIYA NAGAR BHOPAL Bhopal, Madhya Pradesh-462003 India", "type": "Registered Dealer"},
-  {"id": "pty_121", "name": "S.K. PIPIES", "firm": "S.K. PIPIES", "phone": "", "city": "Bhopal", "gst": "23BTRPM9060M1ZZ", "address": "PLOT NO 136 S.K.PIPES ACHARPURA INDUSTRIAL AREA BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_122", "name": "SAAVLI ENTERPRISES", "firm": "SAAVLI ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23AFWPM9249Q1Z9", "address": "BHOPAL TALKIES CHOURAHA 5 BERASIA ROAD BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_123", "name": "SACHIN HARDWARE STORE", "firm": "SACHIN HARDWARE STORE", "phone": "", "city": "Vidisha", "gst": "23ARCPG8041J1Z0", "address": "18 bus stand complex vidisha road, bustand berasia", "type": "Registered Dealer"},
-  {"id": "pty_124", "name": "SADGURU KRIPA TRADERS", "firm": "SADGURU KRIPA TRADERS", "phone": "", "city": "Raisen", "gst": "23ARUPG9176C1ZJ", "address": "WARD NO. 15  SAINKHEDA ROAD Silwani  Raisen, Madhya Pradesh-464886 India", "type": "Registered Dealer"},
-  {"id": "pty_125", "name": "SAHIL HARDWARE AND ELECTRICALS", "firm": "SAHIL HARDWARE AND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "23EGIPS4281K1ZX", "address": "SHOP NO 3 PLOT NO 2 AND 5 RAJIV PALACE BDA COLONY AWADHPURI  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_126", "name": "SAI CONSTRICTIONS", "firm": "SAI CONSTRICTIONS", "phone": "", "city": "Indore", "gst": "23AACFS6772M1ZS", "address": "2 MANAS BHAWAN 215 11 RNT MARG INDORE", "type": "Registered Dealer"},
-  {"id": "pty_127", "name": "SAI NATH", "firm": "SAI NATH", "phone": "", "city": "Bhopal", "gst": "23AEWPC7953C2ZE", "address": "75 AHIRPURA CHURCH ROAD BHOPAL  Bhopal, Madhya Pradesh-462008 India", "type": "Registered Dealer"},
-  {"id": "pty_128", "name": "SANDHYA ENTERPRISES", "firm": "SANDHYA ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23DZFPR5351N1ZW", "address": "NEW SABJI MANDI, KAROND 01 80 FIT ROAD Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_129", "name": "SANJAY TRADERS", "firm": "SANJAY TRADERS", "phone": "", "city": "Dehgaon", "gst": "23BOCPK6173D1Z9", "address": "01  BAMHORI ROAD DEHGAON", "type": "Registered Dealer"},
-  {"id": "pty_130", "name": "SARAF ENTERPRISES", "firm": "SARAF ENTERPRISES", "phone": "", "city": "", "gst": "23AAZPJ7585J1ZU", "address": "14  hamidia road bal vihar ke samne", "type": "Registered Dealer"},
-  {"id": "pty_131", "name": "SATYAM TRADERS", "firm": "SATYAM TRADERS", "phone": "", "city": "Kurawar", "gst": "23CNKPA9832P1ZJ", "address": "0 ward no 08 0 BANK OGF INDIA KE SAMNE KURAWAR", "type": "Registered Dealer"},
-  {"id": "pty_132", "name": "SATYENDRA VYAS", "firm": "SATYENDRA VYAS", "phone": "", "city": "", "gst": "Unregistered", "address": "BAGHSEVANIYA NEAR ASHIMA MALL", "type": "Unregistered (URP)"},
-  {"id": "pty_133", "name": "SHANTI HARDWARE", "firm": "SHANTI HARDWARE", "phone": "", "city": "Bhopal", "gst": "23CBYPP8983N1Z9", "address": "LEELA ARCADE PLOT NO. 335, SHOP NO. 1&2 SECTOR - E PHASE 2 Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_134", "name": "SHIV SHAKTI TRADERS", "firm": "SHIV SHAKTI TRADERS", "phone": "", "city": "Raisen", "gst": "23AUKPB0943K1ZU", "address": "OLD NH 12 UDAIPURA DIST. RAISEN (M.P)", "type": "Registered Dealer"},
-  {"id": "pty_135", "name": "SHIVAM TRADERS", "firm": "SHIVAM TRADERS", "phone": "", "city": "", "gst": "23BJUPL1911P1ZR", "address": "SHOP AT JHULELAL MARKET GANDHI NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_136", "name": "SHIVIKA TRADERS", "firm": "SHIVIKA TRADERS", "phone": "", "city": "", "gst": "23ACDPY9836H1Z4", "address": "SHOP NO. 7 PATWA MARKET NEAR BHARAT TALKIES", "type": "Registered Dealer"},
-  {"id": "pty_137", "name": "SHREE HARDWARE", "firm": "SHREE HARDWARE", "phone": "", "city": "Vidisha", "gst": "23AHTPJ2029G1ZG", "address": "29/1 VIDISHA ROAD BHANPUR", "type": "Registered Dealer"},
-  {"id": "pty_138", "name": "SHREE SHIVAAY HARDWARE", "firm": "SHREE SHIVAAY HARDWARE", "phone": "", "city": "Bhopal", "gst": "23BABPC9869F1ZQ", "address": "mahendra plaza E-8 36 & 37 Bawadiya Kalan Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_139", "name": "SHREE SHYAM TRADERS", "firm": "SHREE SHYAM TRADERS", "phone": "", "city": "Bhopal", "gst": "23CSFPM6553F1ZR", "address": "House No. 30 Transport Area New Itwara Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_140", "name": "SHRI  ADVERTISING AND MARKETING", "firm": "SHRI  ADVERTISING AND MARKETING", "phone": "", "city": "Bhopal", "gst": "23AKKPM9285H1ZP", "address": "B-48  GOVINDPURA BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
-  {"id": "pty_141", "name": "SHRI BALAJI MARKETING CO(MFG UNIT)", "firm": "SHRI BALAJI MARKETING CO(MFG UNIT)", "phone": "", "city": "", "gst": "23APDPM4839B1Z8", "address": "87/2  Tel Gali Corner, Siyaganj", "type": "Registered Dealer"},
-  {"id": "pty_142", "name": "SHRI SAINATH TRADERS", "firm": "SHRI SAINATH TRADERS", "phone": "", "city": "", "gst": "23BPUPS3323A1Z1", "address": "CHANDRIKA HOUSING SOCEITY PLOT NO . 88 SHOP NO. 1 R S NAGAR ROHIT NAGAR -1 BAWADIYAKALAN", "type": "Registered Dealer"},
-  {"id": "pty_143", "name": "SHRI SAROJ ENTERPRISES", "firm": "SHRI SAROJ ENTERPRISES", "phone": "", "city": "Bhopal", "gst": "23CCPPS7555B1ZC", "address": "House no 279 Rohit Nagar Gram Nirman samiti Phase II shop No 2 Gram Bawadia kalan Ward no 52 Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_144", "name": "SHRI SHANKAR MACHINERY STORES", "firm": "SHRI SHANKAR MACHINERY STORES", "phone": "", "city": "Bhopal", "gst": "23AAUPA6758M1Z5", "address": "29/4 opposite bal vihar hamidia road bhopal", "type": "Registered Dealer"},
-  {"id": "pty_145", "name": "SHRI SHIV SAI TRADER", "firm": "SHRI SHIV SAI TRADER", "phone": "", "city": "Seoni Malwa", "gst": "23AYMPK2325G2ZN", "address": "01  RUNIVHA DHAM COLONY SEONI MALWA  Narmadapuram, Madhya Pradesh-461223 India", "type": "Registered Dealer"},
-  {"id": "pty_146", "name": "SIDDHI VINAYAK TRADERS", "firm": "SIDDHI VINAYAK TRADERS", "phone": "", "city": "Shyampur", "gst": "Unregistered", "address": "KHAJURIA KALAN SHYAMPUR ROAD", "type": "Unregistered (URP)"},
-  {"id": "pty_147", "name": "SIMARIYA HARDWARE", "firm": "SIMARIYA HARDWARE", "phone": "", "city": "Raisen", "gst": "23BMOPS3691E1ZQ", "address": "00 00 00 NEAR UDAIPURA NAKA J J ROAD BARELI TAH BARELI  Raisen, Madhya Pradesh-464668 India", "type": "Registered Dealer"},
-  {"id": "pty_148", "name": "SINGH TRADERS", "firm": "SINGH TRADERS", "phone": "", "city": "Bhopal", "gst": "23ASUPS0024J1ZL", "address": "9- A  Awadhpuri Road Bhopal  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_150", "name": "SK ENTERPRISES", "firm": "SK ENTERPRISES", "phone": "", "city": "Sironj", "gst": "23ALNPJ1907H1ZA", "address": "RAVJI PURA 0 RAVJI PATH Sironj", "type": "Registered Dealer"},
-  {"id": "pty_151", "name": "SONAKSHI INTERPRISES", "firm": "SONAKSHI INTERPRISES", "phone": "", "city": "", "gst": "23EPBPS7456Q1Z2", "address": "Plot No - 68 Sewaniya Kanasaiya Bilkhiriya Khurd", "type": "Registered Dealer"},
-  {"id": "pty_152", "name": "SP ENTERPRISE", "firm": "SP ENTERPRISE", "phone": "7000512025", "city": "Bhopal", "gst": "23CAMPK5961L1Z8", "address": "H. NO. 211 VIJAY NAGAR NEAR VIJAY NAGAR SQUARE CHANDBAD , BHOPAL", "type": "Registered Dealer"},
-  {"id": "pty_153", "name": "SSK INTERIO", "firm": "SSK INTERIO", "phone": "", "city": "", "gst": "23ASJPV1911C1Z2", "address": "FIRST FLOOR PLOT NO 03  AYODHYA BY PASS ROAD SANTOSHI VIHAR", "type": "Registered Dealer"},
-  {"id": "pty_154", "name": "SUNIL TRADING COMPANY", "firm": "SUNIL TRADING COMPANY", "phone": "", "city": "", "gst": "Unregistered", "address": "MANGALWARA TRANSPORT NAGAR", "type": "Unregistered (URP)"},
-  {"id": "pty_155", "name": "SUSHILA INDUSTRY", "firm": "SUSHILA INDUSTRY", "phone": "", "city": "", "gst": "23AKPPK0844F1ZB", "address": "PLOT NO 37, INDUSTRIAL AREA RICHHAI RICHHAI RICHHAI JABALPUR", "type": "Registered Dealer"},
-  {"id": "pty_156", "name": "SWASTIK TRADERS", "firm": "SWASTIK TRADERS", "phone": "", "city": "Obaidullaganj", "gst": "23ADQPU6302A1ZS", "address": "Gokul Dham Ward No 01 PH No 08 Shop No A-03, A-04, Near NH -12 Main Road Obaidullaganj", "type": "Registered Dealer"},
-  {"id": "pty_157", "name": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "firm": "SYNERGY MANAGEMENT SOLUTION (INDIA) PVT LTD", "phone": "", "city": "Bhopal", "gst": "23ABDCS5083N1ZZ", "address": "DELUX HIG 16 BHEEM KUNG  KOLAR ROAD BHOPAL  Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
-  {"id": "pty_158", "name": "TARUN HARDWARE STORE", "firm": "TARUN HARDWARE STORE", "phone": "", "city": "", "gst": "23ACKPT2879E1ZB", "address": "PLOT NO 03  SANTOSHI VIHAR AYODHYA NAGAR", "type": "Registered Dealer"},
-  {"id": "pty_159", "name": "UDAY HARDWEARE & ELECTRICALS", "firm": "UDAY HARDWEARE & ELECTRICALS", "phone": "", "city": "", "gst": "23ASBPD4059P1ZO", "address": "mayur vihar calony e 23 mayur vihar calony ashoka gaden ashoka gaden", "type": "Registered Dealer"},
-  {"id": "pty_160", "name": "VAIBHAV HARDWARE AND SPARE PARTS", "firm": "VAIBHAV HARDWARE AND SPARE PARTS", "phone": "", "city": "Bari", "gst": "23AHUPJ5139Q1ZL", "address": "main road 01 jj road bari", "type": "Registered Dealer"},
-  {"id": "pty_161", "name": "VAIBHAV TRADERS", "firm": "VAIBHAV TRADERS", "phone": "", "city": "Bhopal", "gst": "23AHWPJ0907E1ZI", "address": "VILLAGE- DEHGAON 01 SAGAR BHOPAL ROAD TEH- GAIRATGANJ DIST- RAISEN", "type": "Registered Dealer"},
-  {"id": "pty_162", "name": "VIKAS SANITARY PLAZA", "firm": "VIKAS SANITARY PLAZA", "phone": "", "city": "", "gst": "23AORPJ8767Q1ZT", "address": "FINE AVENUE COMPLEX SHOP NO.-4 KOLAR ROAD NAYAPURA", "type": "Registered Dealer"},
-  {"id": "pty_163", "name": "VINAYAK TRADERS", "firm": "VINAYAK TRADERS", "phone": "", "city": "Raisen", "gst": "Unregistered", "address": "RAISEN", "type": "Unregistered (URP)"},
-  {"id": "pty_164", "name": "WATERFLO PIPING SYSTEM", "firm": "WATERFLO PIPING SYSTEM", "phone": "", "city": "Bhopal", "gst": "23AABFW0415G1ZQ", "address": "BUILDING NO.4D, RAMESH MALIK SCIENTIFIC WAREHOUSING AND LOGISTICS COMPLEXS, GOVINDPURA INDUSTRIAL AREA, J.K.ROAD, BHOPAL  Bhopal, Madhya Pradesh-462022 India", "type": "Registered Dealer"},
-  {"id": "pty_165", "name": "YAKSHA ENTERPRISES", "firm": "YAKSHA ENTERPRISES", "phone": "", "city": "", "gst": "23CIDPR3352M1Z2", "address": "Shop No 2 and 3 Ward No 1 Murti Wali Puliya Sultanpur", "type": "Registered Dealer"},
-  {"id": "pty_166", "name": "YASH ELECTRICAL", "firm": "YASH ELECTRICAL", "phone": "", "city": "Raisen", "gst": "23AYBPS8557R1ZI", "address": "GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ GOHARGANJ ROAD OBAIDULLAGANJ OBAIDULLAGANJ Raisen, Madhya Pradesh-464993 India", "type": "Registered Dealer"},
-  {"id": "pty_167", "name": "YASH HARDWAREAND ELECTRICALS", "firm": "YASH HARDWAREAND ELECTRICALS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "ANAND NAGAR BHOPAL", "type": "Unregistered (URP)"},
-  {"id": "pty_168", "name": "YASHODA CERAMICS", "firm": "YASHODA CERAMICS", "phone": "", "city": "Bhopal", "gst": "23BQHPP6954Q1ZZ", "address": "SHOP NO - 01 SAHYOG VIHAR HOUSING SOCIETY BAWADIYA KALAN Bhopal  Bhopal, Madhya Pradesh-462026 India", "type": "Registered Dealer"},
-  {"id": "pty_169", "name": "ZARA TRADERS", "firm": "ZARA TRADERS", "phone": "", "city": "Bhopal", "gst": "23BEDPH0336A1ZH", "address": "SHOP NO G-03 Vironika Khushi Heights Raja Bhoj Airport Road Bhopal Bhopal, Madhya Pradesh-462036 India", "type": "Registered Dealer"}
-];
-
-    const PIPE_CATEGORIES = [
-      "Water Tank",
-      "PVC Agri / Irrigation Fittings",
-      "PVC Agri / Column Pipe",
-      "CPVC Plumbing Fittings",
-      "UPVC Pressure Fittings",
-      "PVC SWR Drainage Fittings",
-      "CPVC Plumbing Pipe",
-      "UPVC Pressure Pipe",
-      "PVC SWR Drainage Pipe",
-      "HDPE Coil / Pipe",
-      "PVC Conduit Electrical Pipe",
-      "GI / MS Steel Pipe",
-      "General Hardware / Solvents"
-    ];
-
-    const BASE_FITTINGS_CATALOG = {
-      "Water Tank": ["Overhead Water Tank", "Loft Tank", "Underground Sump Tank"],
-      "PVC Agri / Irrigation Fittings": [
-        "Agri Coupler / Socket (Fabricated / Molded)", "Agri Elbow 90°", "Agri Elbow 45°", "Agri Tee (Equal)",
-        "Agri Reducing Tee", "Agri Reducing Bushing / Reducer", "Agri MTA (Male Threaded Adaptor)",
-        "Agri FTA (Female Threaded Adaptor)", "Tail Piece / Flange Spigot", "Agri Flange Set (with Rubber Gasket)",
-        "Service Saddle (Single / Double Strap)", "Service Saddle with Brass Insert", "Agri Ball Valve (Solid Handle)",
-        "Foot Valve / Strainer", "Non Return Valve (NRV)", "Agri End Cap (Plug)", "Agri Cross Tee",
-        "Quick Release Coupling (QRC / Sprinkler)", "Sprinkler Foot Batten / Riser", "Drip Joiner / Grommet / Take-off",
-        "Agri Heavy Solvent Cement", "Other Agri Fitting"
-      ],
-      "PVC Agri / Column Pipe": [
-        "Agri Delivery Pipe (Plain / Socketed)", "Column Pipe (Submersible Pump)", "Casing Pipe (Shallow / Deep Well)",
-        "Suction Hose Pipe", "Sprinkler Pipe with Latch Clamp"
-      ],
-      "CPVC Plumbing Fittings": [
-        "Elbow 90°", "Elbow 45°", "Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee",
-        "Brass Elbow 90° (Female)", "Brass Tee (Female)", "Brass FTA (Female Threaded Adaptor)",
-        "Brass MTA (Male Threaded Adaptor)", "Plastic FTA (Plain)", "Plastic MTA (Plain)",
-        "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing",
-        "Reducer Brass Elbow", "Reducer Brass Tee", "CPVC Ball Valve", "Concealed Valve",
-        "Long Plug", "Tank Nipple", "Pipe Clip / Saddle", "CPVC Solvent Cement", "Other CPVC Fitting"
-      ],
-      "UPVC Pressure Fittings": [
-        "Plain Elbow 90°", "Plain Elbow 45°", "Plain Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee",
-        "Brass Elbow 90°", "Brass Tee", "Brass FTA (Female)", "Brass MTA (Male)", "Plain MTA", "Plain FTA",
-        "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing", "UPVC Ball Valve",
-        "Non Return Valve (NRV)", "Flange Set / Tail Piece", "Tank Nipple", "UPVC Solvent Cement", "Other UPVC Fitting"
-      ],
-      "PVC SWR Drainage Fittings": [
-        "Bend 87.5° (Plain)", "Bend 87.5° with Door", "Bend 45° (Plain)", "Single Tee (Plain)", "Single Tee with Door",
-        "Single Y (45° Plain)", "Single Y with Door", "Double Y (Plain)", "Double Y with Door", "Cross Tee (Plain)",
-        "Cross Tee with Door", "Nahani Trap (Self Cleaning)", "Nahani Trap with Jali", "P-Trap (with/without vent)",
-        "S-Trap", "Q-Trap", "Multi Floor Trap", "Coupler / Socket", "Reducer (e.g. 110x75)", "Vent Cowl",
-        "Cleaning Pipe / Access Plug", "Aerator", "Pipe Clip / Bracket", "Rubber Ring / Gasket", "Solvent Cement SWR", "Other SWR Fitting"
-      ],
-      "CPVC Plumbing Pipe": ["Standard CPVC Pipe"],
-      "UPVC Pressure Pipe": ["Standard UPVC Pressure Pipe"],
-      "PVC SWR Drainage Pipe": ["SWR Ringfit Pipe", "SWR Selfit Pipe"],
-      "HDPE Coil / Pipe": ["HDPE Coil", "HDPE Straight Pipe"],
-      "PVC Conduit Electrical Pipe": ["Electrical Conduit Pipe"],
-      "GI / MS Steel Pipe": ["GI Galvanized Pipe", "MS Black Pipe"],
-      "General Hardware / Solvents": [
-        "CPVC Solvent Cement (Tin / Tube)", "SWR Solvent Cement (Tin)", "Agri PVC Solvent Cement",
-        "Teflon Tape", "Rubber Washer", "Hacksaw Blade", "Clamp"
-      ]
-    };
-
-    let FITTINGS_CATALOG = JSON.parse(JSON.stringify(BASE_FITTINGS_CATALOG));
-
-    function loadCustomProducts() {
-      try {
-        const customProds = JSON.parse(localStorage.getItem('airen_pipe_custom_products') || '{}');
-        const removedProds = JSON.parse(localStorage.getItem('airen_pipe_removed_products') || '{}');
-        FITTINGS_CATALOG = JSON.parse(JSON.stringify(BASE_FITTINGS_CATALOG));
-
-        for (const cat in customProds) {
-          if (!FITTINGS_CATALOG[cat]) {
-            FITTINGS_CATALOG[cat] = [];
-            if (!PIPE_CATEGORIES.includes(cat)) PIPE_CATEGORIES.push(cat);
-          }
-          customProds[cat].forEach(item => {
-            if (!FITTINGS_CATALOG[cat].includes(item)) FITTINGS_CATALOG[cat].unshift(item);
-          });
-        }
-
-        for (const cat in removedProds) {
-          if (FITTINGS_CATALOG[cat]) {
-            FITTINGS_CATALOG[cat] = FITTINGS_CATALOG[cat].filter(it => !removedProds[cat].includes(it));
-          }
-        }
-      } catch(e) {}
-    }
-
-    const PIPE_BRANDS = ["KASTA", "AIREN"];
-
-    const CATEGORY_SIZES_MAP = {
-      "Water Tank": ["1000 Ltr", "500 Ltr", "750 Ltr", "300 Ltr", "200 Ltr", "100 Ltr", "1500 Ltr", "2000 Ltr", "3000 Ltr", "5000 Ltr"],
-      "PVC Agri / Irrigation Fittings": [
-        "2-1/2\" (65mm / 75mm OD)", "2\" (50mm / 63mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)", "5\" (125mm / 140mm OD)", "6\" (150mm / 160mm OD)",
-        "2-1/2\" x 2\" (75x63mm)", "3\" x 2-1/2\" (90x75mm)", "4\" x 2-1/2\" (110x75mm)", "4\" x 3\" (110x90mm)", "2\" x 1-1/2\" (63x50mm)", "5\" x 4\" (140x110mm)", "6\" x 4\" (160x110mm)",
-        "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)"
-      ],
-      "PVC Agri / Column Pipe": [
-        "2-1/2\" (65mm / 75mm OD)", "2\" (50mm / 63mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)", "5\" (125mm / 140mm OD)", "6\" (150mm / 160mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "8\" (200mm OD)", "10\" (250mm OD)"
-      ],
-      "CPVC Plumbing Fittings": [
-        "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)",
-        "3/4\" x 1/2\"", "1\" x 1/2\"", "1\" x 3/4\"", "1-1/4\" x 3/4\"", "1-1/4\" x 1\"", "1-1/2\" x 1\"", "1-1/2\" x 1-1/4\"", "2\" x 1-1/4\"", "2\" x 1-1/2\""
-      ],
-      "CPVC Plumbing Pipe": ["3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)"],
-      "UPVC Pressure Fittings": [
-        "1\" (25mm / 32mm OD)", "3/4\" (20mm / 25mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)",
-        "1\" x 1/2\"", "1\" x 3/4\"", "1-1/4\" x 1\"", "1-1/2\" x 1-1/4\"", "2\" x 1-1/2\"", "2-1/2\" x 2\"", "3\" x 2-1/2\""
-      ],
-      "UPVC Pressure Pipe": ["1\" (25mm / 32mm OD)", "3/4\" (20mm / 25mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)"],
-      "PVC SWR Drainage Fittings": [
-        "4\" (100mm / 110mm OD)", "3\" (75mm / 90mm OD)", "2-1/2\" (65mm / 75mm OD)", "6\" (150mm / 160mm OD)",
-        "110mm x 75mm (4\" x 2.5\")", "110mm x 90mm (4\" x 3\")", "160mm x 110mm (6\" x 4\")", "90mm x 75mm (3\" x 2.5\")"
-      ],
-      "PVC SWR Drainage Pipe": ["4\" (100mm / 110mm OD)", "3\" (75mm / 90mm OD)", "2-1/2\" (65mm / 75mm OD)", "6\" (150mm / 160mm OD)"],
-      "HDPE Coil / Pipe": ["2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "1\" (25mm / 32mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "4\" (100mm / 110mm OD)"],
-      "General Hardware / Solvents": [
-        "100 ml (CPVC Tin)", "250 ml (CPVC Tin)", "500 ml (CPVC Tin)", "50 ml (CPVC Tin)", "20 ml (CPVC Tube)", "10 ml (CPVC Tube)", "1 Liter (CPVC Tin)", "5 Liter (CPVC Can)",
-        "100 ml (SWR Tin)", "250 ml (SWR Tin)", "500 ml (SWR Tin)", "50 ml (SWR Tin)", "1 Liter (SWR Tin)", "5 Liter (SWR Can)", "Universal"
-      ],
-      "PVC Conduit Electrical Pipe": ["3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)"],
-      "GI / MS Steel Pipe": ["1/2\" (15mm / 20mm OD)", "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)"]
-    };
-
-    const CATEGORY_CLASS_MAP = {
-      "Water Tank": ["4 Layer (Puf Foam - Tank)", "3 Layer (Water Tank)", "5 Layer (Anti-Bacterial - Tank)", "Heavy Duty Extra Rib (Tank)"],
-      "PVC Agri / Irrigation Fittings": ["4.0 kg/cm² (Class 2 - Agri)", "6.0 kg/cm² (Class 3 - Agri)", "2.5 kg/cm² (Class 1 - Agri)", "8.0 kg/cm² (Class 4 - Agri)", "10.0 kg/cm² (Class 5 - Agri)", "Standard / Molded", "None"],
-      "PVC Agri / Column Pipe": ["4.0 kg/cm² (Class 2 - Agri)", "6.0 kg/cm² (Class 3 - Agri)", "2.5 kg/cm² (Class 1 - Agri)", "8.0 kg/cm² (Class 4 - Agri)", "10.0 kg/cm² (Class 5 - Agri)", "12.5 kg/cm² (High Pressure)"],
-      "CPVC Plumbing Fittings": ["SDR 11 (Class 1 - CPVC)", "SDR 13.5 (Class 2 - CPVC)", "Standard / Molded", "None"],
-      "CPVC Plumbing Pipe": ["SDR 11 (Class 1 - CPVC)", "SDR 13.5 (Class 2 - CPVC)"],
-      "UPVC Pressure Fittings": ["SCH 40 (Plumbing / Pressure)", "SCH 80 (Heavy Pressure)", "Standard / Molded", "None"],
-      "UPVC Pressure Pipe": ["SCH 40 (Plumbing / Pressure)", "SCH 80 (Heavy Pressure)"],
-      "PVC SWR Drainage Fittings": ["Type B (Soil/Waste)", "Type A (Rainwater)", "Standard / Molded", "None"],
-      "PVC SWR Drainage Pipe": ["Type B (Soil/Waste)", "Type A (Rainwater)"],
-      "HDPE Coil / Pipe": ["PN 6 (HDPE / Agri)", "PN 4 (HDPE / Agri)", "PN 10 (HDPE / Agri)", "PN 12.5 (HDPE)", "PN 16 (HDPE)"],
-      "General Hardware / Solvents": ["Standard / Molded", "None"],
-      "PVC Conduit Electrical Pipe": ["Standard / Molded", "None"],
-      "GI / MS Steel Pipe": ["Standard / Molded", "None"]
-    };
-
-    const ALL_LENGTHS = ["None / N.A. (Fittings)", "6 Meters (20 ft)", "3 Meters (10 ft)", "5 Meters (16.4 ft)", "100 Meter Coil", "300 Meter Coil", "500 Meter Coil", "Custom / Cut Length"];
-    const ALL_UNITS = ["Nos (Numbers)", "Lengths (Pipes)", "Bags / Bags Pack", "Boxes / Cartons", "Bundles", "Coils", "Meters", "Feet"];
-
-    let parties = [];
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
     let orders = [];
-    let activeModalOrder = null;
-    let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v9_bulletproof_edit_lock";
-
-    function getMasterPin() {
-      let pin = localStorage.getItem('airen_pipe_master_pin');
-      if (!pin || pin === "1234") {
-        pin = "1379";
-        localStorage.setItem('airen_pipe_master_pin', "1379");
-      }
-      return pin;
-    }
-
-    function setMasterPin(newPin) {
-      localStorage.setItem('airen_pipe_master_pin', newPin);
-    }
-
-    function requirePin(actionCallback, actionDescription = "Proceed with this action") {
-      pendingPinCallback = actionCallback;
-      document.getElementById('pin-modal-action-title').textContent = actionDescription;
-      document.getElementById('pin-input-field').value = "";
-      document.getElementById('pinModal').classList.remove('hidden');
-      setTimeout(() => document.getElementById('pin-input-field').focus(), 100);
-    }
-
-    function cancelPinModal() {
-      document.getElementById('pinModal').classList.add('hidden');
-      pendingPinCallback = null;
-    }
-
-    function confirmPinModal() {
-      const enteredPin = document.getElementById('pin-input-field').value.trim();
-      const currentPin = getMasterPin();
-
-      if (enteredPin === currentPin) {
-        document.getElementById('pinModal').classList.add('hidden');
-        if (typeof pendingPinCallback === 'function') {
-          const cb = pendingPinCallback;
-          pendingPinCallback = null;
-          cb();
-        }
-      } else {
-        showToast("Incorrect Master PIN. Access Denied.", "error");
-        document.getElementById('pin-input-field').value = "";
-        document.getElementById('pin-input-field').focus();
-      }
-    }
-
-    function handleChangePin(event) {
-      event.preventDefault();
-      const currentEntered = document.getElementById('pin-current').value.trim();
-      const newPin = document.getElementById('pin-new').value.trim();
-      const realPin = getMasterPin();
-
-      if (currentEntered !== realPin) {
-        showToast("Current PIN is incorrect.", "error");
-        return;
-      }
-      if (newPin.length < 4) {
-        showToast("New PIN must be at least 4 digits.", "warning");
-        return;
-      }
-
-      setMasterPin(newPin);
-      document.getElementById('pin-current').value = "";
-      document.getElementById('pin-new').value = "";
-      showToast("Security PIN updated successfully!", "success");
-    }
-
-    function initDataStore() {
-      loadCustomProducts();
-      getMasterPin();
-
-      const savedVersion = localStorage.getItem('airen_parties_version');
-      if (savedVersion !== PARTIES_DATA_VERSION) {
-        parties = [...DEFAULT_PARTIES];
-        saveParties();
-        localStorage.setItem('airen_parties_version', PARTIES_DATA_VERSION);
-      } else {
-        const storedParties = localStorage.getItem('airen_pipe_parties');
-        if (storedParties) {
-          try { parties = JSON.parse(storedParties); } catch (e) { parties = [...DEFAULT_PARTIES]; }
-        } else {
-          parties = [...DEFAULT_PARTIES];
-          saveParties();
-        }
-      }
-
-      const storedOrders = localStorage.getItem('airen_pipe_orders');
-      if (storedOrders) {
-        try { orders = JSON.parse(storedOrders); } catch (e) { orders = []; }
-      } else {
-        orders = [];
-        saveOrders();
-      }
-
-      let webhook = localStorage.getItem('airen_pipe_google_webhook');
-      if (!webhook || !webhook.includes("AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw")) {
-        webhook = DEFAULT_WEBHOOK_URL;
-        localStorage.setItem('airen_pipe_google_webhook', webhook);
-      }
-      const webhookEl = document.getElementById('google-webhook-url');
-      if (webhookEl) webhookEl.value = webhook;
-
-      const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
-      const spSelect = document.getElementById('form-salesperson');
-      if (spSelect && savedSalesperson) spSelect.value = savedSalesperson;
-    }
-
-    function saveParties() {
-      localStorage.setItem('airen_pipe_parties', JSON.stringify(parties));
-    }
-
-    function saveOrders() {
-      localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
-    }
-
-    function saveGoogleWebhookUrl() {
-      const url = document.getElementById('google-webhook-url').value.trim();
-      localStorage.setItem('airen_pipe_google_webhook', url || DEFAULT_WEBHOOK_URL);
-      showToast("Google Sheets webhook URL updated!", "success");
-    }
 
     function switchTab(tabId) {
-      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
-      const targetView = document.getElementById(`view-${tabId}`);
-      if (targetView) targetView.classList.remove('hidden');
-
-      document.querySelectorAll('.nav-tab').forEach(btn => {
-        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
-        btn.classList.add('text-slate-300');
-      });
-      const activeBtn = document.getElementById(`tab-${tabId}-btn`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
-        activeBtn.classList.remove('text-slate-300');
-      }
-
-      document.querySelectorAll('.m-nav-tab').forEach(btn => {
-        btn.classList.remove('bg-brand-600', 'text-white');
-      });
-      const mActiveBtn = document.getElementById(`m-tab-${tabId}`);
-      if (mActiveBtn) {
-        mActiveBtn.classList.add('bg-brand-600', 'text-white');
-      }
-
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
       if (tabId === 'orders') renderOrdersList();
-      if (tabId === 'parties') renderPartiesList();
-      if (tabId === 'catalog') initManageCatalogUI();
-      if (tabId === 'new-order') {
-        populatePartyDropdowns();
-        const tbody = document.getElementById('order-items-tbody');
-        if (tbody.children.length === 0) {
-          addOrderItemRow();
-        }
-      }
     }
 
     function quickOpenNewOrder() {
@@ -1282,642 +206,76 @@
       switchTab('new-order');
     }
 
-    function getItemsForCategory(category) {
-      return FITTINGS_CATALOG[category] || ["Standard Product", "Other"];
-    }
-
-    // 100% सटीक HTML रेंडरिंग: बिना किसी अनचाहे रीसेट के
     function createPipeRowHTML(item = {}) {
-      const category = item.category || PIPE_CATEGORIES[0];
-      const availableItems = getItemsForCategory(category);
-      const itemName = item.itemName || availableItems[0];
-      const brand = item.brand || "KASTA";
-
-      const availableSizes = [...(CATEGORY_SIZES_MAP[category] || ["Universal"])];
-      const availableClasses = [...(CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"])];
-
-      let defaultLength = "None / N.A. (Fittings)";
-      let defaultUnit = "Nos (Numbers)";
-
-      if (category.includes('Pipe')) {
-        defaultUnit = "Lengths (Pipes)";
-        if (category.includes('CPVC')) defaultLength = "3 Meters (10 ft)";
-        else if (category.includes('HDPE')) { defaultLength = "100 Meter Coil"; defaultUnit = "Coils"; }
-        else defaultLength = "6 Meters (20 ft)";
-      }
-
-      const length = item.length || defaultLength;
-      const unit = item.unit || defaultUnit;
-      const qty = item.qty !== undefined ? item.qty : 0;
-      const remarks = item.remarks || "";
-
-      const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
-
-      // अगर आइटम लिस्ट में न हो तो उसे जोड़ें
-      let allItems = [...availableItems];
-      if (itemName && !allItems.includes(itemName)) allItems.unshift(itemName);
-      const itemOptions = allItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
-
-      const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
-
-      // साइज़ मिलान
-      let allSizes = [...availableSizes];
-      let targetSize = (item.size || "").trim();
-      let matchedSize = allSizes[0];
-
-      if (targetSize) {
-        let found = allSizes.find(s => s.toLowerCase() === targetSize.toLowerCase() || s.toLowerCase().startsWith(targetSize.toLowerCase()) || targetSize.toLowerCase().startsWith(s.split(' ')[0].toLowerCase()));
-        if (found) {
-          matchedSize = found;
-        } else {
-          allSizes.unshift(targetSize);
-          matchedSize = targetSize;
-        }
-      }
-      const sizeOptions = allSizes.map(s => `<option value="${s}" ${s === matchedSize ? 'selected' : ''}>${s}</option>`).join('');
-
-      // क्लास मिलान
-      let allClasses = [...availableClasses];
-      let targetClass = (item.specClass || "").trim();
-      let matchedClass = allClasses[0];
-
-      if (targetClass && targetClass !== 'None') {
-        let foundCl = allClasses.find(c => c.toLowerCase() === targetClass.toLowerCase() || c.toLowerCase().includes(targetClass.toLowerCase()) || targetClass.toLowerCase().includes(c.split(' ')[0].toLowerCase()));
-        if (foundCl) {
-          matchedClass = foundCl;
-        } else {
-          allClasses.unshift(targetClass);
-          matchedClass = targetClass;
-        }
-      }
-      const classOptions = allClasses.map(cl => `<option value="${cl}" ${cl === matchedClass ? 'selected' : ''}>${cl}</option>`).join('');
-
-      const lengthOptions = ALL_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
-      const unitOptions = ALL_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
-
       return `
-        <tr class="order-line-row hover:bg-slate-50 transition-colors">
+        <tr class="order-line-row hover:bg-slate-50">
           <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
-          <td class="py-2.5 px-1.5">
-            <select onchange="onCategoryChangeManual(this)" class="item-category w-full text-xs py-1.5 px-2 bg-blue-50/50 border border-blue-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-bold text-slate-900">
-              ${categoryOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-name w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-medium text-brand-900">
-              ${itemOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-brand w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
-              ${brandOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-size w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-900">
-              ${sizeOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-class w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-800 font-bold">
-              ${classOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-length w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
-              ${lengthOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <input type="number" min="1" step="1" required value="${qty}" oninput="recalculateFormTotals()" class="item-qty w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-bold text-slate-900 text-right">
-          </td>
-          <td class="py-2.5 px-1.5">
-            <select class="item-unit w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500">
-              ${unitOptions}
-            </select>
-          </td>
-          <td class="py-2.5 px-1.5">
-            <input type="text" value="${remarks.replace(/"/g, '&quot;')}" placeholder="e.g. 4kg pressure" class="item-remarks w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-600">
-          </td>
-          <td class="py-2.5 px-1.5 text-center">
-            <button type="button" onclick="removeOrderItemRow(this)" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors" title="Delete Row">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            </button>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.category || '').replace(/"/g, '&quot;')}" class="item-category w-full text-xs p-1.5 border rounded-lg font-bold"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.itemName || '').replace(/"/g, '&quot;')}" class="item-name w-full text-xs p-1.5 border rounded-lg font-semibold text-sky-900"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.brand || 'KASTA').replace(/"/g, '&quot;')}" class="item-brand w-full text-xs p-1.5 border rounded-lg font-semibold"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.size || '').replace(/"/g, '&quot;')}" class="item-size w-full text-xs p-1.5 border rounded-lg font-bold text-slate-900"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.specClass || '').replace(/"/g, '&quot;')}" class="item-class w-full text-xs p-1.5 border rounded-lg font-medium"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.length || '').replace(/"/g, '&quot;')}" class="item-length w-full text-xs p-1.5 border rounded-lg"></td>
+          <td class="py-2 px-1.5"><input type="number" min="1" value="${item.qty || 0}" oninput="recalculateFormTotals()" class="item-qty w-full text-xs p-1.5 border rounded-lg font-bold text-right"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.unit || 'Nos').replace(/"/g, '&quot;')}" class="item-unit w-full text-xs p-1.5 border rounded-lg"></td>
+          <td class="py-2 px-1.5 text-center">
+            <button type="button" onclick="this.closest('tr').remove(); renumberRowIndices(); recalculateFormTotals();" class="text-red-500 font-bold">✕</button>
           </td>
         </tr>
       `;
-    }
-
-    // सिर्फ तभी चलेगा जब यूज़र खुद हाथ से कैटेगरी बदलेगा
-    function onCategoryChangeManual(selectEl) {
-      const row = selectEl.closest('tr');
-      const category = selectEl.value;
-      const itemSelect = row.querySelector('.item-name');
-      const sizeSelect = row.querySelector('.item-size');
-      const classSelect = row.querySelector('.item-class');
-      const lengthSelect = row.querySelector('.item-length');
-      const unitSelect = row.querySelector('.item-unit');
-
-      const items = getItemsForCategory(category);
-      itemSelect.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
-
-      const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
-      sizeSelect.innerHTML = availableSizes.map(s => `<option value="${s}">${s}</option>`).join('');
-
-      const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
-      classSelect.innerHTML = availableClasses.map(cl => `<option value="${cl}">${cl}</option>`).join('');
-
-      if (category === 'Water Tank') {
-        lengthSelect.value = "None / N.A. (Fittings)";
-        unitSelect.value = "Nos (Numbers)";
-      } else if (category.includes('Pipe')) {
-        unitSelect.value = "Lengths (Pipes)";
-        if (category.includes('CPVC')) lengthSelect.value = "3 Meters (10 ft)";
-        else if (category.includes('HDPE')) { lengthSelect.value = "100 Meter Coil"; unitSelect.value = "Coils"; }
-        else lengthSelect.value = "6 Meters (20 ft)";
-      } else {
-        lengthSelect.value = "None / N.A. (Fittings)";
-        unitSelect.value = "Nos (Numbers)";
-      }
     }
 
     function addOrderItemRow(itemData = null) {
       const tbody = document.getElementById('order-items-tbody');
       const tempWrapper = document.createElement('tbody');
       tempWrapper.innerHTML = createPipeRowHTML(itemData || {});
-      const newRow = tempWrapper.firstElementChild;
-      tbody.appendChild(newRow);
-      renumberRowIndices();
-      recalculateFormTotals();
-    }
-
-    function removeOrderItemRow(btn) {
-      const tbody = document.getElementById('order-items-tbody');
-      if (tbody.children.length <= 1) {
-        showToast("At least one specification line is required.", "warning");
-        return;
-      }
-      btn.closest('tr').remove();
+      tbody.appendChild(tempWrapper.firstElementChild);
       renumberRowIndices();
       recalculateFormTotals();
     }
 
     function renumberRowIndices() {
       const rows = document.querySelectorAll('#order-items-tbody tr');
-      rows.forEach((row, idx) => {
-        const indexEl = row.querySelector('.row-index');
-        if (indexEl) indexEl.textContent = idx + 1;
-      });
-      const badge = document.getElementById('line-items-count-badge');
-      if (badge) badge.textContent = `${rows.length} item${rows.length > 1 ? 's' : ''}`;
+      rows.forEach((r, i) => { r.querySelector('.row-index').textContent = i + 1; });
+      document.getElementById('summary-total-lines').textContent = rows.length;
     }
 
     function recalculateFormTotals() {
-      const rows = document.querySelectorAll('#order-items-tbody tr');
-      let totalQty = 0;
-      rows.forEach(row => {
-        const qtyInput = row.querySelector('.item-qty');
-        totalQty += (parseFloat(qtyInput ? qtyInput.value : 0) || 0);
-      });
-      document.getElementById('summary-total-lines').textContent = rows.length;
-      document.getElementById('summary-total-qty').textContent = totalQty.toLocaleString();
-    }
-
-    function insertQuickPreset(type) {
-      if (type === 'agri_fittings') {
-        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Coupler / Socket (Fabricated / Molded)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "4kg Agri socket" });
-        addOrderItemRow({ category: "PVC Agri / Irrigation Fittings", itemName: "Agri Tee (Equal)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "None / N.A. (Fittings)", qty: 25, unit: "Nos (Numbers)", remarks: "4kg Equal Tee" });
-      } else if (type === 'cpvc_fittings') {
-        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Elbow 90°", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "None / N.A. (Fittings)", qty: 100, unit: "Nos (Numbers)", remarks: "Standard 90 Elbow" });
-      } else if (type === 'water_tank') {
-        addOrderItemRow({ category: "Water Tank", itemName: "Overhead Water Tank", brand: "KASTA", size: "500 Ltr", specClass: "4 Layer (Puf Foam - Tank)", length: "None / N.A. (Fittings)", qty: 2, unit: "Nos (Numbers)", remarks: "4 Layer PUF Tank" });
-      }
-      showToast("Preset added successfully!", "info");
-    }
-
-    function populatePartyDropdowns() {
-      filterPartyDropdown("");
-    }
-
-    function filterPartyDropdown(query) {
-      const select = document.getElementById('form-party-id');
-      const filterSelect = document.getElementById('order-party-filter');
-      const q = (query || "").toLowerCase().trim();
-      const currentSelected = select.value;
-
-      select.innerHTML = '<option value="">-- Select Party (167 Available) --</option>';
-
-      const filtered = parties.filter(p => {
-        if (!q) return true;
-        return (
-          p.name.toLowerCase().includes(q) ||
-          (p.city && p.city.toLowerCase().includes(q)) ||
-          (p.gst && p.gst.toLowerCase().includes(q)) ||
-          (p.address && p.address.toLowerCase().includes(q))
-        );
-      });
-
-      filtered.forEach(p => {
-        const option = document.createElement('option');
-        option.value = p.id;
-        const gstBadge = (p.gst && p.gst !== 'Unregistered') ? ` [${p.gst}]` : ' [URP]';
-        const cityBadge = p.city ? ` - ${p.city}` : '';
-        option.textContent = `${p.name}${cityBadge}${gstBadge}`;
-        select.appendChild(option);
-      });
-
-      if (filterSelect && (!q || filterSelect.children.length <= 1)) {
-        const cur = filterSelect.value;
-        filterSelect.innerHTML = '<option value="ALL">All Parties (167)</option>';
-        parties.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.name;
-          filterSelect.appendChild(opt);
-        });
-        if (cur) filterSelect.value = cur;
-      }
-
-      if (currentSelected && filtered.some(p => p.id === currentSelected)) {
-        select.value = currentSelected;
-      }
-    }
-
-    function onPartySelected(partyId) {
-      const infoEl = document.getElementById('party-quick-info');
-      if (!partyId) {
-        infoEl.classList.add('hidden');
-        return;
-      }
-      const party = parties.find(p => p.id === partyId);
-      if (party) {
-        const gstText = (party.gst && party.gst !== 'Unregistered') ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">GST: ${party.gst}</span>` : `<span class="bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Unregistered (URP)</span>`;
-        const phoneText = party.phone ? ` • 📞 ${party.phone}` : '';
-        const locText = party.address ? ` • 📍 ${party.address}` : (party.city ? ` • 📍 ${party.city}` : '');
-        infoEl.innerHTML = `${gstText}${phoneText}${locText}`;
-        infoEl.classList.remove('hidden');
-      }
-    }
-
-    async function syncOrderToGoogleSheet(order) {
-      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
-      if (!webhookUrl) return;
-
-      try {
-        await fetch(webhookUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(order)
-        });
-      } catch (err) {
-        console.warn("Google webhook sync skipped or network unavailable", err);
-      }
-    }
-
-    async function handleSaveOrder(event) {
-      event.preventDefault();
-      
-      const editId = document.getElementById('edit-order-id').value;
-      const salesperson = document.getElementById('form-salesperson').value;
-      const partyId = document.getElementById('form-party-id').value;
-      const orderDate = document.getElementById('form-order-date').value;
-      const targetDate = document.getElementById('form-target-date').value;
-      const status = document.getElementById('form-order-status').value;
-      const partyRef = document.getElementById('form-party-ref').value.trim();
-      const deliverySite = document.getElementById('form-delivery-site').value.trim();
-      const notes = document.getElementById('form-order-notes').value.trim();
-
-      if (!salesperson) {
-        showToast("Please select salesperson.", "error");
-        return;
-      }
-      localStorage.setItem('airen_pipe_default_salesperson', salesperson);
-
-      if (!partyId) {
-        showToast("Please select a party.", "error");
-        return;
-      }
-
-      let party = parties.find(p => p.id === partyId);
-      let partyName = party ? party.name : "";
-      let partyGst = party ? (party.gst || "Unregistered") : "Unregistered";
-      let partyPhone = party ? (party.phone || "") : "";
-      let partyCity = party ? (party.city || "") : "";
-      let partyAddress = party ? (party.address || "") : "";
-
-      if (!party) {
-        const partySelect = document.getElementById('form-party-id');
-        partyName = partySelect.options[partySelect.selectedIndex].text.replace(" [Saved Order]", "");
-      }
-
-      const rows = document.querySelectorAll('#order-items-tbody tr');
-      if (rows.length === 0) {
-        showToast("Please add at least one item.", "error");
-        return;
-      }
-
-      const items = [];
-      for (const row of rows) {
-        const catSelect = row.querySelector('.item-category');
-        const itemSelect = row.querySelector('.item-name');
-        const brandSelect = row.querySelector('.item-brand');
-        const sizeSelect = row.querySelector('.item-size');
-        const classSelect = row.querySelector('.item-class');
-        const lengthSelect = row.querySelector('.item-length');
-        const unitSelect = row.querySelector('.item-unit');
-        const qtyInput = row.querySelector('.item-qty');
-        const remarksInput = row.querySelector('.item-remarks');
-
-        const category = catSelect ? catSelect.value : "";
-        const itemName = itemSelect ? itemSelect.value : "Item";
-        const brand = brandSelect ? brandSelect.value : "KASTA";
-        const size = sizeSelect ? sizeSelect.value : "";
-        const specClass = classSelect ? classSelect.value : "None";
-        const length = lengthSelect ? lengthSelect.value : "";
-        const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
-        const unit = unitSelect ? unitSelect.value : "Nos";
-        const remarks = remarksInput ? remarksInput.value.trim() : "";
-
-        if (qty <= 0) {
-          showToast("Quantity must be greater than zero.", "error");
-          return;
-        }
-
-        items.push({ category, itemName, brand, size, specClass, length, qty, unit, remarks });
-      }
-
-      let savedOrderObj = null;
-
-      if (editId) {
-        const index = orders.findIndex(o => o.id === editId);
-        if (index !== -1) {
-          orders[index] = {
-            ...orders[index],
-            salesperson,
-            partyId,
-            partyName,
-            partyGst,
-            partyPhone,
-            partyCity,
-            partyAddress,
-            orderDate,
-            targetDate,
-            status,
-            partyRef,
-            deliverySite,
-            notes,
-            items
-          };
-          savedOrderObj = orders[index];
-          saveOrders();
-          showToast(`Order #${editId} updated!`, "success");
-        }
-      } else {
-        const prefixMap = { "Sonam Jain": "SJ", "Adil Beg": "AB", "Ateeque Ahmed": "AA", "Abhishek Agrawal": "AG", "Office Counter": "OC" };
-        const prefix = prefixMap[salesperson] || "ORD";
-        const spKey = `airen_seq_${prefix}`;
-        let currentSeq = parseInt(localStorage.getItem(spKey) || "1000", 10) + 1;
-        localStorage.setItem(spKey, currentSeq);
-        const newOrderId = `${prefix}-${currentSeq}`;
-
-        const newOrder = {
-          id: newOrderId,
-          salesperson,
-          partyId,
-          partyName,
-          partyGst,
-          partyPhone,
-          partyCity,
-          partyAddress,
-          orderDate,
-          targetDate,
-          status,
-          partyRef,
-          deliverySite,
-          notes,
-          items,
-          createdAt: new Date().toISOString()
-        };
-        orders.unshift(newOrder);
-        savedOrderObj = newOrder;
-        saveOrders();
-        showToast(`Order #${newOrderId} saved!`, "success");
-      }
-
-      if (savedOrderObj) {
-        syncOrderToGoogleSheet(savedOrderObj);
-      }
-
-      resetOrderForm();
-      switchTab('orders');
-      updateGlobalKPIs();
-    }
-
-    function resetOrderForm() {
-      document.getElementById('orderForm').reset();
-      document.getElementById('edit-order-id').value = "";
-      document.getElementById('order-form-title').textContent = "Record Airen Pipe & Fittings Order";
-      document.getElementById('save-order-btn-text').textContent = "Save & Record Order";
-      document.getElementById('party-quick-info').classList.add('hidden');
-      document.getElementById('party-search-box').value = "";
-      
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('form-order-date').value = today;
-
-      const savedSalesperson = localStorage.getItem('airen_pipe_default_salesperson') || "";
-      if (savedSalesperson) document.getElementById('form-salesperson').value = savedSalesperson;
-
-      populatePartyDropdowns();
-
-      const tbody = document.getElementById('order-items-tbody');
-      tbody.innerHTML = '';
-      addOrderItemRow();
+      let total = 0;
+      document.querySelectorAll('.item-qty').forEach(q => { total += parseFloat(q.value) || 0; });
+      document.getElementById('summary-total-qty').textContent = total.toLocaleString();
     }
 
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
-      const emptyState = document.getElementById('orders-empty-state');
-      const searchQuery = document.getElementById('order-search-input').value.toLowerCase().trim();
-      const statusFilter = document.getElementById('order-status-filter').value;
-      const salespersonFilter = document.getElementById('order-salesperson-filter').value;
-      const partyFilter = document.getElementById('order-party-filter').value;
+      const search = document.getElementById('order-search-input').value.toLowerCase().trim();
 
-      populatePartyDropdowns();
+      const filtered = orders.filter(o => !search || o.id.toLowerCase().includes(search) || (o.partyName || '').toLowerCase().includes(search));
+      document.getElementById('filtered-count-badge').textContent = filtered.length;
 
-      const filtered = orders.filter(order => {
-        if (statusFilter !== 'ALL' && order.status !== statusFilter) return false;
-        if (salespersonFilter !== 'ALL' && order.salesperson !== salespersonFilter) return false;
-        if (partyFilter !== 'ALL' && order.partyId !== partyFilter) return false;
-        if (searchQuery) {
-          const matchId = order.id.toLowerCase().includes(searchQuery);
-          const matchSalesperson = (order.salesperson || "").toLowerCase().includes(searchQuery);
-          const matchParty = (order.partyName || "").toLowerCase().includes(searchQuery);
-          return matchId || matchSalesperson || matchParty;
-        }
-        return true;
-      });
-
-      document.getElementById('filtered-count-badge').textContent = `${filtered.length} Orders`;
-
-      if (filtered.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      }
-      emptyState.classList.add('hidden');
-
-      container.innerHTML = filtered.map(order => {
-        let itemsList = order.items;
-        if (typeof itemsList === 'string') {
-          try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
-        }
-        if (!Array.isArray(itemsList)) itemsList = [];
-
-        const totalItemsCount = itemsList.reduce((sum, it) => sum + (parseFloat(it.qty) || 0), 0);
-        const previewItemsText = itemsList.slice(0, 3).map(it => `${it.qty} ${(it.unit || 'Nos').split(' ')[0]} ${it.brand || 'KASTA'} ${it.itemName || it.category} ${it.size}`).join(' • ');
+      container.innerHTML = filtered.map(o => {
+        let its = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
+        let totalQty = its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0);
 
         return `
-          <div class="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div class="flex-1 space-y-1.5 min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${order.id}</span>
-                <span class="font-bold text-sm text-slate-900 truncate">${order.partyName}</span>
-                <span class="text-xs bg-blue-50 text-brand-800 font-bold px-2 py-0.5 rounded border border-blue-200">👤 ${order.salesperson || 'Staff'}</span>
-                <span class="text-xs text-slate-400 font-medium">📅 ${order.orderDate}</span>
+          <div class="p-4 flex justify-between items-center hover:bg-slate-50">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${o.id}</span>
+                <span class="font-bold text-sm text-slate-900">${o.partyName}</span>
+                <span class="text-xs text-slate-400">📅 ${o.orderDate}</span>
               </div>
-              <p class="text-xs text-slate-600 leading-relaxed truncate"><strong class="text-slate-700">Items:</strong> ${previewItemsText}</p>
+              <p class="text-xs text-slate-500 mt-1">${its.length} items | Total: <strong class="text-sky-700">${totalQty}</strong> pcs</p>
             </div>
-            <div class="flex items-center space-x-2 self-end md:self-center shrink-0">
-              <button onclick="viewOrderSlip('${order.id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold text-xs rounded-xl border border-brand-200 transition-colors">
-                View Slip
-              </button>
-              <button onclick="editOrderDirect('${order.id}')" class="p-1.5 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Order">
-                ✏️
-              </button>
-              <button onclick="deleteOrderPrompt('${order.id}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
-                🗑️
-              </button>
+            <div class="flex gap-2">
+              <button onclick="viewOrderSlip('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-sky-700 bg-sky-50 rounded-lg border border-sky-200">View Slip</button>
+              <button onclick="editOrderDirect('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 rounded-lg border border-amber-200">✏️ Edit</button>
             </div>
           </div>
         `;
       }).join('');
-
-      updateGlobalKPIs();
     }
 
-    function viewOrderSlip(orderId) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-      activeModalOrder = order;
-
-      let itemsList = order.items;
-      if (typeof itemsList === 'string') {
-        try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
-      }
-      if (!Array.isArray(itemsList)) itemsList = [];
-
-      document.getElementById('slip-order-id').textContent = `#${order.id}`;
-      document.getElementById('slip-order-date').textContent = order.orderDate || "--";
-      document.getElementById('slip-salesperson').textContent = order.salesperson || "Counter / Direct";
-      document.getElementById('slip-footer-salesperson').textContent = `(${order.salesperson || 'Airen Pipe Desk'})`;
-      document.getElementById('slip-party-name').textContent = order.partyName;
-      document.getElementById('slip-party-gst').textContent = (order.partyGst && order.partyGst !== 'Unregistered') ? `GSTIN: ${order.partyGst}` : 'GSTIN: Unregistered (URP)';
-      document.getElementById('slip-party-phone').textContent = `Phone: ${order.partyPhone || 'N/A'}`;
-      document.getElementById('slip-party-city').textContent = `Location: ${order.partyAddress || order.partyCity || 'N/A'}`;
-      document.getElementById('slip-party-ref').textContent = order.partyRef || "None / Direct";
-      document.getElementById('slip-target-date').textContent = order.targetDate || "Immediate / ASAP";
-      document.getElementById('slip-delivery-site').textContent = order.deliverySite || "Godown counter";
-      document.getElementById('slip-notes').textContent = order.notes || "No special instructions.";
-
-      const statusBadge = document.getElementById('slip-status-badge');
-      statusBadge.textContent = order.status;
-      statusBadge.className = order.status === 'Confirmed' ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold';
-
-      const tbody = document.getElementById('slip-items-tbody');
-      let totalQty = 0;
-
-      if (itemsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="py-4 text-center text-slate-400">No line items found.</td></tr>`;
-      } else {
-        tbody.innerHTML = itemsList.map((item, idx) => {
-          totalQty += (parseFloat(item.qty) || 0);
-          return `
-            <tr class="hover:bg-slate-50">
-              <td class="py-2 px-2 border border-slate-200 text-center font-mono">${idx + 1}</td>
-              <td class="py-2 px-3 border border-slate-200 text-slate-700 text-[11px]">${item.category || '-'}</td>
-              <td class="py-2 px-3 border border-slate-200 text-slate-900 font-bold">${item.itemName || item.category}</td>
-              <td class="py-2 px-2 border border-slate-200 text-slate-700">${item.brand || 'KASTA'}</td>
-              <td class="py-2 px-3 border border-slate-200 font-bold text-slate-900">${item.size || '-'}</td>
-              <td class="py-2 px-2 border border-slate-200 text-slate-800">${item.specClass || '-'}</td>
-              <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.length || '-'}</td>
-              <td class="py-2 px-3 border border-slate-200 text-right font-black font-mono text-slate-900">${item.qty || 0}</td>
-              <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.unit || 'Nos'}</td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      document.getElementById('slip-total-qty').textContent = totalQty.toLocaleString();
-      document.getElementById('orderDetailModal').classList.remove('hidden');
-    }
-
-    function closeOrderDetailModal() {
-      document.getElementById('orderDetailModal').classList.add('hidden');
-      activeModalOrder = null;
-    }
-
-    function cloneOrderFromModal() {
-      if (!activeModalOrder) return;
-      const order = activeModalOrder;
-      closeOrderDetailModal();
-      
-      resetOrderForm();
-      document.getElementById('form-salesperson').value = order.salesperson || "";
-
-      // पार्टी सुरक्षित भरना
-      const partySelect = document.getElementById('form-party-id');
-      let matchedParty = null;
-      if (order.partyId) matchedParty = parties.find(p => p.id === order.partyId);
-      if (!matchedParty && order.partyName) matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
-
-      if (matchedParty) {
-        partySelect.value = matchedParty.id;
-        onPartySelected(matchedParty.id);
-      } else if (order.partyName) {
-        let tempId = order.partyId || `pty_${Date.now()}`;
-        partySelect.add(new Option(order.partyName, tempId));
-        partySelect.value = tempId;
-      }
-
-      document.getElementById('form-party-ref').value = order.partyRef ? `Re-order of ${order.id}` : "";
-      document.getElementById('form-delivery-site').value = order.deliverySite || "";
-      document.getElementById('form-order-notes').value = order.notes || "";
-
-      let itemsList = order.items;
-      if (typeof itemsList === 'string') {
-        try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
-      }
-      if (!Array.isArray(itemsList)) itemsList = [];
-
-      const tbody = document.getElementById('order-items-tbody');
-      tbody.innerHTML = '';
-      itemsList.forEach(it => {
-        addOrderItemRow(it);
-      });
-
-      switchTab('new-order');
-      showToast("Order items cloned!", "info");
-    }
-
-    function editOrderFromModal() {
-      if (!activeModalOrder) return;
-      const id = activeModalOrder.id;
-      closeOrderDetailModal();
-      editOrderDirect(id);
-    }
-
-    // 100% फुल-प्रूफ एडिट फंक्शन: पार्टी या साइज़ कभी नहीं बदलेगा
     function editOrderDirect(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
@@ -1925,240 +283,129 @@
       document.getElementById('orderForm').reset();
       document.getElementById('edit-order-id').value = order.id;
       document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
-      document.getElementById('save-order-btn-text').textContent = "Update Order Details";
-
-      // सेल्सपर्सन सेट करें
       document.getElementById('form-salesperson').value = order.salesperson || "";
-
-      // पार्टी सेट करें
-      const partySelect = document.getElementById('form-party-id');
-      populatePartyDropdowns();
-
-      let matchedParty = null;
-      if (order.partyId) matchedParty = parties.find(p => p.id === order.partyId);
-      if (!matchedParty && order.partyName) {
-        let cleanName = order.partyName.trim().toLowerCase();
-        matchedParty = parties.find(p => p.name.trim().toLowerCase() === cleanName);
-      }
-      if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') {
-        matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
-      }
-
-      if (matchedParty) {
-        partySelect.value = matchedParty.id;
-        onPartySelected(matchedParty.id);
-      } else if (order.partyName) {
-        let customId = order.partyId || `saved_${Date.now()}`;
-        partySelect.add(new Option(order.partyName + " [Saved Order]", customId));
-        partySelect.value = customId;
-        const infoEl = document.getElementById('party-quick-info');
-        infoEl.innerHTML = `<span class="bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">${order.partyName}</span>`;
-        infoEl.classList.remove('hidden');
-      }
-
-      // अन्य फील्ड्स
+      document.getElementById('form-party-name').value = order.partyName || "";
       document.getElementById('form-order-date').value = order.orderDate || "";
-      document.getElementById('form-target-date').value = order.targetDate || "";
       document.getElementById('form-order-status').value = order.status || "Confirmed";
-      document.getElementById('form-party-ref').value = order.partyRef || "";
-      document.getElementById('form-delivery-site').value = order.deliverySite || "";
-      document.getElementById('form-order-notes').value = order.notes || "";
 
-      // लाइन आइटम्स लोड करें
-      let itemsList = order.items;
-      if (typeof itemsList === 'string') {
-        try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
-      }
-      if (!Array.isArray(itemsList)) itemsList = [];
-
+      let itemsList = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
-      
-      itemsList.forEach(it => {
-        addOrderItemRow(it);
-      });
+      itemsList.forEach(it => addOrderItemRow(it));
 
       switchTab('new-order');
     }
 
-    function deleteOrderPrompt(orderId) {
-      requirePin(() => {
-        orders = orders.filter(o => o.id !== orderId);
-        saveOrders();
-        renderOrdersList();
-        syncOrderToGoogleSheet({ id: orderId, action: "delete" });
-        showToast(`Order #${orderId} deleted.`, "info");
-      }, `Authorize Deletion of Order #${orderId}`);
+    function viewOrderSlip(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      document.getElementById('slip-order-id').textContent = `#${order.id}`;
+      document.getElementById('slip-party-name').textContent = order.partyName;
+      document.getElementById('slip-order-date').textContent = order.orderDate || "--";
+
+      let its = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+      document.getElementById('slip-items-tbody').innerHTML = its.map((it, i) => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-2 text-center">${i+1}</td>
+          <td class="p-2">${it.category}</td>
+          <td class="p-2 font-bold">${it.itemName}</td>
+          <td class="p-2">${it.brand}</td>
+          <td class="p-2 font-bold">${it.size}</td>
+          <td class="p-2">${it.specClass}</td>
+          <td class="p-2">${it.length}</td>
+          <td class="p-2 text-right font-black">${it.qty}</td>
+          <td class="p-2">${it.unit}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('orderDetailModal').classList.remove('hidden');
     }
 
-    function renderPartiesList() {
-      const grid = document.getElementById('parties-grid-container');
-      const searchQuery = document.getElementById('party-search-input').value.toLowerCase().trim();
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').classList.add('hidden');
+    }
 
-      const filtered = parties.filter(p => {
-        if (!searchQuery) return true;
-        return (
-          p.name.toLowerCase().includes(searchQuery) ||
-          (p.gst && p.gst.toLowerCase().includes(searchQuery)) ||
-          (p.city && p.city.toLowerCase().includes(searchQuery))
-        );
+    async function handleSaveOrder(e) {
+      e.preventDefault();
+      const editId = document.getElementById('edit-order-id').value;
+      const salesperson = document.getElementById('form-salesperson').value;
+      const partyName = document.getElementById('form-party-name').value;
+      const orderDate = document.getElementById('form-order-date').value;
+      const status = document.getElementById('form-order-status').value;
+
+      const items = [];
+      document.querySelectorAll('#order-items-tbody tr').forEach(r => {
+        items.push({
+          category: r.querySelector('.item-category').value,
+          itemName: r.querySelector('.item-name').value,
+          brand: r.querySelector('.item-brand').value,
+          size: r.querySelector('.item-size').value,
+          specClass: r.querySelector('.item-class').value,
+          length: r.querySelector('.item-length').value,
+          qty: parseFloat(r.querySelector('.item-qty').value) || 0,
+          unit: r.querySelector('.item-unit').value
+        });
       });
 
-      if (parties.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500">No parties available.</div>`;
-        return;
+      const orderObj = { id: editId || `ORD-${Date.now()}`, salesperson, partyName, orderDate, status, items };
+
+      if (editId) {
+        const idx = orders.findIndex(o => o.id === editId);
+        if (idx !== -1) orders[idx] = orderObj;
+      } else {
+        orders.unshift(orderObj);
       }
 
-      grid.innerHTML = filtered.map(p => `
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <h3 class="font-bold text-slate-900 text-base">${p.name}</h3>
-            <p class="text-xs font-mono font-bold ${p.gst && p.gst !== 'Unregistered' ? 'text-emerald-700' : 'text-slate-500'} mt-0.5">
-              ${p.gst && p.gst !== 'Unregistered' ? 'GST: ' + p.gst : 'URP (Unregistered)'}
-            </p>
-            <p class="text-[11px] text-slate-500 mt-2">${p.address || p.city || 'No address'}</p>
-          </div>
-          <div class="pt-3 border-t border-slate-100 flex justify-end">
-            <button onclick="quickOrderForParty('${p.id}')" class="px-3 py-1 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs">
-              + Book Order
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
+      localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
 
-    function quickOrderForParty(partyId) {
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(orderObj)
+        });
+      } catch(err) {}
+
       resetOrderForm();
-      document.getElementById('form-party-id').value = partyId;
-      onPartySelected(partyId);
-      switchTab('new-order');
+      switchTab('orders');
+      alert("✅ ऑर्डर सुरक्षित सेव हो गया!");
     }
 
-    function openPartyModal() {
-      document.getElementById('partyForm').reset();
-      document.getElementById('edit-party-id').value = "";
-      document.getElementById('partyModal').classList.remove('hidden');
-    }
-
-    function closePartyModal() {
-      document.getElementById('partyModal').classList.add('hidden');
-    }
-
-    function handleSaveParty(event) {
-      event.preventDefault();
-      const name = document.getElementById('party-name').value.trim();
-      const rawGst = document.getElementById('party-gst').value.trim().toUpperCase();
-      const gst = rawGst || "Unregistered";
-      const phone = document.getElementById('party-phone').value.trim();
-      const city = document.getElementById('party-city').value.trim();
-      const address = document.getElementById('party-address').value.trim();
-
-      const newParty = { id: `pty_${Date.now()}`, name, firm: name, phone, city, gst, address, type: gst !== 'Unregistered' ? 'Registered Dealer' : 'Unregistered (URP)' };
-      parties.unshift(newParty);
-      saveParties();
-      closePartyModal();
-      populatePartyDropdowns();
-      renderPartiesList();
-      showToast(`Party "${name}" added!`, "success");
-    }
-
-    function updateGlobalKPIs() {
-      const totalCount = orders.length;
-      const pendingCount = orders.filter(o => o.status === 'Recorded' || o.status === 'Hold').length;
-      const confirmedCount = orders.filter(o => o.status === 'Confirmed').length;
-      
-      const totalPcs = orders.reduce((sum, ord) => {
-        let its = ord.items;
-        if (typeof its === 'string') { try { its = JSON.parse(its); } catch(e) { its = []; } }
-        return sum + (Array.isArray(its) ? its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0) : 0);
-      }, 0);
-
-      document.getElementById('stat-total-orders').textContent = totalCount;
-      document.getElementById('stat-pending-orders').textContent = pendingCount;
-      document.getElementById('stat-confirmed-orders').textContent = confirmedCount;
-      document.getElementById('stat-total-pcs').textContent = totalPcs.toLocaleString();
+    function resetOrderForm() {
+      document.getElementById('orderForm').reset();
+      document.getElementById('edit-order-id').value = "";
+      document.getElementById('order-form-title').textContent = "Record Airen Pipe Order";
+      document.getElementById('form-order-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('order-items-tbody').innerHTML = '';
+      addOrderItemRow();
     }
 
     async function fetchOrdersFromCloud() {
-      requirePin(async () => {
-        const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
-        const btn = document.getElementById('btn-cloud-sync');
-        if (btn) btn.innerHTML = `<span>⏳ Syncing...</span>`;
-
-        try {
-          const response = await fetch(webhookUrl);
-          const data = await response.json();
-          
-          if (data && Array.isArray(data.orders) && data.orders.length > 0) {
-            const sanitizedRemoteOrders = data.orders.map(ord => {
-              if (typeof ord.items === 'string') {
-                try { ord.items = JSON.parse(ord.items); } catch(e) { ord.items = []; }
-              }
-              return ord;
-            });
-
-            const remoteIds = new Set(sanitizedRemoteOrders.map(r => r.id));
-            const localOnly = orders.filter(loc => !remoteIds.has(loc.id));
-            
-            orders = [...sanitizedRemoteOrders, ...localOnly];
-            saveOrders();
-            renderOrdersList();
-            updateGlobalKPIs();
-            showToast(`✓ ${sanitizedRemoteOrders.length} ऑर्डर्स सुरक्षित लोड हो गए!`, "success");
-          } else {
-            showToast("Sheet में कोई नया रिकॉर्ड नहीं मिला।", "info");
-          }
-        } catch (err) {
-          console.error("Cloud fetch failed", err);
-          showToast("Cloud sync failed.", "error");
-        } finally {
-          if (btn) btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span>☁️ Sync All Orders</span>`;
+      const btn = document.getElementById('btn-cloud-sync');
+      btn.textContent = "⏳ Syncing...";
+      try {
+        const res = await fetch(WEBHOOK_URL);
+        const data = await res.json();
+        if (data && data.orders && data.orders.length > 0) {
+          orders = data.orders;
+          localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
+          renderOrdersList();
+          alert(`✓ ${orders.length} ऑर्डर्स लाइव शीट से सही लोड हो गए!`);
         }
-      }, "Owner PIN Authorization: Sync All Orders");
-    }
-
-    function exportOrdersToCSV() {
-      if (orders.length === 0) {
-        showToast("No orders to export.", "warning");
-        return;
+      } catch(e) {
+        alert("Sync failed: Check network.");
+      } finally {
+        btn.textContent = "☁️ Sync All Orders";
       }
-      let csv = "Order ID,Order Date,Salesperson,Party Name,GSTIN,Quantity,Status\n";
-      orders.forEach(o => {
-        let its = o.items;
-        if (typeof its === 'string') { try { its = JSON.parse(its); } catch(e) { its = []; } }
-        let totalQty = Array.isArray(its) ? its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0) : 0;
-        csv += `"${o.id}","${o.orderDate}","${o.salesperson}","${o.partyName}","${o.partyGst}","${totalQty}","${o.status}"\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `Airen_Orders_${new Date().toISOString().split('T')[0]}.csv`;
-      link.click();
-    }
-
-    function showToast(message, type = "info") {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      let bg = "bg-slate-900 text-white";
-      if (type === "success") bg = "bg-emerald-900 text-emerald-50 border border-emerald-700";
-      else if (type === "warning" || type === "error") bg = "bg-red-900 text-red-50 border border-red-700";
-
-      toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs font-medium transition-all duration-300 pointer-events-auto max-w-xs`;
-      toast.textContent = message;
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
     }
 
     window.onload = function() {
-      initDataStore();
-      populatePartyDropdowns();
+      const saved = localStorage.getItem('airen_pipe_orders');
+      if (saved) { try { orders = JSON.parse(saved); } catch(e) { orders = []; } }
       renderOrdersList();
       resetOrderForm();
-      updateGlobalKPIs();
     };
   </script>
 </body>
