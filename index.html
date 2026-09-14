@@ -1740,11 +1740,50 @@
       const itemName = item.itemName || availableItems[0];
       const brand = item.brand || "KASTA";
       
-      const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
-      const size = item.size && availableSizes.includes(item.size) ? item.size : availableSizes[0];
+      const availableSizes = [...(CATEGORY_SIZES_MAP[category] || ["Universal"])];
       
-      const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
-      const specClass = item.specClass && availableClasses.includes(item.specClass) ? item.specClass : availableClasses[0];
+      // स्मार्ट साइज़ मैचिंग: अगर पूरा मैच न भी हो तो शुरुआत का साइज़ (e.g. "3/4" या "1") सही पकड़े
+      let rawItemSize = (item.size || "").trim();
+      let matchedSize = availableSizes[0];
+
+      if (rawItemSize) {
+        let exactMatch = availableSizes.find(s => s.toLowerCase() === rawItemSize.toLowerCase());
+        if (exactMatch) {
+          matchedSize = exactMatch;
+        } else {
+          let cleanInput = rawItemSize.replace(/["\s]/g, '').toLowerCase();
+          let partialMatch = availableSizes.find(s => {
+            let cleanOption = s.replace(/["\s]/g, '').toLowerCase();
+            return cleanOption.startsWith(cleanInput) || cleanOption.includes(cleanInput);
+          });
+          if (partialMatch) {
+            matchedSize = partialMatch;
+          } else {
+            matchedSize = rawItemSize;
+            if (!availableSizes.includes(rawItemSize)) {
+              availableSizes.unshift(rawItemSize);
+            }
+          }
+        }
+      }
+      
+      const availableClasses = [...(CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"])];
+      let rawClass = (item.specClass || "").trim();
+      let matchedClass = availableClasses[0];
+
+      if (rawClass && rawClass !== "None") {
+        let exactClassMatch = availableClasses.find(c => c.toLowerCase() === rawClass.toLowerCase());
+        if (exactClassMatch) {
+          matchedClass = exactClassMatch;
+        } else {
+          let cleanClassInput = rawClass.toLowerCase();
+          let partialClass = availableClasses.find(c => c.toLowerCase().includes(cleanClassInput) || cleanClassInput.includes(c.toLowerCase().split(' ')[0]));
+          matchedClass = partialClass ? partialClass : rawClass;
+          if (!availableClasses.includes(matchedClass)) {
+            availableClasses.unshift(matchedClass);
+          }
+        }
+      }
 
       let defaultLength = "None / N.A. (Fittings)";
       let defaultUnit = "Nos (Numbers)";
@@ -1764,8 +1803,8 @@
       const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
       const itemOptions = availableItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
       const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
-      const sizeOptions = availableSizes.map(s => `<option value="${s}" ${s === size ? 'selected' : ''}>${s}</option>`).join('');
-      const classOptions = availableClasses.map(cl => `<option value="${cl}" ${cl === specClass ? 'selected' : ''}>${cl}</option>`).join('');
+      const sizeOptions = availableSizes.map(s => `<option value="${s}" ${s === matchedSize ? 'selected' : ''}>${s}</option>`).join('');
+      const classOptions = availableClasses.map(cl => `<option value="${cl}" ${cl === matchedClass ? 'selected' : ''}>${cl}</option>`).join('');
       const lengthOptions = ALL_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
       const unitOptions = ALL_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
 
@@ -2396,8 +2435,24 @@
       
       resetOrderForm();
       document.getElementById('form-salesperson').value = order.salesperson || "";
-      document.getElementById('form-party-id').value = order.partyId || "";
-      onPartySelected(order.partyId);
+
+      // पार्टी का स्वचालित मिलान (ID, नाम या GST से)
+      let matchedParty = null;
+      if (order.partyId) {
+        matchedParty = parties.find(p => p.id === order.partyId);
+      }
+      if (!matchedParty && order.partyName) {
+        matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
+      }
+      if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') {
+        matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
+      }
+
+      if (matchedParty) {
+        document.getElementById('form-party-id').value = matchedParty.id;
+        onPartySelected(matchedParty.id);
+      }
+
       document.getElementById('form-party-ref').value = order.partyRef ? `Re-order of ${order.id}` : "";
       document.getElementById('form-delivery-site').value = order.deliverySite || "";
       document.getElementById('form-order-notes').value = order.notes || "";
@@ -2435,8 +2490,24 @@
       document.getElementById('save-order-btn-text').textContent = "Update Order Details";
 
       document.getElementById('form-salesperson').value = order.salesperson || "";
-      document.getElementById('form-party-id').value = order.partyId || "";
-      onPartySelected(order.partyId);
+
+      // पार्टी का स्वचालित मिलान (ID, नाम या GST से)
+      let matchedParty = null;
+      if (order.partyId) {
+        matchedParty = parties.find(p => p.id === order.partyId);
+      }
+      if (!matchedParty && order.partyName) {
+        matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
+      }
+      if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') {
+        matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
+      }
+
+      if (matchedParty) {
+        document.getElementById('form-party-id').value = matchedParty.id;
+        onPartySelected(matchedParty.id);
+      }
+
       document.getElementById('form-order-date').value = order.orderDate || "";
       document.getElementById('form-target-date').value = order.targetDate || "";
       document.getElementById('form-order-status').value = order.status || "Recorded";
