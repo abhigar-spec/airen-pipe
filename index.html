@@ -219,7 +219,7 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders punched by all salespersons from Google Sheet">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders punched by all salespersons from Google Sheet (Requires Owner PIN)">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             <span>☁️ Sync All Orders</span>
           </button>
@@ -352,7 +352,7 @@
                 <span>Pipes & Fittings Specification Line Items</span>
                 <span id="line-items-count-badge" class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded-full font-bold">1 item</span>
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Select category, fitting type/pipe, size, pressure rating (kg / class), length/unit, and quantity.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Category select karte hi item, size, pressure aur length automatically adjust ho jayenge.</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -390,8 +390,8 @@
                   <th class="py-3 px-2 w-48">Category</th>
                   <th class="py-3 px-2 w-52">Fitting Type / Item</th>
                   <th class="py-3 px-2 w-28">Brand</th>
-                  <th class="py-3 px-2 w-32">Size / Dia</th>
-                  <th class="py-3 px-2 w-36">Kg / Class / Pressure</th>
+                  <th class="py-3 px-2 w-40">Size / Dia</th>
+                  <th class="py-3 px-2 w-40">Kg / Class / Pressure</th>
                   <th class="py-3 px-2 w-28">Length / Pkg</th>
                   <th class="py-3 px-2 w-24 text-right">Quantity</th>
                   <th class="py-3 px-2 w-24">Unit</th>
@@ -573,7 +573,7 @@
           </div>
           <div>
             <h2 class="text-base font-bold text-slate-900">Airen Pipe Owner Security PIN</h2>
-            <p class="text-xs text-slate-500">Protects database against unauthorized deletions of orders, products, and parties.</p>
+            <p class="text-xs text-slate-500">Protects database against unauthorized deletions of orders, products, parties, and cloud sync.</p>
           </div>
         </div>
 
@@ -761,7 +761,7 @@
         <div class="space-y-4">
           <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
             <span class="font-bold text-slate-700 block mb-0.5">Special Instructions / Remarks:</span>
-            <p id="slip-notes" class="text-slate-600 italic">No specific instructions.</p>
+            <p id="slip-notes" class="text-slate-600 italic">No special instructions.</p>
           </div>
 
           <div class="grid grid-cols-2 pt-6 gap-8 text-xs text-center border-t border-slate-300">
@@ -1191,7 +1191,15 @@
       "HDPE Coil / Pipe": ["HDPE Coil", "HDPE Straight Pipe"],
       "PVC Conduit Electrical Pipe": ["Electrical Conduit Pipe"],
       "GI / MS Steel Pipe": ["GI Galvanized Pipe", "MS Black Pipe"],
-      "General Hardware / Solvents": ["Solvent Can", "Teflon Tape", "Rubber Washer", "Hacksaw Blade", "Clamp"]
+      "General Hardware / Solvents": [
+        "CPVC Solvent Cement (Tin / Tube)",
+        "SWR Solvent Cement (Tin)",
+        "Agri PVC Solvent Cement",
+        "Teflon Tape",
+        "Rubber Washer",
+        "Hacksaw Blade",
+        "Clamp"
+      ]
     };
 
     let FITTINGS_CATALOG = JSON.parse(JSON.stringify(BASE_FITTINGS_CATALOG));
@@ -1228,76 +1236,136 @@
       "AIREN"
     ];
 
-    const PIPE_SIZES = [
-      "1/2\" (15mm / 20mm OD)",
-      "3/4\" (20mm / 25mm OD)",
-      "1\" (25mm / 32mm OD)",
-      "1-1/4\" (32mm / 40mm OD)",
-      "1-1/2\" (40mm / 50mm OD)",
-      "2\" (50mm / 63mm OD)",
-      "2-1/2\" (65mm / 75mm OD)",
-      "3\" (75mm / 90mm OD)",
-      "4\" (100mm / 110mm OD)",
-      "5\" (125mm / 140mm OD)",
-      "6\" (150mm / 160mm OD)",
-      "7\" (180mm OD)",
-      "8\" (200mm OD)",
-      "10\" (250mm OD)",
-      "12\" (315mm OD)",
-      "100 Ltr",
-      "200 Ltr",
-      "300 Ltr",
-      "500 Ltr",
-      "750 Ltr",
-      "1000 Ltr",
-      "1500 Ltr",
-      "2000 Ltr",
-      "3000 Ltr",
-      "5000 Ltr",
-      "2\" x 1-1/2\" (63x50mm)",
-      "2-1/2\" x 2\" (75x63mm)",
-      "3\" x 2\" (90x63mm)",
-      "3\" x 2-1/2\" (90x75mm)",
-      "4\" x 2\" (110x63mm)",
-      "4\" x 2-1/2\" (110x75mm)",
-      "4\" x 3\" (110x90mm)",
-      "5\" x 4\" (140x110mm)",
-      "6\" x 4\" (160x110mm)",
-      "3/4\" x 1/2\"",
-      "1\" x 1/2\"",
-      "1\" x 3/4\"",
-      "1-1/4\" x 1\"",
-      "1-1/2\" x 1\"",
-      "1-1/2\" x 1-1/4\""
-    ];
+    /* ==========================================================
+       CATEGORY-SPECIFIC SIZE MAPPINGS (INTELLIGENT FILTERING)
+       ========================================================== */
+    const CATEGORY_SIZES_MAP = {
+      "Water Tank": [
+        "1000 Ltr", "500 Ltr", "750 Ltr", "300 Ltr", "200 Ltr", "100 Ltr", "1500 Ltr", "2000 Ltr", "3000 Ltr", "5000 Ltr"
+      ],
+      "PVC Agri / Irrigation Fittings": [
+        "2-1/2\" (65mm / 75mm OD)", "2\" (50mm / 63mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)", "5\" (125mm / 140mm OD)", "6\" (150mm / 160mm OD)",
+        "2-1/2\" x 2\" (75x63mm)", "3\" x 2-1/2\" (90x75mm)", "4\" x 2-1/2\" (110x75mm)", "4\" x 3\" (110x90mm)", "2\" x 1-1/2\" (63x50mm)", "5\" x 4\" (140x110mm)", "6\" x 4\" (160x110mm)",
+        "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)"
+      ],
+      "PVC Agri / Column Pipe": [
+        "2-1/2\" (65mm / 75mm OD)", "2\" (50mm / 63mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)", "5\" (125mm / 140mm OD)", "6\" (150mm / 160mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "8\" (200mm OD)", "10\" (250mm OD)"
+      ],
+      "CPVC Plumbing Fittings": [
+        "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)",
+        "3/4\" x 1/2\"", "1\" x 1/2\"", "1\" x 3/4\"", "1-1/4\" x 3/4\"", "1-1/4\" x 1\"", "1-1/2\" x 1\"", "1-1/2\" x 1-1/4\"", "2\" x 1-1/4\"", "2\" x 1-1/2\""
+      ],
+      "CPVC Plumbing Pipe": [
+        "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)"
+      ],
+      "UPVC Pressure Fittings": [
+        "1\" (25mm / 32mm OD)", "3/4\" (20mm / 25mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)",
+        "1\" x 1/2\"", "1\" x 3/4\"", "1-1/4\" x 1\"", "1-1/2\" x 1-1/4\"", "2\" x 1-1/2\"", "2-1/2\" x 2\"", "3\" x 2-1/2\""
+      ],
+      "UPVC Pressure Pipe": [
+        "1\" (25mm / 32mm OD)", "3/4\" (20mm / 25mm OD)", "1/2\" (15mm / 20mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)"
+      ],
+      "PVC SWR Drainage Fittings": [
+        "4\" (100mm / 110mm OD)", "3\" (75mm / 90mm OD)", "2-1/2\" (65mm / 75mm OD)", "6\" (150mm / 160mm OD)",
+        "110mm x 75mm (4\" x 2.5\")", "110mm x 90mm (4\" x 3\")", "160mm x 110mm (6\" x 4\")", "90mm x 75mm (3\" x 2.5\")"
+      ],
+      "PVC SWR Drainage Pipe": [
+        "4\" (100mm / 110mm OD)", "3\" (75mm / 90mm OD)", "2-1/2\" (65mm / 75mm OD)", "6\" (150mm / 160mm OD)"
+      ],
+      "HDPE Coil / Pipe": [
+        "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "1\" (25mm / 32mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "4\" (100mm / 110mm OD)"
+      ],
+      "General Hardware / Solvents": [
+        "100 ml (CPVC Tin)", "250 ml (CPVC Tin)", "500 ml (CPVC Tin)", "50 ml (CPVC Tin)", "20 ml (CPVC Tube)", "10 ml (CPVC Tube)", "1 Liter (CPVC Tin)", "5 Liter (CPVC Can)",
+        "100 ml (SWR Tin)", "250 ml (SWR Tin)", "500 ml (SWR Tin)", "50 ml (SWR Tin)", "1 Liter (SWR Tin)", "5 Liter (SWR Can)", "Universal"
+      ],
+      "PVC Conduit Electrical Pipe": [
+        "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)"
+      ],
+      "GI / MS Steel Pipe": [
+        "1/2\" (15mm / 20mm OD)", "3/4\" (20mm / 25mm OD)", "1\" (25mm / 32mm OD)", "1-1/4\" (32mm / 40mm OD)", "1-1/2\" (40mm / 50mm OD)", "2\" (50mm / 63mm OD)", "2-1/2\" (65mm / 75mm OD)", "3\" (75mm / 90mm OD)", "4\" (100mm / 110mm OD)"
+      ]
+    };
 
-    const PIPE_CLASSES = [
-      "None",
-      "3 Layer (Water Tank)",
-      "4 Layer (Puf Foam - Tank)",
-      "5 Layer (Anti-Bacterial - Tank)",
-      "Heavy Duty Extra Rib (Tank)",
-      "2.5 kg/cm² (Class 1 - Agri)",
-      "4.0 kg/cm² (Class 2 - Agri)",
-      "6.0 kg/cm² (Class 3 - Agri)",
-      "8.0 kg/cm² (Class 4 - Agri)",
-      "10.0 kg/cm² (Class 5 - Agri)",
-      "12.5 kg/cm² (High Pressure)",
-      "PN 4 (HDPE / Agri)",
-      "PN 6 (HDPE / Agri)",
-      "PN 10 (HDPE / Agri)",
-      "PN 12.5 (HDPE)",
-      "PN 16 (HDPE)",
-      "SCH 40 (Plumbing / Pressure)",
-      "SCH 80 (Heavy Pressure)",
-      "SDR 11 (Class 1 - CPVC)",
-      "SDR 13.5 (Class 2 - CPVC)",
-      "Type A (Rainwater)",
-      "Type B (Soil/Waste)",
-      "Standard / Molded"
-    ];
+    /* ==========================================================
+       CATEGORY-SPECIFIC PRESSURE / CLASS MAPPINGS
+       ========================================================== */
+    const CATEGORY_CLASS_MAP = {
+      "Water Tank": [
+        "4 Layer (Puf Foam - Tank)",
+        "3 Layer (Water Tank)",
+        "5 Layer (Anti-Bacterial - Tank)",
+        "Heavy Duty Extra Rib (Tank)"
+      ],
+      "PVC Agri / Irrigation Fittings": [
+        "4.0 kg/cm² (Class 2 - Agri)",
+        "6.0 kg/cm² (Class 3 - Agri)",
+        "2.5 kg/cm² (Class 1 - Agri)",
+        "8.0 kg/cm² (Class 4 - Agri)",
+        "10.0 kg/cm² (Class 5 - Agri)",
+        "Standard / Molded",
+        "None"
+      ],
+      "PVC Agri / Column Pipe": [
+        "4.0 kg/cm² (Class 2 - Agri)",
+        "6.0 kg/cm² (Class 3 - Agri)",
+        "2.5 kg/cm² (Class 1 - Agri)",
+        "8.0 kg/cm² (Class 4 - Agri)",
+        "10.0 kg/cm² (Class 5 - Agri)",
+        "12.5 kg/cm² (High Pressure)"
+      ],
+      "CPVC Plumbing Fittings": [
+        "SDR 11 (Class 1 - CPVC)",
+        "SDR 13.5 (Class 2 - CPVC)",
+        "Standard / Molded",
+        "None"
+      ],
+      "CPVC Plumbing Pipe": [
+        "SDR 11 (Class 1 - CPVC)",
+        "SDR 13.5 (Class 2 - CPVC)"
+      ],
+      "UPVC Pressure Fittings": [
+        "SCH 40 (Plumbing / Pressure)",
+        "SCH 80 (Heavy Pressure)",
+        "Standard / Molded",
+        "None"
+      ],
+      "UPVC Pressure Pipe": [
+        "SCH 40 (Plumbing / Pressure)",
+        "SCH 80 (Heavy Pressure)"
+      ],
+      "PVC SWR Drainage Fittings": [
+        "Type B (Soil/Waste)",
+        "Type A (Rainwater)",
+        "Standard / Molded",
+        "None"
+      ],
+      "PVC SWR Drainage Pipe": [
+        "Type B (Soil/Waste)",
+        "Type A (Rainwater)"
+      ],
+      "HDPE Coil / Pipe": [
+        "PN 6 (HDPE / Agri)",
+        "PN 4 (HDPE / Agri)",
+        "PN 10 (HDPE / Agri)",
+        "PN 12.5 (HDPE)",
+        "PN 16 (HDPE)"
+      ],
+      "General Hardware / Solvents": [
+        "Standard / Molded",
+        "None"
+      ],
+      "PVC Conduit Electrical Pipe": [
+        "Standard / Molded",
+        "None"
+      ],
+      "GI / MS Steel Pipe": [
+        "Standard / Molded",
+        "None"
+      ]
+    };
 
-    const PIPE_LENGTHS = [
+    const ALL_LENGTHS = [
       "None / N.A. (Fittings)",
       "6 Meters (20 ft)",
       "3 Meters (10 ft)",
@@ -1308,11 +1376,11 @@
       "Custom / Cut Length"
     ];
 
-    const PIPE_UNITS = [
+    const ALL_UNITS = [
       "Nos (Numbers)",
+      "Lengths (Pipes)",
       "Bags / Bags Pack",
       "Boxes / Cartons",
-      "Lengths (Pipes)",
       "Bundles",
       "Coils",
       "Meters",
@@ -1326,7 +1394,7 @@
     let orders = [];
     let activeModalOrder = null;
     let pendingPinCallback = null;
-    const PARTIES_DATA_VERSION = "2026_v6_clean167_pin1379_smart_portal";
+    const PARTIES_DATA_VERSION = "2026_v8_clean167_full_auto_select";
 
     function getMasterPin() {
       let pin = localStorage.getItem('airen_pipe_master_pin');
@@ -1593,11 +1661,7 @@
         category: category,
         itemName: prodName,
         brand: "KASTA",
-        size: category === 'Water Tank' ? '1000 Ltr' : PIPE_SIZES[0],
-        specClass: category === 'Water Tank' ? '4 Layer (Puf Foam - Tank)' : "None",
-        length: category.includes('Fitting') || category === 'Water Tank' ? "None / N.A. (Fittings)" : "6 Meters (20 ft)",
         qty: category === 'Water Tank' ? 2 : 10,
-        unit: category.includes('Fitting') || category === 'Water Tank' ? "Nos (Numbers)" : "Lengths (Pipes)",
         remarks: "Custom Added Item"
       });
 
@@ -1770,7 +1834,7 @@
     }
 
     /* ==========================================================
-       ORDER ROW MANAGEMENT
+       ORDER ROW MANAGEMENT WITH COMPLETE SMART AUTO-SELECTION
        ========================================================== */
     function getItemsForCategory(category) {
       return FITTINGS_CATALOG[category] || ["Standard Product", "Other"];
@@ -1782,40 +1846,42 @@
       const itemName = item.itemName || availableItems[0];
       const brand = item.brand || "KASTA";
       
-      let defaultSize = PIPE_SIZES[1];
-      if (category === 'Water Tank') defaultSize = "1000 Ltr";
-      else if (category.includes('Agri')) defaultSize = "2-1/2\" (65mm / 75mm OD)";
-      const size = item.size || defaultSize;
+      // Auto-fetch category specific sizes & classes
+      const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
+      const size = item.size && availableSizes.includes(item.size) ? item.size : availableSizes[0];
       
-      let defaultClass = "None";
-      if (category === 'Water Tank') defaultClass = "4 Layer (Puf Foam - Tank)";
-      else if (category.includes('Agri')) defaultClass = "4.0 kg/cm² (Class 2 - Agri)";
-      else if (category.includes('CPVC')) defaultClass = "SDR 11 (Class 1 - CPVC)";
-      const specClass = item.specClass !== undefined ? item.specClass : defaultClass;
+      const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
+      const specClass = item.specClass && availableClasses.includes(item.specClass) ? item.specClass : availableClasses[0];
 
-      let defaultLength = PIPE_LENGTHS[0];
-      if (category === 'Water Tank' || category.includes('Fitting')) defaultLength = "None / N.A. (Fittings)";
-      else if (category.includes('Agri')) defaultLength = PIPE_LENGTHS[1];
-      else if (category.includes('CPVC')) defaultLength = PIPE_LENGTHS[2];
+      // Auto-set length & unit
+      let defaultLength = "None / N.A. (Fittings)";
+      let defaultUnit = "Nos (Numbers)";
+
+      if (category.includes('Pipe')) {
+        defaultUnit = "Lengths (Pipes)";
+        if (category.includes('CPVC')) defaultLength = "3 Meters (10 ft)";
+        else if (category.includes('HDPE')) { defaultLength = "100 Meter Coil"; defaultUnit = "Coils"; }
+        else defaultLength = "6 Meters (20 ft)";
+      }
+
       const length = item.length || defaultLength;
-
+      const unit = item.unit || defaultUnit;
       const qty = item.qty !== undefined ? item.qty : (category === 'Water Tank' ? 1 : 0);
-      const unit = item.unit || (category === 'Water Tank' || category.includes('Fitting') ? "Nos (Numbers)" : "Lengths (Pipes)");
       const remarks = item.remarks || "";
 
       const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
       const itemOptions = availableItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
       const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
-      const sizeOptions = PIPE_SIZES.map(s => `<option value="${s}" ${s === size ? 'selected' : ''}>${s}</option>`).join('');
-      const classOptions = PIPE_CLASSES.map(cl => `<option value="${cl}" ${cl === specClass ? 'selected' : ''}>${cl}</option>`).join('');
-      const lengthOptions = PIPE_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
-      const unitOptions = PIPE_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
+      const sizeOptions = availableSizes.map(s => `<option value="${s}" ${s === size ? 'selected' : ''}>${s}</option>`).join('');
+      const classOptions = availableClasses.map(cl => `<option value="${cl}" ${cl === specClass ? 'selected' : ''}>${cl}</option>`).join('');
+      const lengthOptions = ALL_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
+      const unitOptions = ALL_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
 
       return `
         <tr class="order-line-row hover:bg-slate-50 transition-colors">
           <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
           <td class="py-2.5 px-1.5">
-            <select onchange="onCategoryChange(this)" class="item-category w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-semibold text-slate-800">
+            <select onchange="onCategoryChange(this)" class="item-category w-full text-xs py-1.5 px-2 bg-blue-50/50 border border-blue-300 rounded-lg focus:ring-1 focus:ring-brand-500 font-bold text-slate-900">
               ${categoryOptions}
             </select>
           </td>
@@ -1835,7 +1901,7 @@
             </select>
           </td>
           <td class="py-2.5 px-1.5">
-            <select class="item-class w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-800 font-medium">
+            <select class="item-class w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-800 font-bold">
               ${classOptions}
             </select>
           </td>
@@ -1853,7 +1919,7 @@
             </select>
           </td>
           <td class="py-2.5 px-1.5">
-            <input type="text" value="${remarks}" placeholder="e.g. 4kg pressure, Brass bolt, 25-bag pack" class="item-remarks w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-600">
+            <input type="text" value="${remarks}" placeholder="e.g. 4kg pressure, Brass bolt" class="item-remarks w-full text-xs py-1.5 px-2 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 text-slate-600">
           </td>
           <td class="py-2.5 px-1.5 text-center">
             <button type="button" onclick="removeOrderItemRow(this)" class="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors" title="Delete Row">
@@ -1873,42 +1939,40 @@
       const lengthSelect = row.querySelector('.item-length');
       const unitSelect = row.querySelector('.item-unit');
 
+      // 1. Items Filter & Auto-Select
       const items = getItemsForCategory(category);
       itemSelect.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
 
+      // 2. Intelligent Sizes Auto-Populate & Auto-Select First
+      const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
+      sizeSelect.innerHTML = availableSizes.map(s => `<option value="${s}">${s}</option>`).join('');
+      sizeSelect.value = availableSizes[0];
+
+      // 3. Intelligent Pressure/Class Auto-Populate & Auto-Select First
+      const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
+      classSelect.innerHTML = availableClasses.map(cl => `<option value="${cl}">${cl}</option>`).join('');
+      classSelect.value = availableClasses[0];
+
+      // 4. Intelligent Length & Unit Auto-Select
       if (category === 'Water Tank') {
-        sizeSelect.value = "1000 Ltr";
-        classSelect.value = "4 Layer (Puf Foam - Tank)";
         lengthSelect.value = "None / N.A. (Fittings)";
         unitSelect.value = "Nos (Numbers)";
-      } else if (category.includes('Agri / Irrigation Fittings')) {
-        sizeSelect.value = "2-1/2\" (65mm / 75mm OD)";
-        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
+      } else if (category.includes('Agri / Irrigation Fittings') || category.includes('Plumbing Fittings') || category.includes('Drainage Fittings') || category.includes('Pressure Fittings')) {
         lengthSelect.value = "None / N.A. (Fittings)";
-        unitSelect.value = "Pcs (Pieces)";
-      } else if (category.includes('Agri / Column Pipe')) {
-        sizeSelect.value = "2-1/2\" (65mm / 75mm OD)";
-        classSelect.value = "4.0 kg/cm² (Class 2 - Agri)";
-        lengthSelect.value = "6 Meters (20 ft)";
-        unitSelect.value = "Lengths (Pipes)";
-      } else if (category.includes('Fitting')) {
-        classSelect.value = "None";
-        lengthSelect.value = "None / N.A. (Fittings)";
-        unitSelect.value = "Pcs (Pieces)";
+        unitSelect.value = "Nos (Numbers)";
       } else if (category.includes('Pipe')) {
+        unitSelect.value = "Lengths (Pipes)";
         if (category.includes('CPVC')) {
-          classSelect.value = "SDR 11 (Class 1 - CPVC)";
           lengthSelect.value = "3 Meters (10 ft)";
-          unitSelect.value = "Lengths (Pipes)";
-        } else if (category.includes('UPVC')) {
-          classSelect.value = "SCH 40 (Plumbing / Pressure)";
-          lengthSelect.value = "6 Meters (20 ft)";
-          unitSelect.value = "Lengths (Pipes)";
         } else if (category.includes('HDPE')) {
-          classSelect.value = "PN 6 (HDPE / Agri)";
           lengthSelect.value = "100 Meter Coil";
           unitSelect.value = "Coils";
+        } else {
+          lengthSelect.value = "6 Meters (20 ft)";
         }
+      } else if (category.includes('Solvent') || category.includes('Hardware')) {
+        lengthSelect.value = "None / N.A. (Fittings)";
+        unitSelect.value = "Nos (Numbers)";
       }
     }
 
@@ -1966,23 +2030,23 @@
         addOrderItemRow({ category: "PVC Agri / Column Pipe", itemName: "Agri Delivery Pipe (Plain / Socketed)", brand: "KASTA", size: "2-1/2\" (65mm / 75mm OD)", specClass: "4.0 kg/cm² (Class 2 - Agri)", length: "6 Meters (20 ft)", qty: 50, unit: "Lengths (Pipes)", remarks: "Farm mainline 4kg" });
         showToast("Added Kasta Agricultural Pack!", "info");
       } else if (type === 'cpvc_fittings') {
-        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Elbow 90°", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 100, unit: "Nos (Numbers)", remarks: "Standard 90 Elbow" });
-        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Tee (Equal)", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "Equal Tee" });
-        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Brass FTA (Female Threaded Adaptor)", brand: "KASTA", size: "3/4\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "Brass insert" });
-        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "CPVC Ball Valve", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Heavy handle" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Elbow 90°", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "None / N.A. (Fittings)", qty: 100, unit: "Nos (Numbers)", remarks: "Standard 90 Elbow" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Tee (Equal)", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "Equal Tee" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "Brass FTA (Female Threaded Adaptor)", brand: "KASTA", size: "3/4\" x 1/2\"", specClass: "SDR 11 (Class 1 - CPVC)", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "Brass insert" });
+        addOrderItemRow({ category: "CPVC Plumbing Fittings", itemName: "CPVC Ball Valve", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Heavy handle" });
         addOrderItemRow({ category: "CPVC Plumbing Pipe", itemName: "Standard CPVC Pipe", brand: "KASTA", size: "3/4\" (20mm / 25mm OD)", specClass: "SDR 11 (Class 1 - CPVC)", length: "3 Meters (10 ft)", qty: 25, unit: "Lengths (Pipes)", remarks: "Hot/Cold pipe" });
         showToast("Added CPVC Fittings & Pipe Pack!", "info");
       } else if (type === 'upvc_fittings') {
         addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Elbow 90°", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 50, unit: "Nos (Numbers)", remarks: "Pressure Elbow" });
         addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Plain Tee (Equal)", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 30, unit: "Nos (Numbers)", remarks: "Pressure Tee" });
-        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Brass MTA (Male)", brand: "KASTA", size: "1\" x 1/2\"", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "Brass MTA" });
-        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "UPVC Ball Valve", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 12, unit: "Nos (Numbers)", remarks: "Solid handle" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "Brass MTA (Male)", brand: "KASTA", size: "1\" x 1/2\"", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "Brass MTA" });
+        addOrderItemRow({ category: "UPVC Pressure Fittings", itemName: "UPVC Ball Valve", brand: "KASTA", size: "1\" (25mm / 32mm OD)", specClass: "SCH 40 (Plumbing / Pressure)", length: "None / N.A. (Fittings)", qty: 12, unit: "Nos (Numbers)", remarks: "Solid handle" });
         showToast("Added UPVC Pressure Fittings Pack!", "info");
       } else if (type === 'swr_fittings') {
         addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Bend 87.5° (Plain)", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 25, unit: "Nos (Numbers)", remarks: "Ringfit 90 bend" });
         addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Single Tee with Door", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 15, unit: "Nos (Numbers)", remarks: "Inspection door" });
-        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Nahani Trap with Jali", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "With SS Jali" });
-        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "P-Trap (with/without vent)", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "None", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Water seal trap" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "Nahani Trap with Jali", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 20, unit: "Nos (Numbers)", remarks: "With SS Jali" });
+        addOrderItemRow({ category: "PVC SWR Drainage Fittings", itemName: "P-Trap (with/without vent)", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "None / N.A. (Fittings)", qty: 10, unit: "Nos (Numbers)", remarks: "Water seal trap" });
         addOrderItemRow({ category: "PVC SWR Drainage Pipe", itemName: "SWR Ringfit Pipe", brand: "KASTA", size: "4\" (100mm / 110mm OD)", specClass: "Type B (Soil/Waste)", length: "3 Meters (10 ft)", qty: 20, unit: "Lengths (Pipes)", remarks: "Rubber ring joint" });
         showToast("Added SWR Drainage Fittings Pack!", "info");
       } else if (type === 'water_tank') {
@@ -2679,6 +2743,7 @@
         }
       }, "Owner PIN Authorization: Sync All Orders");
     }
+
     function exportOrdersToCSV() {
       if (orders.length === 0) {
         showToast("No orders available to export.", "warning");
