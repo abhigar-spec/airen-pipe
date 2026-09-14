@@ -24,7 +24,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-orange-500 flex items-center justify-center font-black text-xl">A</div>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-orange-500 flex items-center justify-center font-black text-xl text-white shadow-inner">A</div>
           <div>
             <div class="flex items-center space-x-2">
               <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-orange-500">Pipe</span></span>
@@ -32,8 +32,8 @@
             </div>
           </div>
         </div>
-        <nav class="flex items-center space-x-2 bg-slate-800 p-1 rounded-xl">
-          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white">Order Book</button>
+        <nav class="flex items-center space-x-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
+          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white shadow-sm">Order Book</button>
           <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white">+ Punch Order</button>
         </nav>
       </div>
@@ -44,10 +44,10 @@
 
     <!-- ORDER BOOK VIEW -->
     <div id="view-orders" class="tab-view space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
-        <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="🔍 Search Order ID, Party Name..." class="w-72 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+        <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="🔍 Search Order ID, Party Name, Salesperson..." class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
         <div class="flex gap-2">
-          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-1.5">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center justify-center gap-1.5">
             <span>☁️ Sync All Orders</span>
           </button>
           <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-sm">
@@ -59,6 +59,7 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
           <h2 class="font-bold text-slate-800 text-sm">Recorded Orders (<span id="filtered-count-badge">0</span>)</h2>
+          <span class="text-xs text-slate-500">Sorted by newest</span>
         </div>
         <div id="orders-container" class="divide-y divide-slate-100"></div>
       </div>
@@ -78,12 +79,19 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Booked By / Salesperson *</label>
-              <input type="text" id="form-salesperson" required placeholder="Salesperson Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
+              <select id="form-salesperson" required class="w-full px-3.5 py-2.5 text-sm bg-blue-50/70 border border-blue-300 rounded-xl font-bold text-slate-800">
+                <option value="">-- Select Salesperson --</option>
+                <option value="Sonam Jain">Sonam Jain</option>
+                <option value="Adil Beg">Adil Beg</option>
+                <option value="Ateeque Ahmed">Ateeque Ahmed</option>
+                <option value="Abhishek Agrawal">Abhishek Agrawal</option>
+                <option value="Office Counter">Office / Counter</option>
+              </select>
             </div>
 
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name *</label>
-              <input type="text" id="form-party-name" required placeholder="Type Party Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900">
+              <input type="text" id="form-party-name" required placeholder="Enter Party Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900">
             </div>
 
             <div>
@@ -105,7 +113,7 @@
 
         <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
           <div class="flex justify-between items-center">
-            <h3 class="text-base font-bold text-slate-900">Line Items (<span id="summary-total-lines">0</span>)</h3>
+            <h3 class="text-base font-bold text-slate-900">Line Items Spec (<span id="summary-total-lines">0</span>)</h3>
             <button type="button" onclick="addOrderItemRow()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm">
               + Add Row
             </button>
@@ -250,24 +258,30 @@
       const container = document.getElementById('orders-container');
       const search = document.getElementById('order-search-input').value.toLowerCase().trim();
 
-      const filtered = orders.filter(o => !search || o.id.toLowerCase().includes(search) || (o.partyName || '').toLowerCase().includes(search));
+      const filtered = orders.filter(o => !search || o.id.toLowerCase().includes(search) || (o.partyName || '').toLowerCase().includes(search) || (o.salesperson || '').toLowerCase().includes(search));
       document.getElementById('filtered-count-badge').textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">No orders recorded or synced yet. Click "Sync All Orders".</div>`;
+        return;
+      }
 
       container.innerHTML = filtered.map(o => {
         let its = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
         let totalQty = its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0);
 
         return `
-          <div class="p-4 flex justify-between items-center hover:bg-slate-50">
+          <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-slate-50">
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${o.id}</span>
                 <span class="font-bold text-sm text-slate-900">${o.partyName}</span>
+                <span class="text-xs bg-blue-50 text-sky-800 font-bold px-2 py-0.5 rounded border">👤 ${o.salesperson || 'Staff'}</span>
                 <span class="text-xs text-slate-400">📅 ${o.orderDate}</span>
               </div>
               <p class="text-xs text-slate-500 mt-1">${its.length} items | Total: <strong class="text-sky-700">${totalQty}</strong> pcs</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 self-end sm:self-center">
               <button onclick="viewOrderSlip('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-sky-700 bg-sky-50 rounded-lg border border-sky-200">View Slip</button>
               <button onclick="editOrderDirect('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 rounded-lg border border-amber-200">✏️ Edit</button>
             </div>
@@ -370,7 +384,7 @@
 
       resetOrderForm();
       switchTab('orders');
-      alert("✅ ऑर्डर सुरक्षित सेव हो गया!");
+      alert("✅ ऑर्डर सफलतापूर्वक सेव हो गया!");
     }
 
     function resetOrderForm() {
@@ -393,9 +407,11 @@
           localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
           renderOrdersList();
           alert(`✓ ${orders.length} ऑर्डर्स लाइव शीट से सही लोड हो गए!`);
+        } else {
+          alert("Sheet से कोई डेटा नहीं मिला।");
         }
       } catch(e) {
-        alert("Sync failed: Check network.");
+        alert("Sync failed: Check network connection.");
       } finally {
         btn.textContent = "☁️ Sync All Orders";
       }
