@@ -805,7 +805,7 @@
     const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
 
     /* ==========================================================
-       EXACT 167 PARTIES FROM "data new.xlsx"
+       EXACT 167 PARTIES
        ========================================================== */
     const DEFAULT_PARTIES = [
   {"id": "pty_001", "name": "A to Z HARDWARE", "firm": "A to Z HARDWARE", "phone": "", "city": "Sironj", "gst": "Unregistered", "address": "Sironj", "type": "Unregistered (URP)"},
@@ -1739,51 +1739,8 @@
       const availableItems = getItemsForCategory(category);
       const itemName = item.itemName || availableItems[0];
       const brand = item.brand || "KASTA";
-      
       const availableSizes = [...(CATEGORY_SIZES_MAP[category] || ["Universal"])];
-      
-      // स्मार्ट साइज़ मैचिंग: अगर पूरा मैच न भी हो तो शुरुआत का साइज़ (e.g. "3/4" या "1") सही पकड़े
-      let rawItemSize = (item.size || "").trim();
-      let matchedSize = availableSizes[0];
-
-      if (rawItemSize) {
-        let exactMatch = availableSizes.find(s => s.toLowerCase() === rawItemSize.toLowerCase());
-        if (exactMatch) {
-          matchedSize = exactMatch;
-        } else {
-          let cleanInput = rawItemSize.replace(/["\s]/g, '').toLowerCase();
-          let partialMatch = availableSizes.find(s => {
-            let cleanOption = s.replace(/["\s]/g, '').toLowerCase();
-            return cleanOption.startsWith(cleanInput) || cleanOption.includes(cleanInput);
-          });
-          if (partialMatch) {
-            matchedSize = partialMatch;
-          } else {
-            matchedSize = rawItemSize;
-            if (!availableSizes.includes(rawItemSize)) {
-              availableSizes.unshift(rawItemSize);
-            }
-          }
-        }
-      }
-      
       const availableClasses = [...(CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"])];
-      let rawClass = (item.specClass || "").trim();
-      let matchedClass = availableClasses[0];
-
-      if (rawClass && rawClass !== "None") {
-        let exactClassMatch = availableClasses.find(c => c.toLowerCase() === rawClass.toLowerCase());
-        if (exactClassMatch) {
-          matchedClass = exactClassMatch;
-        } else {
-          let cleanClassInput = rawClass.toLowerCase();
-          let partialClass = availableClasses.find(c => c.toLowerCase().includes(cleanClassInput) || cleanClassInput.includes(c.toLowerCase().split(' ')[0]));
-          matchedClass = partialClass ? partialClass : rawClass;
-          if (!availableClasses.includes(matchedClass)) {
-            availableClasses.unshift(matchedClass);
-          }
-        }
-      }
 
       let defaultLength = "None / N.A. (Fittings)";
       let defaultUnit = "Nos (Numbers)";
@@ -1803,8 +1760,8 @@
       const categoryOptions = PIPE_CATEGORIES.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
       const itemOptions = availableItems.map(it => `<option value="${it}" ${it === itemName ? 'selected' : ''}>${it}</option>`).join('');
       const brandOptions = PIPE_BRANDS.map(b => `<option value="${b}" ${b === brand ? 'selected' : ''}>${b}</option>`).join('');
-      const sizeOptions = availableSizes.map(s => `<option value="${s}" ${s === matchedSize ? 'selected' : ''}>${s}</option>`).join('');
-      const classOptions = availableClasses.map(cl => `<option value="${cl}" ${cl === matchedClass ? 'selected' : ''}>${cl}</option>`).join('');
+      const sizeOptions = availableSizes.map(s => `<option value="${s}">${s}</option>`).join('');
+      const classOptions = availableClasses.map(cl => `<option value="${cl}">${cl}</option>`).join('');
       const lengthOptions = ALL_LENGTHS.map(l => `<option value="${l}" ${l === length ? 'selected' : ''}>${l}</option>`).join('');
       const unitOptions = ALL_UNITS.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('');
 
@@ -1909,6 +1866,68 @@
       tempWrapper.innerHTML = createPipeRowHTML(itemData || {});
       const newRow = tempWrapper.firstElementChild;
       tbody.appendChild(newRow);
+
+      // DOM तैयार होने के बाद JavaScript से सटीक वैल्यू सेट करना
+      if (itemData) {
+        const catSelect = newRow.querySelector('.item-category');
+        const itemSelect = newRow.querySelector('.item-name');
+        const brandSelect = newRow.querySelector('.item-brand');
+        const sizeSelect = newRow.querySelector('.item-size');
+        const classSelect = newRow.querySelector('.item-class');
+        const lenSelect = newRow.querySelector('.item-length');
+        const unitSelect = newRow.querySelector('.item-unit');
+
+        if (itemData.category && catSelect) {
+          catSelect.value = itemData.category;
+          onCategoryChange(catSelect);
+        }
+
+        if (itemData.itemName && itemSelect) {
+          let optExists = Array.from(itemSelect.options).some(o => o.value === itemData.itemName);
+          if (!optExists) {
+            itemSelect.add(new Option(itemData.itemName, itemData.itemName));
+          }
+          itemSelect.value = itemData.itemName;
+        }
+
+        if (itemData.brand && brandSelect) brandSelect.value = itemData.brand;
+
+        // SIZE FORCE SETTING
+        if (itemData.size && sizeSelect) {
+          let targetSize = (itemData.size || "").toString().trim().toLowerCase();
+          let matchedOption = Array.from(sizeSelect.options).find(o => {
+            let ov = o.value.toLowerCase();
+            return ov === targetSize || ov.startsWith(targetSize) || targetSize.startsWith(ov.split(' ')[0]);
+          });
+
+          if (matchedOption) {
+            sizeSelect.value = matchedOption.value;
+          } else {
+            sizeSelect.add(new Option(itemData.size, itemData.size));
+            sizeSelect.value = itemData.size;
+          }
+        }
+
+        // CLASS FORCE SETTING
+        if (itemData.specClass && classSelect) {
+          let targetClass = (itemData.specClass || "").toString().trim().toLowerCase();
+          let matchedClass = Array.from(classSelect.options).find(o => {
+            let cv = o.value.toLowerCase();
+            return cv === targetClass || cv.includes(targetClass) || targetClass.includes(cv.split(' ')[0]);
+          });
+
+          if (matchedClass) {
+            classSelect.value = matchedClass.value;
+          } else {
+            classSelect.add(new Option(itemData.specClass, itemData.specClass));
+            classSelect.value = itemData.specClass;
+          }
+        }
+
+        if (itemData.length && lenSelect) lenSelect.value = itemData.length;
+        if (itemData.unit && unitSelect) unitSelect.value = itemData.unit;
+      }
+
       renumberRowIndices();
       recalculateFormTotals();
     }
@@ -2098,10 +2117,17 @@
         return;
       }
 
-      const party = parties.find(p => p.id === partyId);
+      let party = parties.find(p => p.id === partyId);
+      let partyName = party ? party.name : "";
+      let partyGst = party ? (party.gst || "Unregistered") : "Unregistered";
+      let partyPhone = party ? (party.phone || "") : "";
+      let partyCity = party ? (party.city || "") : "";
+      let partyAddress = party ? (party.address || "") : "";
+
+      // अगर पार्टी लिस्ट में न होकर कस्टम हो (एडिट के समय)
       if (!party) {
-        showToast("Selected party does not exist.", "error");
-        return;
+        const partySelect = document.getElementById('form-party-id');
+        partyName = partySelect.options[partySelect.selectedIndex].text.replace(" [Saved Order]", "");
       }
 
       const rows = document.querySelectorAll('#order-items-tbody tr');
@@ -2149,11 +2175,11 @@
             ...orders[index],
             salesperson,
             partyId,
-            partyName: party.name,
-            partyGst: party.gst || "Unregistered",
-            partyPhone: party.phone || "",
-            partyCity: party.city || "",
-            partyAddress: party.address || "",
+            partyName,
+            partyGst,
+            partyPhone,
+            partyCity,
+            partyAddress,
             orderDate,
             targetDate,
             status,
@@ -2184,11 +2210,11 @@
           id: newOrderId,
           salesperson,
           partyId,
-          partyName: party.name,
-          partyGst: party.gst || "Unregistered",
-          partyPhone: party.phone || "",
-          partyCity: party.city || "",
-          partyAddress: party.address || "",
+          partyName,
+          partyGst,
+          partyPhone,
+          partyCity,
+          partyAddress,
           orderDate,
           targetDate,
           status,
@@ -2203,7 +2229,7 @@
         saveOrders();
         showToast(`Order #${newOrderId} booked by ${salesperson}!`, "success");
 
-        alert(`✅ ऑर्डर सफलतापूर्वक दर्ज हो गया है!\n\nOrder #: ${newOrderId}\nSalesperson: ${salesperson}\nParty: ${party.name}`);
+        alert(`✅ ऑर्डर सफलतापूर्वक दर्ज हो गया है!\n\nOrder #: ${newOrderId}\nSalesperson: ${salesperson}\nParty: ${partyName}`);
       }
 
       if (savedOrderObj) {
@@ -2436,21 +2462,20 @@
       resetOrderForm();
       document.getElementById('form-salesperson').value = order.salesperson || "";
 
-      // पार्टी का स्वचालित मिलान (ID, नाम या GST से)
+      // पार्टी का सुरक्षित मिलान
+      const partySelect = document.getElementById('form-party-id');
       let matchedParty = null;
-      if (order.partyId) {
-        matchedParty = parties.find(p => p.id === order.partyId);
-      }
-      if (!matchedParty && order.partyName) {
-        matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
-      }
-      if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') {
-        matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
-      }
+      if (order.partyId) matchedParty = parties.find(p => p.id === order.partyId);
+      if (!matchedParty && order.partyName) matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
+      if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
 
       if (matchedParty) {
-        document.getElementById('form-party-id').value = matchedParty.id;
+        partySelect.value = matchedParty.id;
         onPartySelected(matchedParty.id);
+      } else if (order.partyName) {
+        let tempId = order.partyId || `pty_${Date.now()}`;
+        partySelect.add(new Option(order.partyName, tempId));
+        partySelect.value = tempId;
       }
 
       document.getElementById('form-party-ref').value = order.partyRef ? `Re-order of ${order.id}` : "";
@@ -2484,37 +2509,49 @@
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
 
-      resetOrderForm();
+      document.getElementById('orderForm').reset();
       document.getElementById('edit-order-id').value = order.id;
       document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
       document.getElementById('save-order-btn-text').textContent = "Update Order Details";
 
+      // सेल्सपर्सन
       document.getElementById('form-salesperson').value = order.salesperson || "";
 
-      // पार्टी का स्वचालित मिलान (ID, नाम या GST से)
+      // पार्टी
+      const partySelect = document.getElementById('form-party-id');
+      populatePartyDropdowns();
+
       let matchedParty = null;
-      if (order.partyId) {
-        matchedParty = parties.find(p => p.id === order.partyId);
-      }
+      if (order.partyId) matchedParty = parties.find(p => p.id === order.partyId);
       if (!matchedParty && order.partyName) {
-        matchedParty = parties.find(p => p.name.trim().toLowerCase() === order.partyName.trim().toLowerCase());
+        let cName = order.partyName.trim().toLowerCase();
+        matchedParty = parties.find(p => p.name.trim().toLowerCase() === cName);
       }
       if (!matchedParty && order.partyGst && order.partyGst !== 'Unregistered') {
         matchedParty = parties.find(p => p.gst && p.gst.toUpperCase() === order.partyGst.toUpperCase());
       }
 
       if (matchedParty) {
-        document.getElementById('form-party-id').value = matchedParty.id;
+        partySelect.value = matchedParty.id;
         onPartySelected(matchedParty.id);
+      } else if (order.partyName) {
+        let tempId = order.partyId || `pty_${Date.now()}`;
+        partySelect.add(new Option(order.partyName + " [Saved Order]", tempId));
+        partySelect.value = tempId;
+        const infoEl = document.getElementById('party-quick-info');
+        infoEl.innerHTML = `<span class="bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">${order.partyName}</span>`;
+        infoEl.classList.remove('hidden');
       }
 
+      // अन्य फील्ड्स
       document.getElementById('form-order-date').value = order.orderDate || "";
       document.getElementById('form-target-date').value = order.targetDate || "";
-      document.getElementById('form-order-status').value = order.status || "Recorded";
+      document.getElementById('form-order-status').value = order.status || "Confirmed";
       document.getElementById('form-party-ref').value = order.partyRef || "";
       document.getElementById('form-delivery-site').value = order.deliverySite || "";
       document.getElementById('form-order-notes').value = order.notes || "";
 
+      // आइटम्स
       let itemsList = order.items;
       if (typeof itemsList === 'string') {
         try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
@@ -2523,6 +2560,7 @@
 
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
+      
       itemsList.forEach(it => {
         addOrderItemRow(it);
       });
