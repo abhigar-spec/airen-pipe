@@ -219,7 +219,7 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders punched by all salespersons from Google Sheet (Requires Owner PIN)">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders from Google Sheet">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             <span>☁️ Sync All Orders</span>
           </button>
@@ -290,7 +290,7 @@
                 <option value="Abhishek Agrawal">Abhishek Agrawal</option>
                 <option value="Office Counter">Office / Counter</option>
               </select>
-              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this phone</span>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Auto-saved on this device</span>
             </div>
 
             <div>
@@ -490,79 +490,6 @@
           </table>
         </div>
       </div>
-
-      <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-2">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900">Airen Pipe & Complete Fittings Reference</h2>
-            <p class="text-xs text-slate-500">Industry-standard catalog for Water Tanks, Agri/Irrigation, CPVC, UPVC, and SWR drainage systems.</p>
-          </div>
-          <button onclick="openProductModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            <span>+ Add New Product</span>
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          <div class="p-4 bg-cyan-50/70 rounded-xl border border-cyan-300 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-cyan-900">Water Tanks & Storage</span>
-              <span class="text-[10px] bg-cyan-200 text-cyan-900 px-2 py-0.5 rounded font-bold">100L - 5000L</span>
-            </div>
-            <p class="text-xs text-slate-700"><strong>Types:</strong> Overhead Water Tank, Loft Tank, Underground Sump Tank</p>
-            <p class="text-xs text-slate-700"><strong>Layers & Quality:</strong> 3 Layer, 4 Layer (Puf Foam), 5 Layer Anti-Bacterial, Heavy Duty Extra Rib</p>
-            <p class="text-xs text-slate-700"><strong>Capacities:</strong> 100L, 200L, 300L, 500L, 750L, 1000L, 1500L, 2000L, 3000L, 5000L</p>
-          </div>
-
-          <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-300 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-emerald-900">PVC Agri / Irrigation Fittings</span>
-              <span class="text-[10px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-bold">2.5kg - 10kg</span>
-            </div>
-            <p class="text-xs text-slate-700"><strong>Agri Fittings:</strong> Coupler, Elbow 90°/45°, Equal Tee, Reducing Tee, Reducing Bushing, Tail Piece, Service Saddle with brass insert, Agri End Cap, Cross Tee</p>
-            <p class="text-xs text-slate-700"><strong>Adaptors & Valves:</strong> MTA, FTA, Agri Ball Valve, Foot Valve, NRV, Flange Set with Gasket, Heavy Agri Solvent</p>
-            <p class="text-xs text-slate-700"><strong>Standard Ratings:</strong> 2.5 kg/cm², 4.0 kg/cm², 6.0 kg/cm², 8.0 kg/cm², 10.0 kg/cm²</p>
-          </div>
-
-          <div class="p-4 bg-red-50/60 rounded-xl border border-red-200 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-red-900">CPVC Plumbing Fittings</span>
-              <span class="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded font-bold">Hot & Cold</span>
-            </div>
-            <p class="text-xs text-slate-700"><strong>Plain Fittings:</strong> Elbow 90°, Elbow 45°, Tee, Coupler/Socket, Union, End Cap, Cross Tee, Reducers</p>
-            <p class="text-xs text-slate-700"><strong>Brass Fittings:</strong> Brass FTA, Brass MTA, Brass Elbow 90°, Brass Tee, Reducer Brass Elbow/Tee</p>
-            <p class="text-xs text-slate-700"><strong>Valves:</strong> CPVC Ball Valve, Concealed Valve, Long Plug, Solvent Cement</p>
-          </div>
-
-          <div class="p-4 bg-blue-50/60 rounded-xl border border-blue-200 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-blue-900">UPVC Pressure Fittings</span>
-              <span class="text-[10px] bg-blue-200 text-blue-800 px-2 py-0.5 rounded font-bold">SCH 40 / 80</span>
-            </div>
-            <p class="text-xs text-slate-700"><strong>Standard:</strong> Plain Elbow 90°/45°, Plain Tee, Coupler, Union, End Cap, Cross Tee, Reducers</p>
-            <p class="text-xs text-slate-700"><strong>Threaded/Brass:</strong> MTA, FTA, Brass MTA, Brass FTA, Brass Elbow 90°, Brass Tee, UPVC Ball Valve, Flanges</p>
-          </div>
-
-          <div class="p-4 bg-amber-50/60 rounded-xl border border-amber-200 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-amber-900">PVC SWR Drainage Fittings</span>
-              <span class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded font-bold">Drainage</span>
-            </div>
-            <p class="text-xs text-slate-700"><strong>Bends & Branches:</strong> Bend 87.5° (Plain/Door), Bend 45°, Single Tee, Single Y, Double Y, Cross Tee</p>
-            <p class="text-xs text-slate-700"><strong>Traps & Specials:</strong> Nahani Trap (with jali), P-Trap, S-Trap, Q-Trap, Multi Floor Trap, Coupler, Reducer (110x75, 160x110)</p>
-          </div>
-
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-sm text-slate-800">PVC Agri & Column Pipes</span>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Agri Delivery</span>
-            </div>
-            <p class="text-xs text-slate-600"><strong>Sizes:</strong> 1" to 8" (40mm to 200mm)</p>
-            <p class="text-xs text-slate-600"><strong>Pressure Ratings:</strong> 2.5 kg, 4.0 kg, 6.0 kg, 8.0 kg, 10.0 kg/cm²</p>
-            <p class="text-xs text-slate-600"><strong>Standard Length:</strong> 6 Meters (20 ft)</p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div id="view-settings" class="tab-view hidden space-y-6">
@@ -601,7 +528,7 @@
           </div>
           <div>
             <h2 class="text-base font-bold text-slate-900">Google Sheets Central Sync</h2>
-            <p class="text-xs text-slate-500">Every order punched on any phone automatically records to your central Google Sheet.</p>
+            <p class="text-xs text-slate-500">Every order punched automatically records to your central Google Sheet.</p>
           </div>
         </div>
 
@@ -747,7 +674,7 @@
                 <th class="py-2.5 px-2 border border-slate-700">Unit</th>
               </tr>
             </thead>
-            <tbody id="slip-items-tbody" class="divide-y divide-slate-200"></tbody>
+            <tbody id="slip-items-tbody" class="divide-y border-b border-slate-200"></tbody>
             <tfoot class="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-400">
               <tr>
                 <td colspan="7" class="py-2 px-3 text-right text-xs uppercase">Total Quantity Booked:</td>
@@ -818,7 +745,7 @@
           </label>
           <div class="flex gap-2">
             <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
-            <button type="button" onclick="openOfficialGstPortal()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Copies GST Number and opens official government search portal">
+            <button type="button" onclick="openOfficialGstPortal()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Copies GST Number and opens official portal">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
               <span>Verify Portal</span>
             </button>
@@ -878,7 +805,7 @@
     const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
 
     /* ==========================================================
-       EXACT 167 PARTIES FROM "data new```.xlsx"
+       EXACT 167 PARTIES FROM "data new.xlsx"
        ========================================================== */
     const DEFAULT_PARTIES = [
   {"id": "pty_001", "name": "A to Z HARDWARE", "firm": "A to Z HARDWARE", "phone": "", "city": "Sironj", "gst": "Unregistered", "address": "Sironj", "type": "Unregistered (URP)"},
@@ -905,7 +832,7 @@
   {"id": "pty_022", "name": "CHOUKSEY STONE CRUSHER", "firm": "CHOUKSEY STONE CRUSHER", "phone": "", "city": "Raisen", "gst": "23AEWPC9700K1Z9", "address": "POLICE CHOUKI KE SAMANE  RAISEN ROAD ANAND NAGAR", "type": "Registered Dealer"},
   {"id": "pty_023", "name": "CHOURASIYA TRADERS", "firm": "CHOURASIYA TRADERS", "phone": "", "city": "Bhopal", "gst": "23ADKPC0615J1Z1", "address": "SECTOR B 20 B ASHOKA GARDEN STATION ROAD BHOPAL  Bhopal, Madhya Pradesh-462023 India", "type": "Registered Dealer"},
   {"id": "pty_024", "name": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "firm": "COSSTECH SOLUTIONS INDIA PRIVATE LIMITED", "phone": "", "city": "Bhopal", "gst": "23AAKCC9454H1ZG", "address": "First Floor Gurudwara Gali Shop No 9, 7B Hamidia Road Bhopal", "type": "Registered Dealer"},
-  {"id": "pty_025", "name": "DARWESH HARDWARE  STORE", "firm": "DARWESH HARDWARE  STORE", "phone": "", "city": "Bhopal", "gst": "23AFUPP5910K1Z0", "address": "21  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
+  {"id": "pty_025", "name": "DARWESH HARDWARE STORE", "firm": "DARWESH HARDWARE STORE", "phone": "", "city": "Bhopal", "gst": "23AFUPP5910K1Z0", "address": "21  HAMIDIA ROAD BHOPAL", "type": "Registered Dealer"},
   {"id": "pty_026", "name": "DD ENTERPRISES", "firm": "DD ENTERPRISES", "phone": "", "city": "", "gst": "Unregistered", "address": "", "type": "Unregistered (URP)"},
   {"id": "pty_027", "name": "DEEP TRADERS", "firm": "DEEP TRADERS", "phone": "", "city": "Bhopal", "gst": "Unregistered", "address": "AYODHYA BYPASS ROAD GEET BUNGLOWS BHOPAL", "type": "Unregistered (URP)"},
   {"id": "pty_028", "name": "DEEVA LOGISTICS PVT LTD", "firm": "DEEVA LOGISTICS PVT LTD", "phone": "", "city": "Indore", "gst": "23AAECD4595L1ZC", "address": "309, Block B  Shalimar Corporate Centre, South Tukoganj INDORE", "type": "Registered Dealer"},
@@ -959,7 +886,7 @@
   {"id": "pty_076", "name": "MEGA DISTRIBUTER", "firm": "MEGA DISTRIBUTER", "phone": "", "city": "Bhopal", "gst": "23AEOPF2262H1ZQ", "address": "SEC F-22  INDUSTRIAL AREA GOVINDPURA BHOPAL", "type": "Registered Dealer"},
   {"id": "pty_077", "name": "METER HOUSE & ELECTRICAL", "firm": "METER HOUSE & ELECTRICAL", "phone": "", "city": "Bhopal", "gst": "23ADBPK7430Q1ZD", "address": "SHOP NO.13 GURU DWARA LANE HAMIDIA ROAD BHOPAL Bhopal, Madhya Pradesh-462001 India", "type": "Registered Dealer"},
   {"id": "pty_078", "name": "MINI KISAN SEWA KENDRA", "firm": "MINI KISAN SEWA KENDRA", "phone": "", "city": "", "gst": "23CJAPS1853E1ZH", "address": "KHASRA NO.410/3/1/1,  VILLAGE HATHODA GANJ BASODA", "type": "Registered Dealer"},
-  {"id": "pty_079", "name": "MIRACLE  BUILDCON", "firm": "MIRACLE  BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II MP NAGAR BHOPAL Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
+  {"id": "pty_079", "name": "MIRACLE BUILDCON", "firm": "MIRACLE BUILDCON", "phone": "", "city": "Bhopal", "gst": "23AWAPP5115H3ZT", "address": "IST FLOOR FLAT NO 2/6 RANTHAMBORE COMPLEX ZONE II MP NAGAR BHOPAL Bhopal, Madhya Pradesh-462011 India", "type": "Registered Dealer"},
   {"id": "pty_080", "name": "MODI HOME DECOR", "firm": "MODI HOME DECOR", "phone": "", "city": "Bhopal", "gst": "23BDEPM9378R1ZM", "address": "GROUND FLOOR SHOP NO - 07, PLOT NO -40 MANDAKNI COLONY KOLAR ROAD Bhopal, Madhya Pradesh-462042 India", "type": "Registered Dealer"},
   {"id": "pty_081", "name": "MODI TRADERS", "firm": "MODI TRADERS", "phone": "", "city": "Bhopal", "gst": "23ACVPJ6070C1ZN", "address": "56 moditraders zone-2 mp nagar bhopal", "type": "Registered Dealer"},
   {"id": "pty_082", "name": "MOHAMMAD TRADERS", "firm": "MOHAMMAD TRADERS", "phone": "", "city": "Shyampur", "gst": "23EPCPK4992A1Z3", "address": "0  MAIN ROAD BARKHEDA HASAN SHYAMPUR", "type": "Registered Dealer"},
@@ -1231,14 +1158,8 @@
       } catch(e) {}
     }
 
-    const PIPE_BRANDS = [
-      "KASTA",
-      "AIREN"
-    ];
+    const PIPE_BRANDS = ["KASTA", "AIREN"];
 
-    /* ==========================================================
-       CATEGORY-SPECIFIC SIZE MAPPINGS (INTELLIGENT FILTERING)
-       ========================================================== */
     const CATEGORY_SIZES_MAP = {
       "Water Tank": [
         "1000 Ltr", "500 Ltr", "750 Ltr", "300 Ltr", "200 Ltr", "100 Ltr", "1500 Ltr", "2000 Ltr", "3000 Ltr", "5000 Ltr"
@@ -1287,9 +1208,6 @@
       ]
     };
 
-    /* ==========================================================
-       CATEGORY-SPECIFIC PRESSURE / CLASS MAPPINGS
-       ========================================================== */
     const CATEGORY_CLASS_MAP = {
       "Water Tank": [
         "4 Layer (Puf Foam - Tank)",
@@ -1351,18 +1269,9 @@
         "PN 12.5 (HDPE)",
         "PN 16 (HDPE)"
       ],
-      "General Hardware / Solvents": [
-        "Standard / Molded",
-        "None"
-      ],
-      "PVC Conduit Electrical Pipe": [
-        "Standard / Molded",
-        "None"
-      ],
-      "GI / MS Steel Pipe": [
-        "Standard / Molded",
-        "None"
-      ]
+      "General Hardware / Solvents": ["Standard / Molded", "None"],
+      "PVC Conduit Electrical Pipe": ["Standard / Molded", "None"],
+      "GI / MS Steel Pipe": ["Standard / Molded", "None"]
     };
 
     const ALL_LENGTHS = [
@@ -1387,9 +1296,6 @@
       "Feet"
     ];
 
-    /* ==========================================================
-       STORAGE & MASTER PIN 1379
-       ========================================================== */
     let parties = [];
     let orders = [];
     let activeModalOrder = null;
@@ -1461,9 +1367,6 @@
       showToast("Security PIN updated successfully!", "success");
     }
 
-    /* ==========================================================
-       SMART GST PARSER & 1-CLICK VERIFICATION
-       ========================================================== */
     const GST_STATE_MAP = {
       "01": "Jammu and Kashmir", "02": "Himachal Pradesh", "03": "Punjab", "04": "Chandigarh",
       "05": "Uttarakhand", "06": "Haryana", "07": "Delhi", "08": "Rajasthan",
@@ -1554,7 +1457,7 @@
         navigator.clipboard.writeText(gstin);
       }
       showToast(`GSTIN ${gstin} copied to clipboard! Opening GST portal...`, "info");
-      window.open("[https://services.gst.gov.in/services/searchtp](https://services.gst.gov.in/services/searchtp)", "_blank");
+      window.open("https://services.gst.gov.in/services/searchtp", "_blank");
     }
 
     function handleSmartGstPaste(val) {
@@ -1613,9 +1516,6 @@
       }
     }
 
-    /* ==========================================================
-       CUSTOM PRODUCT MANAGEMENT & CATALOG REMOVE FEATURE
-       ========================================================== */
     function openProductModal() {
       const catSelect = document.getElementById('new-prod-category');
       catSelect.innerHTML = PIPE_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -1790,9 +1690,6 @@
       showToast("Google Sheets webhook URL updated!", "success");
     }
 
-    /* ==========================================================
-       TAB ROUTING
-       ========================================================== */
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
       const targetView = document.getElementById(`view-${tabId}`);
@@ -1833,9 +1730,6 @@
       switchTab('new-order');
     }
 
-    /* ==========================================================
-       ORDER ROW MANAGEMENT WITH COMPLETE SMART AUTO-SELECTION
-       ========================================================== */
     function getItemsForCategory(category) {
       return FITTINGS_CATALOG[category] || ["Standard Product", "Other"];
     }
@@ -1846,14 +1740,12 @@
       const itemName = item.itemName || availableItems[0];
       const brand = item.brand || "KASTA";
       
-      // Auto-fetch category specific sizes & classes
       const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
       const size = item.size && availableSizes.includes(item.size) ? item.size : availableSizes[0];
       
       const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
       const specClass = item.specClass && availableClasses.includes(item.specClass) ? item.specClass : availableClasses[0];
 
-      // Auto-set length & unit
       let defaultLength = "None / N.A. (Fittings)";
       let defaultUnit = "Nos (Numbers)";
 
@@ -1939,21 +1831,17 @@
       const lengthSelect = row.querySelector('.item-length');
       const unitSelect = row.querySelector('.item-unit');
 
-      // 1. Items Filter & Auto-Select
       const items = getItemsForCategory(category);
       itemSelect.innerHTML = items.map(it => `<option value="${it}">${it}</option>`).join('');
 
-      // 2. Intelligent Sizes Auto-Populate & Auto-Select First
       const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
       sizeSelect.innerHTML = availableSizes.map(s => `<option value="${s}">${s}</option>`).join('');
       sizeSelect.value = availableSizes[0];
 
-      // 3. Intelligent Pressure/Class Auto-Populate & Auto-Select First
       const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
       classSelect.innerHTML = availableClasses.map(cl => `<option value="${cl}">${cl}</option>`).join('');
       classSelect.value = availableClasses[0];
 
-      // 4. Intelligent Length & Unit Auto-Select
       if (category === 'Water Tank') {
         lengthSelect.value = "None / N.A. (Fittings)";
         unitSelect.value = "Nos (Numbers)";
@@ -2130,9 +2018,6 @@
       }
     }
 
-    /* ==========================================================
-       ORDER SAVE & CENTRAL SHEET SYNC
-       ========================================================== */
     async function syncOrderToGoogleSheet(order) {
       const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
       if (!webhookUrl) return;
@@ -2188,15 +2073,25 @@
 
       const items = [];
       for (const row of rows) {
-        const category = row.querySelector('.item-category').value;
-        const itemName = row.querySelector('.item-name') ? row.querySelector('.item-name').value : "Item";
-        const brand = row.querySelector('.item-brand').value;
-        const size = row.querySelector('.item-size').value;
-        const specClass = row.querySelector('.item-class').value || "None";
-        const length = row.querySelector('.item-length').value;
-        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-        const unit = row.querySelector('.item-unit').value;
-        const remarks = row.querySelector('.item-remarks').value.trim();
+        const catSelect = row.querySelector('.item-category');
+        const itemSelect = row.querySelector('.item-name');
+        const brandSelect = row.querySelector('.item-brand');
+        const sizeSelect = row.querySelector('.item-size');
+        const classSelect = row.querySelector('.item-class');
+        const lengthSelect = row.querySelector('.item-length');
+        const unitSelect = row.querySelector('.item-unit');
+        const qtyInput = row.querySelector('.item-qty');
+        const remarksInput = row.querySelector('.item-remarks');
+
+        const category = catSelect ? (catSelect.options[catSelect.selectedIndex]?.value || catSelect.value) : "";
+        const itemName = itemSelect ? (itemSelect.options[itemSelect.selectedIndex]?.value || itemSelect.value) : "Item";
+        const brand = brandSelect ? (brandSelect.options[brandSelect.selectedIndex]?.value || brandSelect.value) : "KASTA";
+        const size = sizeSelect ? (sizeSelect.options[sizeSelect.selectedIndex]?.value || sizeSelect.value) : "";
+        const specClass = classSelect ? (classSelect.options[classSelect.selectedIndex]?.value || classSelect.value || "None") : "None";
+        const length = lengthSelect ? (lengthSelect.options[lengthSelect.selectedIndex]?.value || lengthSelect.value) : "";
+        const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+        const unit = unitSelect ? (unitSelect.options[unitSelect.selectedIndex]?.value || unitSelect.value) : "Nos";
+        const remarks = remarksInput ? remarksInput.value.trim() : "";
 
         if (qty <= 0) {
           showToast("Quantity must be greater than zero for all rows.", "error");
@@ -2325,7 +2220,12 @@
           const matchGst = (order.partyGst || "").toLowerCase().includes(searchQuery);
           const matchRef = (order.partyRef || "").toLowerCase().includes(searchQuery);
           const matchCity = (order.partyCity || "").toLowerCase().includes(searchQuery);
-          const matchItems = order.items.some(it => 
+          
+          let itemsList = order.items;
+          if (typeof itemsList === 'string') {
+            try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
+          }
+          const matchItems = Array.isArray(itemsList) && itemsList.some(it => 
             (it.category || "").toLowerCase().includes(searchQuery) ||
             (it.itemName || "").toLowerCase().includes(searchQuery) ||
             (it.brand || "").toLowerCase().includes(searchQuery) ||
@@ -2348,13 +2248,19 @@
       emptyState.classList.add('hidden');
 
       container.innerHTML = filtered.map(order => {
-        const totalItemsCount = order.items.reduce((sum, it) => sum + (it.qty || 0), 0);
-        const previewItemsText = order.items.slice(0, 3).map(it => {
+        let itemsList = order.items;
+        if (typeof itemsList === 'string') {
+          try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
+        }
+        if (!Array.isArray(itemsList)) itemsList = [];
+
+        const totalItemsCount = itemsList.reduce((sum, it) => sum + (parseFloat(it.qty) || 0), 0);
+        const previewItemsText = itemsList.slice(0, 3).map(it => {
           const itemLabel = it.itemName ? `${it.itemName}` : it.category;
           const classText = (it.specClass && it.specClass !== 'None') ? ` [${it.specClass.split(' ')[0]}]` : '';
-          return `${it.qty} ${it.unit.split(' ')[0]} ${it.brand} ${itemLabel} ${it.size}${classText}`;
+          return `${it.qty} ${(it.unit || 'Nos').split(' ')[0]} ${it.brand || 'KASTA'} ${itemLabel} ${it.size}${classText}`;
         }).join(' • ');
-        const extraItemsBadge = order.items.length > 3 ? `<span class="text-xs text-brand-600 font-semibold">+${order.items.length - 3} more items</span>` : '';
+        const extraItemsBadge = itemsList.length > 3 ? `<span class="text-xs text-brand-600 font-semibold">+${itemsList.length - 3} more items</span>` : '';
 
         let statusBadge = `<span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full">Draft</span>`;
         if (order.status === 'Confirmed') {
@@ -2414,6 +2320,18 @@
       if (!order) return;
       activeModalOrder = order;
 
+      let itemsList = order.items;
+      if (typeof itemsList === 'string') {
+        try {
+          itemsList = JSON.parse(itemsList);
+        } catch(e) {
+          itemsList = [];
+        }
+      }
+      if (!Array.isArray(itemsList)) {
+        itemsList = [];
+      }
+
       document.getElementById('slip-order-id').textContent = `#${order.id}`;
       document.getElementById('slip-order-date').textContent = order.orderDate || "--";
       document.getElementById('slip-salesperson').textContent = order.salesperson || "Counter / Direct";
@@ -2433,29 +2351,34 @@
 
       const tbody = document.getElementById('slip-items-tbody');
       let totalQty = 0;
-      tbody.innerHTML = order.items.map((item, idx) => {
-        totalQty += (item.qty || 0);
-        const itemDesc = item.itemName ? `<strong>${item.itemName}</strong>` : `<strong>${item.category}</strong>`;
-        const lengthDisplay = (item.length && !item.length.includes('N.A.')) ? item.length : '-';
-        const classDisplay = (item.specClass && item.specClass !== 'None') ? item.specClass : '-';
 
-        return `
-          <tr class="hover:bg-slate-50">
-            <td class="py-2 px-2 border border-slate-200 text-center font-mono">${idx + 1}</td>
-            <td class="py-2 px-3 border border-slate-200 text-slate-700 text-[11px]">${item.category}</td>
-            <td class="py-2 px-3 border border-slate-200 text-slate-900">
-              ${itemDesc}
-              ${item.remarks ? `<span class="block text-[10px] text-slate-500 font-normal italic">${item.remarks}</span>` : ''}
-            </td>
-            <td class="py-2 px-2 border border-slate-200 text-slate-700">${item.brand}</td>
-            <td class="py-2 px-3 border border-slate-200 font-bold text-slate-900">${item.size}</td>
-            <td class="py-2 px-2 border border-slate-200 text-slate-800 font-medium">${classDisplay}</td>
-            <td class="py-2 px-2 border border-slate-200 text-slate-600">${lengthDisplay}</td>
-            <td class="py-2 px-3 border border-slate-200 text-right font-black font-mono text-slate-900">${item.qty}</td>
-            <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.unit}</td>
-          </tr>
-        `;
-      }).join('');
+      if (itemsList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-4 text-center text-slate-400">No line items found for this order.</td></tr>`;
+      } else {
+        tbody.innerHTML = itemsList.map((item, idx) => {
+          totalQty += (parseFloat(item.qty) || 0);
+          const itemDesc = item.itemName ? `<strong>${item.itemName}</strong>` : `<strong>${item.category}</strong>`;
+          const lengthDisplay = (item.length && !item.length.includes('N.A.')) ? item.length : '-';
+          const classDisplay = (item.specClass && item.specClass !== 'None') ? item.specClass : '-';
+
+          return `
+            <tr class="hover:bg-slate-50">
+              <td class="py-2 px-2 border border-slate-200 text-center font-mono">${idx + 1}</td>
+              <td class="py-2 px-3 border border-slate-200 text-slate-700 text-[11px]">${item.category || '-'}</td>
+              <td class="py-2 px-3 border border-slate-200 text-slate-900">
+                ${itemDesc}
+                ${item.remarks ? `<span class="block text-[10px] text-slate-500 font-normal italic">${item.remarks}</span>` : ''}
+              </td>
+              <td class="py-2 px-2 border border-slate-200 text-slate-700">${item.brand || 'KASTA'}</td>
+              <td class="py-2 px-3 border border-slate-200 font-bold text-slate-900">${item.size || '-'}</td>
+              <td class="py-2 px-2 border border-slate-200 text-slate-800 font-medium">${classDisplay}</td>
+              <td class="py-2 px-2 border border-slate-200 text-slate-600">${lengthDisplay}</td>
+              <td class="py-2 px-3 border border-slate-200 text-right font-black font-mono text-slate-900">${item.qty || 0}</td>
+              <td class="py-2 px-2 border border-slate-200 text-slate-600">${item.unit || 'Nos'}</td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       document.getElementById('slip-total-qty').textContent = totalQty.toLocaleString();
       document.getElementById('orderDetailModal').classList.remove('hidden');
@@ -2479,9 +2402,15 @@
       document.getElementById('form-delivery-site').value = order.deliverySite || "";
       document.getElementById('form-order-notes').value = order.notes || "";
 
+      let itemsList = order.items;
+      if (typeof itemsList === 'string') {
+        try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
+      }
+      if (!Array.isArray(itemsList)) itemsList = [];
+
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
-      order.items.forEach(it => {
+      itemsList.forEach(it => {
         addOrderItemRow(it);
       });
 
@@ -2515,9 +2444,15 @@
       document.getElementById('form-delivery-site').value = order.deliverySite || "";
       document.getElementById('form-order-notes').value = order.notes || "";
 
+      let itemsList = order.items;
+      if (typeof itemsList === 'string') {
+        try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
+      }
+      if (!Array.isArray(itemsList)) itemsList = [];
+
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
-      order.items.forEach(it => {
+      itemsList.forEach(it => {
         addOrderItemRow(it);
       });
 
@@ -2534,9 +2469,6 @@
       }, `Authorize Deletion of Order #${orderId}`);
     }
 
-    /* ==========================================================
-       PARTIES DIRECTORY & CRUD
-       ========================================================== */
     function renderPartiesList() {
       const grid = document.getElementById('parties-grid-container');
       const searchQuery = document.getElementById('party-search-input').value.toLowerCase().trim();
@@ -2575,7 +2507,11 @@
 
       grid.innerHTML = filtered.map(p => {
         const partyOrders = orders.filter(o => o.partyId === p.id);
-        const totalPcs = partyOrders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+        const totalPcs = partyOrders.reduce((sum, ord) => {
+          let its = ord.items;
+          if (typeof its === 'string') { try { its = JSON.parse(its); } catch(e) { its = []; } }
+          return sum + (Array.isArray(its) ? its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0) : 0);
+        }, 0);
         const isGst = p.gst && p.gst !== 'Unregistered';
 
         return `
@@ -2695,9 +2631,6 @@
       renderPartiesList();
     }
 
-    /* ==========================================================
-       KPIS & EXPORT
-       ========================================================== */
     function updateGlobalKPIs() {
       const totalOrdersEl = document.getElementById('stat-total-orders');
       const pendingOrdersEl = document.getElementById('stat-pending-orders');
@@ -2707,7 +2640,12 @@
       const totalCount = orders.length;
       const pendingCount = orders.filter(o => o.status === 'Recorded' || o.status === 'Hold').length;
       const confirmedCount = orders.filter(o => o.status === 'Confirmed').length;
-      const totalPcs = orders.reduce((sum, ord) => sum + ord.items.reduce((s, it) => s + (it.qty || 0), 0), 0);
+      
+      const totalPcs = orders.reduce((sum, ord) => {
+        let its = ord.items;
+        if (typeof its === 'string') { try { its = JSON.parse(its); } catch(e) { its = []; } }
+        return sum + (Array.isArray(its) ? its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0) : 0);
+      }, 0);
 
       if (totalOrdersEl) totalOrdersEl.textContent = totalCount;
       if (pendingOrdersEl) pendingOrdersEl.textContent = pendingCount;
@@ -2725,19 +2663,28 @@
           const response = await fetch(webhookUrl);
           const data = await response.json();
           
-          if (data && data.orders) {
-            const localOnly = orders.filter(loc => !data.orders.some(rem => rem.id === loc.id));
-            orders = [...data.orders, ...localOnly];
+          if (data && Array.isArray(data.orders) && data.orders.length > 0) {
+            const sanitizedRemoteOrders = data.orders.map(ord => {
+              if (typeof ord.items === 'string') {
+                try { ord.items = JSON.parse(ord.items); } catch(e) { ord.items = []; }
+              }
+              return ord;
+            });
+
+            const remoteIds = new Set(sanitizedRemoteOrders.map(r => r.id));
+            const localOnly = orders.filter(loc => !remoteIds.has(loc.id));
+            
+            orders = [...sanitizedRemoteOrders, ...localOnly];
             saveOrders();
             renderOrdersList();
             updateGlobalKPIs();
-            showToast(`✓ ${data.orders.length} ऑर्डर्स Google Sheet से लोड हो गए!`, "success");
+            showToast(`✓ ${sanitizedRemoteOrders.length} ऑर्डर्स सुरक्षित लोड हो गए!`, "success");
           } else {
-            showToast("Sheet में कोई नया ऑर्डर नहीं मिला।", "info");
+            showToast("Sheet में कोई नया रिकॉर्ड नहीं मिला। लोकल डेटा सुरक्षित है।", "info");
           }
         } catch (err) {
           console.error("Cloud fetch failed", err);
-          showToast("Cloud sync failed. कृपया Apps Script deployment चेक करें।", "error");
+          showToast("Cloud sync failed. कृपया नेटवर्क व Apps Script चेक करें।", "error");
         } finally {
           if (btn) btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span>☁️ Sync All Orders</span>`;
         }
@@ -2753,7 +2700,11 @@
       let csv = "Order ID,Order Date,Salesperson,Party Name,GSTIN,Party Phone,City,Status,Party PO Ref,Delivery Site,Category,Fitting Item,Brand,Size,Pressure/Kg/Class,Length,Quantity,Unit,Line Remarks\n";
 
       orders.forEach(o => {
-        o.items.forEach(it => {
+        let its = o.items;
+        if (typeof its === 'string') { try { its = JSON.parse(its); } catch(e) { its = []; } }
+        if (!Array.isArray(its)) its = [];
+
+        its.forEach(it => {
           const row = [
             o.id,
             o.orderDate || "",
@@ -2765,14 +2716,14 @@
             o.status || "",
             `"${(o.partyRef || "").replace(/"/g, '""')}"`,
             `"${(o.deliverySite || "").replace(/"/g, '""')}"`,
-            `"${it.category}"`,
+            `"${it.category || ""}"`,
             `"${(it.itemName || "").replace(/"/g, '""')}"`,
-            `"${it.brand}"`,
-            `"${it.size}"`,
-            `"${it.specClass}"`,
-            `"${it.length}"`,
-            it.qty,
-            `"${it.unit}"`,
+            `"${it.brand || ""}"`,
+            `"${it.size || ""}"`,
+            `"${it.specClass || ""}"`,
+            `"${it.length || ""}"`,
+            it.qty || 0,
+            `"${it.unit || ""}"`,
             `"${(it.remarks || "").replace(/"/g, '""')}"`
           ];
           csv += row.join(",") + "\n";
