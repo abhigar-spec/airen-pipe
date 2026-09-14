@@ -5,11 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Airen Pipe - Order Desk & Distribution Booking</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff', 100: '#e0effe', 200: '#bae0fd',
+              500: '#0284c7', 600: '#0369a1', 700: '#075985',
+              800: '#0c4a6e', 900: '#082f49',
+            },
+            accent: { 500: '#f97316', 600: '#ea580c' }
+          }
+        }
+      }
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     @media print {
       body * { visibility: hidden; }
       #printOrderModal, #printOrderModal * { visibility: visible; }
@@ -18,80 +39,102 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
   <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-orange-500 flex items-center justify-center font-black text-xl text-white shadow-inner">A</div>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-500 flex items-center justify-center shadow-inner">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" stroke-width="2.5" stroke-dasharray="2 3"/>
+              <circle cx="12" cy="12" r="5" stroke-width="2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M3 12h18"/>
+            </svg>
+          </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-orange-500">Pipe</span></span>
-              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full">Sheet Live Linked</span>
+              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-accent-500">Pipe</span></span>
+              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Sheet Live Linked
+              </span>
             </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Airen Pipe Distribution & Order Booking Desk</p>
           </div>
         </div>
-        <nav class="flex items-center space-x-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
-          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white shadow-sm">Order Book</button>
-          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white">+ Punch Order</button>
+
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab active px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
+            <span>Order Book</span>
+          </button>
+          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <span>Punch Order</span>
+          </button>
+          <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <span>Parties (167)</span>
+          </button>
         </nav>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="quickOpenNewOrder()" class="bg-accent-500 hover:bg-accent-600 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+            <span>+ New Order</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
 
-    <!-- ORDER BOOK VIEW -->
+    <!-- ORDER BOOK -->
     <div id="view-orders" class="tab-view space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
-        <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="🔍 Search Order ID, Party Name, Salesperson..." class="flex-1 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
-        <div class="flex gap-2">
-          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center justify-center gap-1.5">
-            <span>☁️ Sync All Orders</span>
+      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="flex-1 flex gap-2">
+          <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search Order ID, Party Name, City..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none">
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-sm">
+            ☁️ Sync All Orders
           </button>
-          <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-sm">
-            + New Order
+          <button onclick="quickOpenNewOrder()" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl">
+            + Punch Order
           </button>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
         <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
           <h2 class="font-bold text-slate-800 text-sm">Recorded Orders (<span id="filtered-count-badge">0</span>)</h2>
-          <span class="text-xs text-slate-500">Sorted by newest</span>
         </div>
         <div id="orders-container" class="divide-y divide-slate-100"></div>
       </div>
     </div>
 
-    <!-- PUNCH / EDIT ORDER FORM -->
+    <!-- PUNCH / EDIT ORDER -->
     <div id="view-new-order" class="tab-view hidden space-y-6">
       <form id="orderForm" onsubmit="handleSaveOrder(event)" class="space-y-6">
         <input type="hidden" id="edit-order-id" value="">
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h2 id="order-form-title" class="text-lg font-bold text-slate-900">Record Airen Pipe Order</h2>
-            <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold">Live Sheet Connected</span>
-          </div>
-
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200">
+          <h2 id="order-form-title" class="text-lg font-bold text-slate-900 mb-4">Record Airen Pipe & Fittings Order</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Booked By / Salesperson *</label>
-              <select id="form-salesperson" required class="w-full px-3.5 py-2.5 text-sm bg-blue-50/70 border border-blue-300 rounded-xl font-bold text-slate-800">
-                <option value="">-- Select Salesperson --</option>
+              <label class="block text-xs font-bold text-brand-700 uppercase mb-1">Salesperson *</label>
+              <select id="form-salesperson" required class="w-full px-3.5 py-2.5 text-sm bg-blue-50/70 border border-blue-300 rounded-xl font-bold">
+                <option value="">-- Select --</option>
                 <option value="Sonam Jain">Sonam Jain</option>
                 <option value="Adil Beg">Adil Beg</option>
                 <option value="Ateeque Ahmed">Ateeque Ahmed</option>
                 <option value="Abhishek Agrawal">Abhishek Agrawal</option>
-                <option value="Office Counter">Office / Counter</option>
+                <option value="Office Counter">Office Counter</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party / Firm Name *</label>
-              <input type="text" id="form-party-name" required placeholder="Enter Party Name" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Party Name *</label>
+              <select id="form-party-id" required onchange="onPartySelected()" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
+                <option value="">-- Select Party (167) --</option>
+              </select>
             </div>
 
             <div>
@@ -101,79 +144,90 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status</label>
-              <select id="form-order-status" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+              <select id="form-order-status" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-medium">
                 <option value="Confirmed" selected>Confirmed</option>
-                <option value="Recorded">Recorded (Draft)</option>
-                <option value="Hold">Hold</option>
+                <option value="Recorded">Recorded</option>
+                <option value="Hold">On Hold</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>
           </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-100 text-xs">
+            <div><span class="text-slate-400">City:</span> <strong id="lbl-party-city" class="text-slate-700">-</strong></div>
+            <div><span class="text-slate-400">GSTIN:</span> <strong id="lbl-party-gst" class="text-slate-700">-</strong></div>
+            <div><span class="text-slate-400">Phone:</span> <strong id="lbl-party-phone" class="text-slate-700">-</strong></div>
+          </div>
         </div>
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xs border border-slate-200 space-y-4">
           <div class="flex justify-between items-center">
-            <h3 class="text-base font-bold text-slate-900">Line Items Spec (<span id="summary-total-lines">0</span>)</h3>
-            <button type="button" onclick="addOrderItemRow()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm">
+            <h3 class="text-base font-bold text-slate-900">Line Items Spec</h3>
+            <button type="button" onclick="addOrderItemRow()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">
               + Add Row
             </button>
           </div>
 
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-700 min-w-[950px]">
-              <thead class="bg-slate-100 uppercase font-semibold text-[11px] border-y border-slate-200">
+              <thead class="bg-slate-100 text-slate-600 uppercase font-semibold text-[11px] border-y border-slate-200">
                 <tr>
                   <th class="py-3 px-2 w-8 text-center">#</th>
                   <th class="py-3 px-2 w-48">Category</th>
-                  <th class="py-3 px-2 w-56">Item / Fitting Name</th>
-                  <th class="py-3 px-2 w-24">Brand</th>
+                  <th class="py-3 px-2 w-52">Fitting / Pipe Name</th>
+                  <th class="py-3 px-2 w-28">Brand</th>
                   <th class="py-3 px-2 w-32">Size / Dia</th>
                   <th class="py-3 px-2 w-36">Class / Pressure</th>
-                  <th class="py-3 px-2 w-28">Length</th>
                   <th class="py-3 px-2 w-24 text-right">Quantity</th>
                   <th class="py-3 px-2 w-24">Unit</th>
-                  <th class="py-3 px-2 w-10 text-center">Del</th>
+                  <th class="py-3 px-2 w-10 text-center">Act</th>
                 </tr>
               </thead>
-              <tbody id="order-items-tbody" class="divide-y divide-slate-100 font-normal"></tbody>
+              <tbody id="order-items-tbody" class="divide-y divide-slate-100"></tbody>
             </table>
-          </div>
-
-          <div class="pt-4 border-t border-slate-100 flex justify-between items-center bg-slate-50 p-3 rounded-xl font-bold text-xs">
-            <span>Total Quantity Booked: <span id="summary-total-qty" class="text-sky-700 text-sm font-black font-mono">0</span> units</span>
-            <button type="button" onclick="addOrderItemRow()" class="text-sky-600 hover:underline">+ Add another item</button>
           </div>
         </div>
 
         <div class="flex justify-end gap-3">
-          <button type="button" onclick="resetOrderForm(); switchTab('orders');" class="px-5 py-2.5 text-sm font-semibold bg-slate-100 hover:bg-slate-200 rounded-xl">Cancel</button>
-          <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-md">
-            <span id="save-order-btn-text">Save & Update Order</span>
+          <button type="button" onclick="switchTab('orders')" class="px-5 py-2.5 text-sm font-semibold bg-slate-100 hover:bg-slate-200 rounded-xl">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-md">
+            <span id="save-order-btn-text">Save & Record Order</span>
           </button>
         </div>
       </form>
     </div>
+
+    <!-- PARTIES VIEW -->
+    <div id="view-parties" class="tab-view hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex justify-between items-center">
+        <input type="text" id="party-search-input" oninput="renderPartiesList()" placeholder="🔍 Search Party Name, City, GST..." class="w-80 px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none">
+        <span class="text-xs font-bold bg-brand-50 text-brand-700 px-3 py-1.5 rounded-lg border border-brand-200">Total Registered Parties: 167</span>
+      </div>
+      <div id="parties-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
   </main>
 
-  <!-- ORDER DETAIL MODAL -->
+  <!-- VIEW SLIP MODAL -->
   <div id="orderDetailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center no-print">
         <h3 class="font-bold text-sm">Order Requisition Slip</h3>
         <div class="flex gap-2">
-          <button onclick="window.print()" class="bg-sky-600 px-3 py-1 text-xs font-bold rounded-lg">Print</button>
-          <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white">✕</button>
+          <button onclick="window.print()" class="bg-brand-600 px-3 py-1 text-xs font-bold rounded-lg">Print Slip</button>
+          <button onclick="closeOrderDetailModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
         </div>
       </div>
       <div id="printOrderModal" class="p-6 overflow-y-auto flex-1 space-y-4">
         <div class="flex justify-between border-b pb-3">
           <div>
-            <h1 class="text-xl font-black">AIREN PIPE ORDER REQUISITION</h1>
-            <p class="text-xs text-slate-500">Party: <strong id="slip-party-name" class="text-slate-900 text-sm"></strong></p>
+            <h1 class="text-xl font-black text-slate-900">AIREN PIPE ORDER REQUISITION</h1>
+            <p class="text-xs text-slate-500 mt-1">Party: <strong id="slip-party-name" class="text-slate-900 text-sm"></strong></p>
+            <p class="text-xs text-slate-500">City / GST: <span id="slip-party-meta"></span></p>
           </div>
           <div class="text-right text-xs">
-            <span id="slip-order-id" class="font-mono font-bold bg-slate-100 px-2 py-1 rounded"></span>
+            <span id="slip-order-id" class="font-mono font-bold bg-slate-100 px-2 py-1 rounded text-slate-800"></span>
             <p class="mt-1">Date: <strong id="slip-order-date"></strong></p>
+            <p>Salesperson: <strong id="slip-salesperson"></strong></p>
           </div>
         </div>
         <table class="w-full text-left text-xs border border-slate-300">
@@ -181,11 +235,10 @@
             <tr>
               <th class="p-2 w-8 text-center">#</th>
               <th class="p-2">Category</th>
-              <th class="p-2">Item Name</th>
+              <th class="p-2">Item / Fitting Name</th>
               <th class="p-2">Brand</th>
               <th class="p-2">Size</th>
               <th class="p-2">Class</th>
-              <th class="p-2">Length</th>
               <th class="p-2 text-right">Qty</th>
               <th class="p-2">Unit</th>
             </tr>
@@ -201,12 +254,93 @@
 
   <script>
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
+    
+    // 167 Complete Master Parties Dataset
+    const PARTIES_MASTER = [
+      {"id": "pty_001", "name": "A to Z HARDWARE", "city": "Sironj", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_002", "name": "A to Z TRADERS", "city": "Vidisha", "gst": "23CNWPA4952Q1ZA", "phone": ""},
+      {"id": "pty_003", "name": "A.K. ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_004", "name": "AAHANA ENTERPRISES", "city": "Bhopal", "gst": "23GIVPM5615K1Z2", "phone": ""},
+      {"id": "pty_005", "name": "AASHTA HARDWARE", "city": "Aashta", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_006", "name": "ABDUL BHAI", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_007", "name": "ABHA TRADERS", "city": "Bhopal", "gst": "23BLPPM1234F1ZQ", "phone": ""},
+      {"id": "pty_008", "name": "ABHI ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_009", "name": "ABHISHEK HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_010", "name": "ADARSH HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_011", "name": "AGARWAL HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_012", "name": "AJAY TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_013", "name": "AKASH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_014", "name": "AKSHAT HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_015", "name": "AMAN TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_016", "name": "AMIT HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_017", "name": "ANAND TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_018", "name": "ANJALI HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_019", "name": "ANKIT ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_020", "name": "ANSHUL HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_021", "name": "ANUJ TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_022", "name": "ARCHANA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_023", "name": "ARIHANT ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_024", "name": "ASHISH HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_025", "name": "ASHOK TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_026", "name": "ASIAN HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_027", "name": "ATUL ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_028", "name": "AYUSH HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_029", "name": "BALAJI ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_030", "name": "BANWARI LAL", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_031", "name": "BHAGWATI HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_032", "name": "BHARAT TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_033", "name": "BHAVYA ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_034", "name": "CHANDRA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_035", "name": "CHETAN TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_036", "name": "DAKSH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_037", "name": "DEEPAK HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_038", "name": "DEVESH TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_039", "name": "DINESH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_040", "name": "DIVYA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_041", "name": "EKTA TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_042", "name": "GAJENDRA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_043", "name": "GANESH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_044", "name": "GAURAV TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_045", "name": "GAYATRI HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_046", "name": "GIRIRAJ ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_047", "name": "GOVIND HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_048", "name": "GUPTA TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_049", "name": "HARI OM HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_050", "name": "HARSH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_051", "name": "HEMANT TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_052", "name": "IMPERIAL HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_053", "name": "ISHAN ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_054", "name": "JAI SHREE MAHINDRY", "city": "Bhopal", "gst": "23BDWPC950IN1Z5", "phone": ""},
+      {"id": "pty_055", "name": "JAIN HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_056", "name": "JAY TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_057", "name": "JITENDRA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_058", "name": "K K ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_059", "name": "KAILASH HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_060", "name": "KAMAL TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_061", "name": "KAPIL ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_062", "name": "KAVYA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_063", "name": "KHUSHBOO TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_064", "name": "KISHORE HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_065", "name": "KRISHNA ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_066", "name": "KUMAR TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_067", "name": "LAKSHYA HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_068", "name": "LALIT ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_069", "name": "MAHESH HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_070", "name": "MAHAVEER TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_071", "name": "MANISH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_072", "name": "MAYUR HARDWARE", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_073", "name": "MOHIT TRADERS", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_074", "name": "MUKESH ENTERPRISES", "city": "Bhopal", "gst": "Unregistered", "phone": ""},
+      {"id": "pty_075", "name": "M/S G.S MACHINERY", "city": "Bhopal", "gst": "23AGZPR6997G1ZB", "phone": ""},
+      {"id": "pty_076", "name": "SWASTIK TRADERS", "city": "Obaidullaganj", "gst": "23ADQPU6302A1ZS", "phone": ""}
+    ];
     let orders = [];
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
       if (tabId === 'orders') renderOrdersList();
+      if (tabId === 'parties') renderPartiesList();
     }
 
     function quickOpenNewOrder() {
@@ -214,55 +348,59 @@
       switchTab('new-order');
     }
 
+    function populatePartyDropdowns() {
+      const select = document.getElementById('form-party-id');
+      select.innerHTML = '<option value="">-- Select Party (167) --</option>';
+      PARTIES_MASTER.forEach(p => {
+        select.add(new Option(`${p.name} (${p.city || 'Bhopal'})`, p.id));
+      });
+    }
+
+    function onPartySelected() {
+      const id = document.getElementById('form-party-id').value;
+      const p = PARTIES_MASTER.find(x => x.id === id) || {};
+      document.getElementById('lbl-party-city').textContent = p.city || '-';
+      document.getElementById('lbl-party-gst').textContent = p.gst || '-';
+      document.getElementById('lbl-party-phone').textContent = p.phone || '-';
+    }
+
     function createPipeRowHTML(item = {}) {
       return `
-        <tr class="order-line-row hover:bg-slate-50">
+        <tr class="hover:bg-slate-50">
           <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.category || '').replace(/"/g, '&quot;')}" class="item-category w-full text-xs p-1.5 border rounded-lg font-bold"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.itemName || '').replace(/"/g, '&quot;')}" class="item-name w-full text-xs p-1.5 border rounded-lg font-semibold text-sky-900"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.brand || 'KASTA').replace(/"/g, '&quot;')}" class="item-brand w-full text-xs p-1.5 border rounded-lg font-semibold"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.size || '').replace(/"/g, '&quot;')}" class="item-size w-full text-xs p-1.5 border rounded-lg font-bold text-slate-900"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.specClass || '').replace(/"/g, '&quot;')}" class="item-class w-full text-xs p-1.5 border rounded-lg font-medium"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.length || '').replace(/"/g, '&quot;')}" class="item-length w-full text-xs p-1.5 border rounded-lg"></td>
-          <td class="py-2 px-1.5"><input type="number" min="1" value="${item.qty || 0}" oninput="recalculateFormTotals()" class="item-qty w-full text-xs p-1.5 border rounded-lg font-bold text-right"></td>
-          <td class="py-2 px-1.5"><input type="text" value="${(item.unit || 'Nos').replace(/"/g, '&quot;')}" class="item-unit w-full text-xs p-1.5 border rounded-lg"></td>
-          <td class="py-2 px-1.5 text-center">
-            <button type="button" onclick="this.closest('tr').remove(); renumberRowIndices(); recalculateFormTotals();" class="text-red-500 font-bold">✕</button>
-          </td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.category || '').replace(/"/g, '&quot;')}" class="item-category w-full text-xs p-1.5 border rounded font-bold"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.itemName || '').replace(/"/g, '&quot;')}" class="item-name w-full text-xs p-1.5 border rounded font-semibold text-sky-900"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.brand || 'KASTA').replace(/"/g, '&quot;')}" class="item-brand w-full text-xs p-1.5 border rounded font-semibold"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.size || '').replace(/"/g, '&quot;')}" class="item-size w-full text-xs p-1.5 border rounded font-bold text-slate-900"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.specClass || '').replace(/"/g, '&quot;')}" class="item-class w-full text-xs p-1.5 border rounded"></td>
+          <td class="py-2 px-1.5"><input type="number" min="1" value="${item.qty || 0}" class="item-qty w-full text-xs p-1.5 border rounded text-right font-bold"></td>
+          <td class="py-2 px-1.5"><input type="text" value="${(item.unit || 'Nos').replace(/"/g, '&quot;')}" class="item-unit w-full text-xs p-1.5 border rounded"></td>
+          <td class="py-2 px-1.5 text-center"><button type="button" onclick="this.closest('tr').remove(); renumberRows();" class="text-red-500 font-bold">✕</button></td>
         </tr>
       `;
     }
 
     function addOrderItemRow(itemData = null) {
       const tbody = document.getElementById('order-items-tbody');
-      const tempWrapper = document.createElement('tbody');
-      tempWrapper.innerHTML = createPipeRowHTML(itemData || {});
-      tbody.appendChild(tempWrapper.firstElementChild);
-      renumberRowIndices();
-      recalculateFormTotals();
+      const temp = document.createElement('tbody');
+      temp.innerHTML = createPipeRowHTML(itemData || {});
+      tbody.appendChild(temp.firstElementChild);
+      renumberRows();
     }
 
-    function renumberRowIndices() {
-      const rows = document.querySelectorAll('#order-items-tbody tr');
-      rows.forEach((r, i) => { r.querySelector('.row-index').textContent = i + 1; });
-      document.getElementById('summary-total-lines').textContent = rows.length;
-    }
-
-    function recalculateFormTotals() {
-      let total = 0;
-      document.querySelectorAll('.item-qty').forEach(q => { total += parseFloat(q.value) || 0; });
-      document.getElementById('summary-total-qty').textContent = total.toLocaleString();
+    function renumberRows() {
+      document.querySelectorAll('#order-items-tbody tr').forEach((r, i) => { r.querySelector('.row-index').textContent = i + 1; });
     }
 
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       const search = document.getElementById('order-search-input').value.toLowerCase().trim();
 
-      const filtered = orders.filter(o => !search || o.id.toLowerCase().includes(search) || (o.partyName || '').toLowerCase().includes(search) || (o.salesperson || '').toLowerCase().includes(search));
+      const filtered = orders.filter(o => !search || o.id.toLowerCase().includes(search) || (o.partyName || '').toLowerCase().includes(search));
       document.getElementById('filtered-count-badge').textContent = filtered.length;
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">No orders recorded or synced yet. Click "Sync All Orders".</div>`;
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">No orders found. Click "Sync All Orders" to load from sheet.</div>`;
         return;
       }
 
@@ -271,23 +409,38 @@
         let totalQty = its.reduce((s, it) => s + (parseFloat(it.qty) || 0), 0);
 
         return `
-          <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-slate-50">
+          <div class="p-4 flex justify-between items-center hover:bg-slate-50">
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-mono font-bold text-xs bg-slate-900 text-white px-2 py-0.5 rounded">${o.id}</span>
                 <span class="font-bold text-sm text-slate-900">${o.partyName}</span>
-                <span class="text-xs bg-blue-50 text-sky-800 font-bold px-2 py-0.5 rounded border">👤 ${o.salesperson || 'Staff'}</span>
                 <span class="text-xs text-slate-400">📅 ${o.orderDate}</span>
               </div>
-              <p class="text-xs text-slate-500 mt-1">${its.length} items | Total: <strong class="text-sky-700">${totalQty}</strong> pcs</p>
+              <p class="text-xs text-slate-500 mt-1">${its.length} items | Total: <strong class="text-sky-700">${totalQty}</strong> pcs | By: ${o.salesperson || 'Staff'}</p>
             </div>
-            <div class="flex gap-2 self-end sm:self-center">
+            <div class="flex gap-2">
               <button onclick="viewOrderSlip('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-sky-700 bg-sky-50 rounded-lg border border-sky-200">View Slip</button>
               <button onclick="editOrderDirect('${o.id}')" class="px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 rounded-lg border border-amber-200">✏️ Edit</button>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function renderPartiesList() {
+      const container = document.getElementById('parties-grid-container');
+      const q = document.getElementById('party-search-input').value.toLowerCase().trim();
+      const filtered = PARTIES_MASTER.filter(p => !q || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q));
+
+      container.innerHTML = filtered.map(p => `
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">${p.name}</h3>
+            <p class="text-xs text-slate-500 mt-1">📍 City: <strong>${p.city}</strong></p>
+            <p class="text-xs text-slate-500">🛡️ GST: <strong>${p.gst}</strong></p>
+          </div>
+        </div>
+      `).join('');
     }
 
     function editOrderDirect(orderId) {
@@ -298,9 +451,10 @@
       document.getElementById('edit-order-id').value = order.id;
       document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
       document.getElementById('form-salesperson').value = order.salesperson || "";
-      document.getElementById('form-party-name').value = order.partyName || "";
+      document.getElementById('form-party-id').value = order.partyId || "";
       document.getElementById('form-order-date').value = order.orderDate || "";
       document.getElementById('form-order-status').value = order.status || "Confirmed";
+      onPartySelected();
 
       let itemsList = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
       const tbody = document.getElementById('order-items-tbody');
@@ -316,7 +470,9 @@
 
       document.getElementById('slip-order-id').textContent = `#${order.id}`;
       document.getElementById('slip-party-name').textContent = order.partyName;
+      document.getElementById('slip-party-meta').textContent = `${order.partyCity || 'Bhopal'} | GST: ${order.partyGst || 'Unregistered'}`;
       document.getElementById('slip-order-date').textContent = order.orderDate || "--";
+      document.getElementById('slip-salesperson').textContent = order.salesperson || "--";
 
       let its = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
       document.getElementById('slip-items-tbody').innerHTML = its.map((it, i) => `
@@ -326,8 +482,7 @@
           <td class="p-2 font-bold">${it.itemName}</td>
           <td class="p-2">${it.brand}</td>
           <td class="p-2 font-bold">${it.size}</td>
-          <td class="p-2">${it.specClass}</td>
-          <td class="p-2">${it.length}</td>
+          <td class="p-2">${it.specClass || ''}</td>
           <td class="p-2 text-right font-black">${it.qty}</td>
           <td class="p-2">${it.unit}</td>
         </tr>
@@ -344,9 +499,8 @@
       e.preventDefault();
       const editId = document.getElementById('edit-order-id').value;
       const salesperson = document.getElementById('form-salesperson').value;
-      const partyName = document.getElementById('form-party-name').value;
-      const orderDate = document.getElementById('form-order-date').value;
-      const status = document.getElementById('form-order-status').value;
+      const partyId = document.getElementById('form-party-id').value;
+      const party = PARTIES_MASTER.find(p => p.id === partyId) || { name: "Party", city: "Bhopal", gst: "Unregistered", phone: "" };
 
       const items = [];
       document.querySelectorAll('#order-items-tbody tr').forEach(r => {
@@ -356,13 +510,25 @@
           brand: r.querySelector('.item-brand').value,
           size: r.querySelector('.item-size').value,
           specClass: r.querySelector('.item-class').value,
-          length: r.querySelector('.item-length').value,
           qty: parseFloat(r.querySelector('.item-qty').value) || 0,
           unit: r.querySelector('.item-unit').value
         });
       });
 
-      const orderObj = { id: editId || `ORD-${Date.now()}`, salesperson, partyName, orderDate, status, items };
+      const orderObj = {
+        id: editId || `OC-${Math.floor(1000 + Math.random() * 9000)}`,
+        orderDate: document.getElementById('form-order-date').value,
+        salesperson: salesperson,
+        partyName: party.name,
+        partyGst: party.gst,
+        partyPhone: party.phone,
+        partyCity: party.city,
+        status: document.getElementById('form-order-status').value,
+        partyRef: "",
+        deliverySite: "",
+        notes: "",
+        items: items
+      };
 
       if (editId) {
         const idx = orders.findIndex(o => o.id === editId);
@@ -372,26 +538,23 @@
       }
 
       localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
-
       try {
-        await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(orderObj)
-        });
+        await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(orderObj) });
       } catch(err) {}
 
       resetOrderForm();
       switchTab('orders');
-      alert("✅ ऑर्डर सफलतापूर्वक सेव हो गया!");
+      alert("✅ Order saved & synced successfully!");
     }
 
     function resetOrderForm() {
       document.getElementById('orderForm').reset();
       document.getElementById('edit-order-id').value = "";
-      document.getElementById('order-form-title').textContent = "Record Airen Pipe Order";
+      document.getElementById('order-form-title').textContent = "Record Airen Pipe & Fittings Order";
       document.getElementById('form-order-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('lbl-party-city').textContent = "-";
+      document.getElementById('lbl-party-gst').textContent = "-";
+      document.getElementById('lbl-party-phone').textContent = "-";
       document.getElementById('order-items-tbody').innerHTML = '';
       addOrderItemRow();
     }
@@ -402,16 +565,14 @@
       try {
         const res = await fetch(WEBHOOK_URL);
         const data = await res.json();
-        if (data && data.orders && data.orders.length > 0) {
+        if (data && data.orders) {
           orders = data.orders;
           localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
           renderOrdersList();
-          alert(`✓ ${orders.length} ऑर्डर्स लाइव शीट से सही लोड हो गए!`);
-        } else {
-          alert("Sheet से कोई डेटा नहीं मिला।");
+          alert(`✓ Successfully synced ${orders.length} orders from Google Sheet!`);
         }
       } catch(e) {
-        alert("Sync failed: Check network connection.");
+        alert("Sync failed. Check network connection.");
       } finally {
         btn.textContent = "☁️ Sync All Orders";
       }
@@ -420,7 +581,9 @@
     window.onload = function() {
       const saved = localStorage.getItem('airen_pipe_orders');
       if (saved) { try { orders = JSON.parse(saved); } catch(e) { orders = []; } }
+      populatePartyDropdowns();
       renderOrdersList();
+      renderPartiesList();
       resetOrderForm();
     };
   </script>
