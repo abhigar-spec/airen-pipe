@@ -601,7 +601,11 @@
                 Update URL
               </button>
             </div>
-            <p class="text-[11px] text-emerald-600 mt-1 font-medium">✓ Central Google Sheet live connection is active.</p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <button onclick="fetchOrdersFromCloud(true)" id="btn-settings-cloud-sync" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-xs">☁️ Sync Orders from Sheet</button>
+              <span id="cloud-sync-status" class="text-[11px] text-slate-500">Auto-sync runs when the app opens.</span>
+            </div>
+            <p class="text-[11px] text-emerald-600 mt-2 font-medium">✓ Central Google Sheet live connection is active.</p>
           </div>
         </div>
       </div>
@@ -1441,7 +1445,20 @@
       localStorage.setItem('airen_pipe_parties', JSON.stringify(parties));
     }
 
+    function dedupeOrdersById(list) {
+      const byId = new Map();
+      (Array.isArray(list) ? list : []).forEach(order => {
+        if (!order) return;
+        const id = String(order.id || '').trim();
+        if (!id) return;
+        // Last copy wins. This also cleans legacy duplicates created by older builds.
+        byId.set(id.toLowerCase(), { ...order, id });
+      });
+      return Array.from(byId.values());
+    }
+
     function saveOrders() {
+      orders = dedupeOrdersById(orders);
       localStorage.setItem('airen_pipe_orders', JSON.stringify(orders));
     }
 
@@ -1831,23 +1848,31 @@
 
       let savedOrderObj = null;
       if (editId) {
-        const index = orders.findIndex(o => o.id === editId);
-        if (index !== -1) {
-          orders[index] = {
-            ...orders[index], id: editId, salesperson, partyId, partyName: party.name,
+        const existing = orders.find(o => String(o.id || '').trim().toLowerCase() === String(editId).trim().toLowerCase());
+        if (existing) {
+          savedOrderObj = {
+            ...existing, id: editId, salesperson, partyId, partyName: party.name,
             partyGst: party.gst || "Unregistered", partyPhone: party.phone || "",
             partyCity: party.city || "", partyAddress: party.address || "",
             orderDate, targetDate, status, partyRef, deliverySite, notes, items
           };
-          savedOrderObj = orders[index];
+          // Critical: remove every legacy copy of this ID, then insert exactly one updated order.
+          orders = orders.filter(o => String(o.id || '').trim().toLowerCase() !== String(editId).trim().toLowerCase());
+          orders.unshift(savedOrderObj);
           saveOrders();
-          showToast(`Order #${editId} updated & synced!`, "success");
+          renderOrdersList();
+          showToast(`Order #${editId} updated.`, "success");
         }
       } else {
         const prefixMap = { "Sonam Jain": "SJ", "Adil Beg": "AB", "Ateeque Ahmed": "AA", "Abhishek Agrawal": "AG", "Office Counter": "OC" };
         const prefix = prefixMap[salesperson] || "ORD";
         const spKey = `airen_seq_${prefix}`;
-        let currentSeq = parseInt(localStorage.getItem(spKey) || "1000", 10) + 1;
+        const storedSeq = parseInt(localStorage.getItem(spKey) || "1000", 10) || 1000;
+        const maxExistingSeq = orders.reduce((max, o) => {
+          const m = String(o.id || '').match(new RegExp('^' + prefix + '-(\\d+)$', 'i'));
+          return m ? Math.max(max, parseInt(m[1], 10) || 0) : max;
+        }, 1000);
+        const currentSeq = Math.max(storedSeq, maxExistingSeq) + 1;
         localStorage.setItem(spKey, currentSeq);
         const newOrderId = `${prefix}-${currentSeq}`;
 
@@ -1865,7 +1890,11 @@
         alert(`✅ ऑर्डर सफलतापूर्वक दर्ज हो गया है!\n\nOrder #: ${newOrderId}\nSalesperson: ${salesperson}\nParty: ${party.name}`);
       }
 
-      if (savedOrderObj) syncOrderToGoogleSheet(savedOrderObj);
+      if (savedOrderObj) {
+        syncOrderToGoogleSheet(savedOrderObj);
+        // Reconcile with the central Sheet after Apps Script has had time to write/rebuild it.
+        setTimeout(() => { syncOrdersFromCloudCore(false).catch(() => {}); }, 1800);
+      }
       resetOrderForm();
       switchTab('orders');
       updateGlobalKPIs();
@@ -2154,6 +2183,7 @@
         saveOrders();
         renderOrdersList();
         syncOrderToGoogleSheet({ id: orderId, action: "delete" });
+        setTimeout(() => { syncOrdersFromCloudCore(false).catch(() => {}); }, 1800);
         showToast(`Order #${orderId} deleted by Admin PIN.`, "info");
       }, `Authorize Deletion of Order #${orderId}`);
     }
@@ -2316,37 +2346,72 @@
       if (totalPcsEl) totalPcsEl.textContent = totalPcs.toLocaleString();
     }
 
-    async function fetchOrdersFromCloud() {
-      requirePin(async () => {
-        const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
-        const btn = document.getElementById('btn-cloud-sync');
-        if (btn) btn.innerHTML = `<span>⏳ Syncing...</span>`;
+    function normalizeCloudOrder(ord) {
+      const clean = { ...ord };
+      if (typeof clean.items === 'string') {
+        try { clean.items = JSON.parse(clean.items); } catch (e) { clean.items = []; }
+      }
+      if (!Array.isArray(clean.items)) clean.items = [];
+      clean.id = String(clean.id || '').trim();
+      return clean;
+    }
 
-        try {
-          const response = await fetch(webhookUrl);
-          const data = await response.json();
-          if (data && Array.isArray(data.orders)) {
-            const sanitizedRemoteOrders = data.orders.map(ord => {
-              if (typeof ord.items === 'string') {
-                try { ord.items = JSON.parse(ord.items); } catch(e) { ord.items = []; }
-              }
-              return ord;
-            });
-            orders = sanitizedRemoteOrders;
-            saveOrders();
-            renderOrdersList();
-            updateGlobalKPIs();
-            showToast(`✓ ${sanitizedRemoteOrders.length} ऑर्डर्स शीट से लोड हो गए!`, "success");
-          } else {
-            showToast("Sheet में कोई रिकॉर्ड नहीं मिला।", "info");
-          }
-        } catch (err) {
-          console.error("Cloud fetch failed", err);
-          showToast("Cloud sync failed. कृपया Apps Script व नेटवर्क चेक करें।", "error");
-        } finally {
-          if (btn) btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><span>☁️ Sync All Orders</span>`;
+    function mergeCloudOrders(remoteOrders) {
+      // FINAL RULE: after a successful Sheet read, Google Sheet is the source of truth.
+      // This permanently removes stale/duplicate local-only copies. If Sheet read fails,
+      // syncOrdersFromCloudCore() leaves the existing local cache untouched.
+      return dedupeOrdersById(remoteOrders.map(normalizeCloudOrder)).filter(o => o && o.id);
+    }
+
+    async function syncOrdersFromCloudCore(showSuccessToast = true) {
+      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      const btn = document.getElementById('btn-cloud-sync');
+      const settingsBtn = document.getElementById('btn-settings-cloud-sync');
+      const statusEl = document.getElementById('cloud-sync-status');
+      const oldBtnHtml = btn ? btn.innerHTML : '';
+      const oldSettingsHtml = settingsBtn ? settingsBtn.innerHTML : '';
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳ Syncing...</span>'; }
+      if (settingsBtn) { settingsBtn.disabled = true; settingsBtn.innerHTML = '⏳ Syncing...'; }
+      if (statusEl) statusEl.textContent = 'Reading latest orders from Google Sheet...';
+
+      try {
+        const separator = webhookUrl.includes('?') ? '&' : '?';
+        const response = await fetch(webhookUrl + separator + '_ts=' + Date.now(), { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        if (!data || data.status === 'error' || !Array.isArray(data.orders)) {
+          throw new Error((data && data.message) || 'Invalid response from Apps Script');
         }
-      }, "Owner PIN Authorization: Sync All Orders");
+
+        const remoteOrders = data.orders.map(normalizeCloudOrder).filter(o => o.id);
+        const beforeCount = orders.length;
+        orders = mergeCloudOrders(remoteOrders);
+        saveOrders();
+        renderOrdersList();
+        updateGlobalKPIs();
+        populateOrderPartyFilter();
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem('airen_last_cloud_sync', new Date().toISOString());
+        if (statusEl) statusEl.textContent = `Last synced ${now} • ${remoteOrders.length} order(s) read from Sheet • ${orders.length} in app`;
+        if (showSuccessToast) showToast(`✓ Sheet sync complete: ${remoteOrders.length} Sheet order(s), ${orders.length} app order(s).`, 'success');
+        return { remoteCount: remoteOrders.length, totalCount: orders.length, beforeCount };
+      } catch (err) {
+        console.error('Cloud fetch failed', err);
+        if (statusEl) statusEl.textContent = 'Sync failed. Local orders are safe. Check Apps Script deployment/network.';
+        if (showSuccessToast) showToast('Cloud sync failed. Local orders were not changed.', 'error');
+        throw err;
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = oldBtnHtml; }
+        if (settingsBtn) { settingsBtn.disabled = false; settingsBtn.innerHTML = oldSettingsHtml; }
+      }
+    }
+
+    async function fetchOrdersFromCloud(skipPin = false) {
+      const run = async () => {
+        try { await syncOrdersFromCloudCore(true); } catch (e) {}
+      };
+      if (skipPin) return run();
+      requirePin(run, 'Owner PIN Authorization: Sync All Orders');
     }
 
     function exportOrdersToCSV() {
@@ -2412,6 +2477,8 @@
       resetOrderForm();
       updateGlobalKPIs();
       initManageCatalogUI();
+      // Pull Sheet data after local UI is ready. Failure never deletes local data.
+      setTimeout(() => { syncOrdersFromCloudCore(false).catch(() => {}); }, 500);
     };
   </script>
 </body>
