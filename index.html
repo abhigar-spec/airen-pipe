@@ -2363,6 +2363,25 @@
       return dedupeOrdersById(remoteOrders.map(normalizeCloudOrder)).filter(o => o && o.id);
     }
 
+    function fetchGoogleSheetJsonp(webhookUrl) {
+      return new Promise((resolve, reject) => {
+        const callbackName = '__airenSheetSync_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(() => cleanup(new Error('Sheet sync timed out')), 15000);
+        function cleanup(err, data) {
+          clearTimeout(timer);
+          try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+          if (err) reject(err); else resolve(data);
+        }
+        window[callbackName] = (data) => cleanup(null, data);
+        script.onerror = () => cleanup(new Error('Could not load Google Sheet sync endpoint'));
+        const separator = webhookUrl.includes('?') ? '&' : '?';
+        script.src = webhookUrl + separator + 'callback=' + encodeURIComponent(callbackName) + '&_ts=' + Date.now();
+        document.head.appendChild(script);
+      });
+    }
+
     async function syncOrdersFromCloudCore(showSuccessToast = true) {
       const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
       const btn = document.getElementById('btn-cloud-sync');
@@ -2375,10 +2394,7 @@
       if (statusEl) statusEl.textContent = 'Reading latest orders from Google Sheet...';
 
       try {
-        const separator = webhookUrl.includes('?') ? '&' : '?';
-        const response = await fetch(webhookUrl + separator + '_ts=' + Date.now(), { cache: 'no-store' });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const data = await response.json();
+        const data = await fetchGoogleSheetJsonp(webhookUrl);
         if (!data || data.status === 'error' || !Array.isArray(data.orders)) {
           throw new Error((data && data.message) || 'Invalid response from Apps Script');
         }
