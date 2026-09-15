@@ -868,7 +868,20 @@
 
   <!-- Single JavaScript Block -->
   <script>
-    const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
+    const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyq_8iKpAMxKqunQ4B-xcpQM7ZV1la5sCofeX1wMaoV_VD5UMqh_HGDjWX4ciC5ohYlgg/exec";
+    const LEGACY_WEBHOOK_URLS = new Set([
+      "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec"
+    ]);
+
+    function getGoogleWebhookUrl() {
+      let webhook = (localStorage.getItem('airen_pipe_google_webhook') || '').trim();
+      const looksLikeAppsScriptExec = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec(?:[?#].*)?$/.test(webhook);
+      if (!looksLikeAppsScriptExec || LEGACY_WEBHOOK_URLS.has(webhook)) {
+        webhook = DEFAULT_WEBHOOK_URL;
+        localStorage.setItem('airen_pipe_google_webhook', webhook);
+      }
+      return webhook;
+    }
 
     const DEFAULT_PARTIES = [
   {"id": "pty_001", "name": "A to Z HARDWARE", "firm": "A to Z HARDWARE", "phone": "", "city": "Sironj", "gst": "Unregistered", "address": "Sironj", "type": "Unregistered (URP)"},
@@ -1428,11 +1441,7 @@
         saveOrders();
       }
 
-      let webhook = localStorage.getItem('airen_pipe_google_webhook');
-      if (!webhook || !webhook.includes("AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw")) {
-        webhook = DEFAULT_WEBHOOK_URL;
-        localStorage.setItem('airen_pipe_google_webhook', webhook);
-      }
+      const webhook = getGoogleWebhookUrl();
       const webhookEl = document.getElementById('google-webhook-url');
       if (webhookEl) webhookEl.value = webhook;
 
@@ -1463,8 +1472,16 @@
     }
 
     function saveGoogleWebhookUrl() {
-      const url = document.getElementById('google-webhook-url').value.trim();
-      localStorage.setItem('airen_pipe_google_webhook', url || DEFAULT_WEBHOOK_URL);
+      const input = document.getElementById('google-webhook-url');
+      const url = (input ? input.value : '').trim();
+      const valid = /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec(?:[?#].*)?$/.test(url);
+      if (!valid) {
+        showToast("Please enter a valid Google Apps Script /exec URL.", "error");
+        if (input) input.value = getGoogleWebhookUrl();
+        return;
+      }
+      localStorage.setItem('airen_pipe_google_webhook', url);
+      if (input) input.value = url;
       showToast("Google Sheets webhook URL updated!", "success");
     }
 
@@ -1769,7 +1786,7 @@
     }
 
     async function syncOrderToGoogleSheet(order) {
-      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      const webhookUrl = getGoogleWebhookUrl();
       if (!webhookUrl) return;
       try {
         await fetch(webhookUrl, {
@@ -2383,7 +2400,7 @@
     }
 
     async function syncOrdersFromCloudCore(showSuccessToast = true) {
-      const webhookUrl = localStorage.getItem('airen_pipe_google_webhook') || DEFAULT_WEBHOOK_URL;
+      const webhookUrl = getGoogleWebhookUrl();
       const btn = document.getElementById('btn-cloud-sync');
       const settingsBtn = document.getElementById('btn-settings-cloud-sync');
       const statusEl = document.getElementById('cloud-sync-status');
@@ -2413,8 +2430,9 @@
         return { remoteCount: remoteOrders.length, totalCount: orders.length, beforeCount };
       } catch (err) {
         console.error('Cloud fetch failed', err);
-        if (statusEl) statusEl.textContent = 'Sync failed. Local orders are safe. Check Apps Script deployment/network.';
-        if (showSuccessToast) showToast('Cloud sync failed. Local orders were not changed.', 'error');
+        const reason = (err && err.message) ? err.message : 'Unknown sync error';
+        if (statusEl) statusEl.textContent = `Sync failed: ${reason}. Local orders are safe.`;
+        if (showSuccessToast) showToast(`Cloud sync failed: ${reason}`, 'error');
         throw err;
       } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = oldBtnHtml; }
