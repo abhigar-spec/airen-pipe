@@ -22,6 +22,7 @@
               900: '#082f49',
             },
             accent: {
+              50: '#fff7ed',
               500: '#f97316',
               600: '#ea580c',
             }
@@ -53,21 +54,57 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+
+    /* Multi-Page Print & PDF Fixes */
     @media print {
       body * {
-        visibility: hidden;
+        visibility: hidden !important;
       }
       #printOrderModal, #printOrderModal * {
-        visibility: visible;
+        visibility: visible !important;
+      }
+      html, body {
+        height: auto !important;
+        overflow: visible !important;
+        background: white !important;
+      }
+      #orderDetailModal {
+        position: static !important;
+        overflow: visible !important;
+        display: block !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #orderDetailModal > div {
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        border: none !important;
+        box-shadow: none !important;
       }
       #printOrderModal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 12px !important;
         background: white !important;
+      }
+      table {
+        page-break-inside: auto !important;
+        width: 100% !important;
+      }
+      tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+      }
+      thead {
+        display: table-header-group !important;
+      }
+      tfoot {
+        display: table-footer-group !important;
       }
       .no-print {
         display: none !important;
@@ -618,7 +655,7 @@
     </div>
   </div>
 
-  <!-- Order Slip Modal -->
+  <!-- Order Slip Modal (Optimized for Multi-Page Printing) -->
   <div id="orderDetailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
       <div class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center no-print">
@@ -810,7 +847,7 @@
 
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-  <!-- Single JavaScript Block (Cleaned & De-duplicated) -->
+  <!-- Single JavaScript Block -->
   <script>
     const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec";
 
