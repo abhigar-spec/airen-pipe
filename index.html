@@ -2377,7 +2377,7 @@
         window[callbackName] = (data) => cleanup(null, data);
         script.onerror = () => cleanup(new Error('Could not load Google Sheet sync endpoint'));
         const separator = webhookUrl.includes('?') ? '&' : '?';
-        script.src = webhookUrl + separator + 'callback=' + encodeURIComponent(callbackName) + '&_ts=' + Date.now();
+        script.src = webhookUrl + separator + 'callback=' + callbackName + '&_ts=' + Date.now();
         document.head.appendChild(script);
       });
     }
