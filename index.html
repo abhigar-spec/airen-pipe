@@ -2405,7 +2405,7 @@
         saveOrders();
         renderOrdersList();
         updateGlobalKPIs();
-        populateOrderPartyFilter();
+        // Order/party filter refresh removed: function does not exist in this build.
         const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         localStorage.setItem('airen_last_cloud_sync', new Date().toISOString());
         if (statusEl) statusEl.textContent = `Last synced ${now} • ${remoteOrders.length} order(s) read from Sheet • ${orders.length} in app`;
