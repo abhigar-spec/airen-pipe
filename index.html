@@ -1442,10 +1442,18 @@
       const availableItems = getItemsForCategory(category);
       const itemName = item.itemName || availableItems[0];
       const brand = item.brand || "KASTA";
+      
       const availableSizes = CATEGORY_SIZES_MAP[category] || ["Universal"];
-      const size = item.size && availableSizes.includes(item.size) ? item.size : availableSizes[0];
+      let size = item.size || availableSizes[0];
+      if (item.size && !availableSizes.includes(item.size)) {
+        availableSizes.unshift(item.size);
+      }
+
       const availableClasses = CATEGORY_CLASS_MAP[category] || ["None", "Standard / Molded"];
-      const specClass = item.specClass && availableClasses.includes(item.specClass) ? item.specClass : availableClasses[0];
+      let specClass = item.specClass || availableClasses[0];
+      if (item.specClass && !availableClasses.includes(item.specClass)) {
+        availableClasses.unshift(item.specClass);
+      }
 
       let defaultLength = "None / N.A. (Fittings)";
       let defaultUnit = "Nos (Numbers)";
@@ -2039,12 +2047,26 @@
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
       resetOrderForm();
+
+      filterPartyDropdown("");
+
+      let targetPartyId = order.partyId;
+      if (!targetPartyId || !parties.some(p => p.id === targetPartyId)) {
+        const found = parties.find(p => p.name.trim().toLowerCase() === (order.partyName || "").trim().toLowerCase());
+        if (found) targetPartyId = found.id;
+      }
+
       document.getElementById('edit-order-id').value = order.id;
       document.getElementById('order-form-title').textContent = `Edit Order #${order.id}`;
       document.getElementById('save-order-btn-text').textContent = "Update Order Details";
       document.getElementById('form-salesperson').value = order.salesperson || "";
-      document.getElementById('form-party-id').value = order.partyId || "";
-      onPartySelected(order.partyId);
+
+      const partySelect = document.getElementById('form-party-id');
+      if (partySelect && targetPartyId) {
+        partySelect.value = targetPartyId;
+        onPartySelected(targetPartyId);
+      }
+
       document.getElementById('form-order-date').value = order.orderDate || "";
       document.getElementById('form-target-date').value = order.targetDate || "";
       document.getElementById('form-order-status').value = order.status || "Recorded";
@@ -2057,9 +2079,11 @@
         try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
       }
       if (!Array.isArray(itemsList)) itemsList = [];
+
       const tbody = document.getElementById('order-items-tbody');
       tbody.innerHTML = '';
       itemsList.forEach(it => addOrderItemRow(it));
+
       switchTab('new-order');
     }
 
@@ -2247,7 +2271,6 @@
               }
               return ord;
             });
-            // Overwrite with pristine sheet data to prevent duplicate line item counts
             orders = sanitizedRemoteOrders;
             saveOrders();
             renderOrdersList();
