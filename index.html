@@ -6,61 +6,10 @@
   <title>Airen Pipe - Order Desk & Distribution Booking</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    @media print {
-      body, html {
-        margin: 0 !important;
-        padding: 0 !important;
-        height: auto !important;
-        min-height: 0 !important;
-        background: #fff !important;
-      }
-      body * {
-        visibility: hidden;
-      }
-      #slip-modal, 
-      #slip-modal * {
-        visibility: visible;
-      }
-      #slip-modal {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 0 !important;
-        display: block !important;
-        background: transparent !important;
-        overflow: visible !important;
-      }
-      #slip-modal > div,
-      #slip-modal .bg-white,
-      #slip-content {
-        position: static !important;
-        margin: 0 !important;
-        padding: 10px 15px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-        border: none !important;
-        transform: none !important;
-      }
-      .no-print,
-      #slip-modal button {
-        display: none !important;
-      }
-      tr {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-    }
-  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
+  <!-- Header -->
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -78,6 +27,7 @@
         </div>
       </div>
 
+      <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-800 p-1 rounded-xl text-sm border border-slate-700">
         <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow">
           <i class="fa-solid fa-clipboard-list"></i> Order Book
@@ -86,7 +36,7 @@
           <i class="fa-solid fa-plus-circle"></i> Punch Order
         </button>
         <button onclick="switchTab('parties')" id="tab-btn-parties" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-2 text-slate-300 hover:text-white">
-          <i class="fa-solid fa-users"></i> Parties (<span id="party-count-badge">167</span>)
+          <i class="fa-solid fa-users"></i> Parties (<span id="party-count-badge">0</span>)
         </button>
         <button onclick="switchTab('catalog')" id="tab-btn-catalog" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-2 text-slate-300 hover:text-white">
           <i class="fa-solid fa-table-list"></i> Specs & Catalog
@@ -104,13 +54,16 @@
     </div>
   </header>
 
+  <!-- Global Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 transform transition-all duration-300 translate-y-20 opacity-0 pointer-events-none bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
     <span id="toast-icon"></span>
     <span id="toast-message" class="text-sm font-semibold"></span>
   </div>
 
+  <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
 
+    <!-- KPI Summary Row -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
         <div class="p-3 bg-blue-50 text-blue-600 rounded-xl text-xl"><i class="fa-solid fa-file-invoice"></i></div>
@@ -389,12 +342,12 @@
   <!-- VIEW SLIP MODAL -->
   <div id="slip-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-slate-200 relative my-auto">
-      <div class="p-4 bg-slate-900 text-white flex items-center justify-between no-print">
+      <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
         <h3 class="font-black text-sm uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-file-invoice"></i> Order Requisition Slip
         </h3>
         <div class="flex items-center gap-2">
-          <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+          <button onclick="printOrderSlip()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow">
             <i class="fa-solid fa-print"></i> Print / PDF
           </button>
           <button onclick="closeSlipModal()" class="text-slate-400 hover:text-white text-lg px-2">
@@ -1040,6 +993,7 @@
       showToast(`Order #${orderId} deleted.`, "success");
     }
 
+    // --- VIEW ORDER SLIP & ISOLATED PRINT ---
     function viewOrderSlip(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
@@ -1145,6 +1099,33 @@
       modal.classList.remove('flex');
     }
 
+    // --- CLEAN ISOLATED PRINT METHOD ---
+    function printOrderSlip() {
+      const slipHtml = document.getElementById('slip-content').innerHTML;
+      const printWindow = window.open('', '_blank', 'width=850,height=900');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Airen Pipe - Order Requisition</title>
+          <script src="https://cdn.tailwindcss.com"><\/script>
+          <style>
+            @page { size: A4 portrait; margin: 12mm 15mm; }
+            body { font-family: ui-sans-serif, system-ui, sans-serif; background: #fff; color: #1e293b; }
+            tr { page-break-inside: avoid; break-inside: avoid; }
+          </style>
+        </head>
+        <body class="p-4" onload="window.print(); setTimeout(function(){ window.close(); }, 500);">
+          <div class="space-y-4">
+            ${slipHtml}
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    // --- PARTIES TABLE & MODALS ---
     function renderPartiesTable() {
       const tbody = document.getElementById('parties-tbody');
       const search = (document.getElementById('party-search').value || "").toLowerCase();
@@ -1227,6 +1208,7 @@
       showToast("Party removed successfully.", "success");
     }
 
+    // --- CATALOG TREE VIEW ---
     function renderCatalogTree() {
       const container = document.getElementById('catalog-tree-view');
       container.innerHTML = Object.keys(CATALOG).map(catKey => {
@@ -1250,6 +1232,7 @@
       }).join('');
     }
 
+    // --- OWNER PIN & WEBHOOK SETTINGS ---
     function handleUpdatePIN() {
       const current = document.getElementById('pin-current').value;
       const newP = document.getElementById('pin-new').value;
