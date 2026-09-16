@@ -791,8 +791,8 @@
   </div>
 
   <!-- Party Modal -->
-  <div id="partyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4">
+  <div id="partyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200 space-y-4 max-h-[94vh] overflow-y-auto my-2 sm:my-0">
       <div class="flex justify-between items-center pb-3 border-b border-slate-100">
         <div>
           <h3 class="font-bold text-slate-900 text-base" id="party-modal-title">Register New Party</h3>
@@ -811,14 +811,19 @@
             <span>GST Number (GSTIN)</span>
             <span class="text-[10px] text-slate-400 lowercase font-normal">(Leave blank if URP)</span>
           </label>
-          <div class="flex gap-2">
-            <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
+          <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+            <input type="text" id="party-gst" maxlength="15" oninput="handleGstinInput(this.value)" placeholder="e.g. 23CNWPA4952Q1ZA" class="flex-1 min-w-[220px] px-3.5 py-2 text-sm bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none uppercase font-mono font-bold tracking-wider text-slate-900">
+            <button type="button" id="gst-live-verify-btn" onclick="verifyGstinLive()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Verify GSTIN live and auto-fill party details">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <span>Live Verify</span>
+            </button>
             <button type="button" onclick="openOfficialGstPortal()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1 shrink-0" title="Copies GST Number and opens official portal">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-              <span>Verify Portal</span>
+              <span>Portal</span>
             </button>
           </div>
           <div id="gst-parsed-badge" class="hidden mt-1.5 p-2 bg-slate-50 rounded-lg border border-slate-200 text-[11px] leading-relaxed text-slate-700"></div>
+          <div id="gst-live-result" class="hidden mt-1.5 p-3 rounded-xl border text-[11px] leading-relaxed"></div>
         </div>
 
         <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-200/80 space-y-1">
@@ -852,7 +857,7 @@
           <textarea id="party-address" rows="2" placeholder="Market, ward, landmark, street..." class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none leading-relaxed"></textarea>
         </div>
 
-        <div class="pt-2 flex justify-end space-x-2">
+        <div class="pt-3 pb-1 flex justify-end space-x-2 border-t border-slate-100 bg-white">
           <button type="button" onclick="closePartyModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl">
             Cancel
           </button>
@@ -869,6 +874,10 @@
   <!-- Single JavaScript Block -->
   <script>
     const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyq_8iKpAMxKqunQ4B-xcpQM7ZV1la5sCofeX1wMaoV_VD5UMqh_HGDjWX4ciC5ohYlgg/exec";
+    // Separate GST verifier backend. This does not replace or modify the order Sheet webhook above.
+    const GST_LIVE_VERIFY_URL = "https://script.google.com/macros/s/AKfycbxLAssMK16bOfDDbfdsx5JVZQM12Ie9NweNub-CR0QPbPIymMimaxhy75osn9yi0RVH/exec";
+    const GST_VERIFY_CACHE_KEY = "airen_gst_verify_cache_v1";
+    const GST_VERIFY_CACHE_MS = 24 * 60 * 60 * 1000;
     const LEGACY_WEBHOOK_URLS = new Set([
       "https://script.google.com/macros/s/AKfycbx8KHYhL55aA28rBumlDzjGJ9G15duOed4nIdBE293GKNznh9ip8cX_DFkJJiw98Ihw/exec"
     ]);
@@ -1239,6 +1248,8 @@
     function handleGstinInput(val) {
       const gstin = (val || "").trim().toUpperCase();
       const badgeEl = document.getElementById('gst-parsed-badge');
+      const liveBox = document.getElementById('gst-live-result');
+      if (liveBox) liveBox.classList.add('hidden');
       if (!gstin || gstin.length < 2) {
         badgeEl.classList.add('hidden');
         return;
@@ -1265,6 +1276,154 @@
         if (!cityInput.value) cityInput.value = info.stateName;
       } else {
         badgeEl.classList.add('hidden');
+      }
+    }
+
+    function escapeGstHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      })[ch]);
+    }
+
+    function getCachedGstVerification(gstin) {
+      try {
+        const all = JSON.parse(localStorage.getItem(GST_VERIFY_CACHE_KEY) || '{}');
+        const row = all[gstin];
+        if (!row || !row.savedAt || !row.payload) return null;
+        if (Date.now() - row.savedAt > GST_VERIFY_CACHE_MS) return null;
+        return row.payload;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function cacheGstVerification(gstin, payload) {
+      try {
+        const all = JSON.parse(localStorage.getItem(GST_VERIFY_CACHE_KEY) || '{}');
+        all[gstin] = { savedAt: Date.now(), payload };
+        localStorage.setItem(GST_VERIFY_CACHE_KEY, JSON.stringify(all));
+      } catch (e) {}
+    }
+
+    function fetchGstVerificationJsonp(gstin) {
+      return new Promise((resolve, reject) => {
+        const callbackName = '__airenGstVerify_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(() => cleanup(new Error('GST verification timed out')), 18000);
+
+        function cleanup(err, data) {
+          clearTimeout(timer);
+          try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+          if (err) reject(err); else resolve(data);
+        }
+
+        window[callbackName] = data => cleanup(null, data);
+        script.onerror = () => cleanup(new Error('Could not reach GST verification service'));
+        const sep = GST_LIVE_VERIFY_URL.includes('?') ? '&' : '?';
+        script.src = GST_LIVE_VERIFY_URL + sep
+          + 'action=verify&gstin=' + encodeURIComponent(gstin)
+          + '&callback=' + encodeURIComponent(callbackName)
+          + '&_ts=' + Date.now();
+        document.head.appendChild(script);
+      });
+    }
+
+    function renderLiveGstVerification(payload, fromCache = false) {
+      const box = document.getElementById('gst-live-result');
+      if (!box) return;
+
+      if (!payload || !payload.success) {
+        const message = payload?.error || 'GST verification failed.';
+        box.className = 'mt-1.5 p-3 rounded-xl border text-[11px] leading-relaxed bg-rose-50 border-rose-200 text-rose-800';
+        box.innerHTML = `<strong>✕ Live verification failed:</strong> ${escapeGstHtml(message)}`;
+        box.classList.remove('hidden');
+        return;
+      }
+
+      const d = payload.data || {};
+      const status = String(d.status || '').trim();
+      const isActive = status.toLowerCase() === 'active';
+      const tradeName = String(d.trade_name || '').trim();
+      const legalName = String(d.legal_name || '').trim();
+      const displayName = tradeName || legalName;
+      const address = String(d.address || '').trim();
+      const details = d.address_details || {};
+      const city = String(details.city || details.district || d.city || '').trim();
+      const pincode = String(d.pincode || details.pincode || '').trim();
+
+      if (displayName) document.getElementById('party-name').value = displayName;
+      if (address) document.getElementById('party-address').value = address;
+      if (city) document.getElementById('party-city').value = city;
+
+      box.className = `mt-1.5 p-3 rounded-xl border text-[11px] leading-relaxed ${isActive ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`;
+      box.innerHTML = `
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <strong>${isActive ? '✓ GST LIVE VERIFIED' : '⚠ GST STATUS: ' + escapeGstHtml(status || 'Unknown')}</strong>
+          <span class="text-[10px] font-semibold">${fromCache ? '24h cache' : 'Live API'}</span>
+        </div>
+        <div><strong>Trade Name:</strong> ${escapeGstHtml(tradeName || '—')}</div>
+        <div><strong>Legal Name:</strong> ${escapeGstHtml(legalName || '—')}</div>
+        <div><strong>Status:</strong> ${escapeGstHtml(status || '—')}</div>
+        <div><strong>Taxpayer Type:</strong> ${escapeGstHtml(d.taxpayer_type || '—')}</div>
+        <div><strong>Registration Date:</strong> ${escapeGstHtml(d.registration_date || '—')}</div>
+        <div><strong>Address:</strong> ${escapeGstHtml(address || '—')}</div>
+        <div><strong>City / Locality:</strong> ${escapeGstHtml(city || '—')}${pincode ? ' • ' + escapeGstHtml(pincode) : ''}</div>
+        <div><strong>Constitution:</strong> ${escapeGstHtml(d.business_constitution || '—')}</div>
+        <div><strong>E-Invoice:</strong> ${escapeGstHtml(d.einvoice_status || '—')}</div>
+        <div class="mt-1 text-[10px] opacity-75">Free credits remaining: ${escapeGstHtml(payload.credits_remaining ?? '—')}</div>
+      `;
+      box.classList.remove('hidden');
+    }
+
+    async function verifyGstinLive() {
+      const gstInput = document.getElementById('party-gst');
+      const gstin = (gstInput?.value || '').trim().toUpperCase();
+      const box = document.getElementById('gst-live-result');
+      const btn = document.getElementById('gst-live-verify-btn');
+      const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+      if (!gstPattern.test(gstin)) {
+        showToast('Enter a valid 15-character GSTIN first.', 'warning');
+        gstInput?.focus();
+        return;
+      }
+
+      const cached = getCachedGstVerification(gstin);
+      if (cached) {
+        renderLiveGstVerification(cached, true);
+        showToast('GST details loaded from verification cache.', 'info');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('opacity-60', 'cursor-wait');
+      }
+      if (box) {
+        box.className = 'mt-1.5 p-3 rounded-xl border text-[11px] leading-relaxed bg-sky-50 border-sky-200 text-sky-800';
+        box.innerHTML = '<strong>Checking GST live…</strong> Please wait.';
+        box.classList.remove('hidden');
+      }
+
+      try {
+        const payload = await fetchGstVerificationJsonp(gstin);
+        if (payload && payload.success) cacheGstVerification(gstin, payload);
+        renderLiveGstVerification(payload, false);
+        if (payload && payload.success) {
+          showToast(`GST ${gstin} verified: ${payload.data?.status || 'Found'}`, 'success');
+        } else {
+          showToast(payload?.error || 'GST verification failed.', 'warning');
+        }
+      } catch (err) {
+        const payload = { success: false, error: err?.message || 'Could not verify GSTIN.' };
+        renderLiveGstVerification(payload, false);
+        showToast(payload.error, 'warning');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove('opacity-60', 'cursor-wait');
+        }
       }
     }
 
@@ -2283,6 +2442,8 @@
       document.getElementById('edit-party-id').value = "";
       document.getElementById('party-modal-title').textContent = "Register New Party";
       document.getElementById('gst-parsed-badge').classList.add('hidden');
+      const liveBox = document.getElementById('gst-live-result');
+      if (liveBox) liveBox.classList.add('hidden');
       document.getElementById('partyModal').classList.remove('hidden');
       setTimeout(() => document.getElementById('party-gst').focus(), 100);
     }
@@ -2302,6 +2463,8 @@
       document.getElementById('party-city').value = p.city || "";
       document.getElementById('party-address').value = p.address || "";
       document.getElementById('gst-parsed-badge').classList.add('hidden');
+      const liveBox = document.getElementById('gst-live-result');
+      if (liveBox) liveBox.classList.add('hidden');
       document.getElementById('partyModal').classList.remove('hidden');
     }
 
