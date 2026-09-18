@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.8 - New Order UX Polish RC</title>
+  <title>Airen Pipe V6.20 - Analytics Final Polish RC</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -190,6 +190,12 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
             <span>Order Book</span>
           </button>
+          <button onclick="switchTab('analytics')" id="tab-analytics-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19V9m5 10V5m5 14v-7m5 7V3"/>
+            </svg>
+            <span>Analytics</span>
+          </button>
           <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
             <svg class="w-4 h-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             <span>Punch Order</span>
@@ -222,6 +228,7 @@
   <!-- Mobile Bar -->
   <div class="md:hidden bg-slate-800 border-b border-slate-700 text-slate-300 text-xs flex justify-around p-1.5 sticky top-16 z-30 shadow-sm">
     <button onclick="switchTab('orders')" id="m-tab-orders" class="m-nav-tab flex-1 py-1.5 text-center font-medium text-white bg-brand-600 rounded">Orders</button>
+    <button onclick="switchTab('analytics')" id="m-tab-analytics" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Charts</button>
     <button onclick="switchTab('new-order')" id="m-tab-new-order" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">+ Punch</button>
     <button onclick="switchTab('parties')" id="m-tab-parties" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Parties</button>
     <button onclick="switchTab('catalog')" id="m-tab-catalog" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Specs</button>
@@ -346,6 +353,155 @@
           </div>
         </div>
       </div>
+    </div>
+
+
+    <!-- Analytics View -->
+    <div id="view-analytics" class="tab-view hidden space-y-4">
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <div class="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center font-black">◔</div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Order Analytics</h2>
+                <p class="text-xs text-slate-500">Live analysis from the orders currently loaded in the app. Quantities with different units are never mixed into one number.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="analytics-range" onchange="renderAnalytics()" class="px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="ALL">All Time</option>
+              <option value="THIS_MONTH">This Month</option>
+              <option value="30D">Last 30 Days</option>
+              <option value="90D">Last 90 Days</option>
+              <option value="THIS_YEAR">This Year</option>
+            </select>
+
+            <select id="analytics-status" onchange="renderAnalytics()" class="px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="ALL">All Statuses</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Recorded">Recorded</option>
+              <option value="Hold">On Hold</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <button type="button" onclick="fetchOrdersFromCloud()" class="px-3.5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm">
+              ☁ Sync Sheet
+            </button>
+          </div>
+        </div>
+
+        <div id="analytics-filter-note" class="mt-3 text-[11px] text-slate-500"></div>
+      </div>
+
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <p class="text-[11px] uppercase tracking-wider font-bold text-slate-500">Orders in View</p>
+          <div id="analytics-kpi-orders" class="text-2xl font-black text-slate-900 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <p class="text-[11px] uppercase tracking-wider font-bold text-slate-500">Active Parties</p>
+          <div id="analytics-kpi-parties" class="text-2xl font-black text-brand-700 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <p class="text-[11px] uppercase tracking-wider font-bold text-slate-500">Order Lines</p>
+          <div id="analytics-kpi-lines" class="text-2xl font-black text-indigo-700 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <p class="text-[11px] uppercase tracking-wider font-bold text-slate-500">Avg Lines / Order</p>
+          <div id="analytics-kpi-avg-lines" class="text-2xl font-black text-emerald-700 mt-1">0</div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="mb-4">
+            <h3 class="font-bold text-slate-900">Salesperson Order Share</h3>
+            <p class="text-xs text-slate-500">Share is based on number of orders, not mixed-unit quantity.</p>
+          </div>
+          <div id="analytics-salesperson-donut"></div>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="mb-4">
+            <h3 class="font-bold text-slate-900">Product Category Share</h3>
+            <p class="text-xs text-slate-500">Based on order-line count, so Nos / Lengths / Coils are not added together.</p>
+          </div>
+          <div id="analytics-category-donut"></div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="mb-3">
+            <h3 class="font-bold text-slate-900">Monthly Order Trend</h3>
+            <p class="text-xs text-slate-500">Up to the latest 12 months in the selected view.</p>
+          </div>
+          <div id="analytics-monthly-trend" class="overflow-x-auto"></div>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="mb-3">
+            <h3 class="font-bold text-slate-900">Top Products</h3>
+            <p class="text-xs text-slate-500">Ranked by number of order lines.</p>
+          </div>
+          <div id="analytics-top-products"></div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="mb-3">
+            <h3 class="font-bold text-slate-900">Top Parties</h3>
+            <p class="text-xs text-slate-500">Comparison by order count in the current analytics view.</p>
+          </div>
+          <div id="analytics-top-parties"></div>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900">Party Analysis</h3>
+              <p class="text-xs text-slate-500">Select a dealer to see its product mix and recent order pattern.</p>
+            </div>
+            <select id="analytics-party-select" onchange="renderAnalyticsParty()" class="px-3 py-2 text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none max-w-full sm:max-w-[260px]">
+              <option value="">No party data</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <p class="text-[10px] uppercase font-bold text-slate-500">Orders</p>
+              <p id="analytics-party-orders" class="font-black text-lg text-slate-900">0</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <p class="text-[10px] uppercase font-bold text-slate-500">Lines</p>
+              <p id="analytics-party-lines" class="font-black text-lg text-slate-900">0</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <p class="text-[10px] uppercase font-bold text-slate-500">Top Product</p>
+              <p id="analytics-party-top-product" class="font-bold text-xs text-slate-900 mt-1 leading-tight">—</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <p class="text-[10px] uppercase font-bold text-slate-500">Last Order</p>
+              <p id="analytics-party-last-order" class="font-bold text-xs text-slate-900 mt-1">—</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-bold text-slate-700 mb-2">Product Mix</p>
+              <div id="analytics-party-mix"></div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-700 mb-2">Recent Monthly Orders</p>
+              <div id="analytics-party-monthly"></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- Punch Order View -->
@@ -5366,6 +5522,537 @@
       }
 
       if (saved) v617RevealSavedOrder(saved.id);
+    };
+  </script>
+
+
+  <script>
+    /* ================================================================
+       Airen V6.18 - Analytics
+       No external chart library: all visuals are rendered from current
+       order data with CSS/SVG so the existing production stack stays intact.
+       ================================================================ */
+
+    let v618CurrentAnalyticsOrders = [];
+
+    const V618_CHART_COLORS = [
+      '#0284c7', '#f97316', '#16a34a', '#7c3aed',
+      '#eab308', '#dc2626', '#0891b2', '#64748b'
+    ];
+
+    function v618Items(order) {
+      let items = order && order.items;
+      if (typeof items === 'string') {
+        try { items = JSON.parse(items); } catch (_) { items = []; }
+      }
+      return Array.isArray(items) ? items : [];
+    }
+
+    function v618ParseDate(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return null;
+
+      let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) {
+        const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12, 0, 0);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      m = raw.match(/^(\d{1,2})[-\/ ]([A-Za-z]{3})[-\/ ](\d{4})$/);
+      if (m) {
+        const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+        const mi = months[m[2].toLowerCase()];
+        if (mi !== undefined) {
+          const d = new Date(Number(m[3]), mi, Number(m[1]), 12, 0, 0);
+          return Number.isNaN(d.getTime()) ? null : d;
+        }
+      }
+
+      m = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+      if (m) {
+        const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), 12, 0, 0);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      const d = new Date(raw);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function v618OrderDate(order) {
+      return v618ParseDate(order?.orderDate || order?.createdAt || order?.updatedAt || '');
+    }
+
+    function v618DateLabel(date) {
+      if (!date) return '—';
+      return date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function v618MapInc(map, key, by=1) {
+      const k = String(key || '').trim() || 'Unknown';
+      map.set(k, (map.get(k) || 0) + by);
+    }
+
+    function v618FilteredOrders() {
+      const range = document.getElementById('analytics-range')?.value || 'ALL';
+      const status = document.getElementById('analytics-status')?.value || 'ALL';
+      const now = new Date();
+      now.setHours(23,59,59,999);
+
+      let start = null;
+      if (range === 'THIS_MONTH') start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      if (range === '30D') {
+        start = new Date(now);
+        start.setDate(start.getDate() - 29);
+        start.setHours(0,0,0,0);
+      }
+      if (range === '90D') {
+        start = new Date(now);
+        start.setDate(start.getDate() - 89);
+        start.setHours(0,0,0,0);
+      }
+      if (range === 'THIS_YEAR') start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+
+      return (Array.isArray(orders) ? orders : []).filter(order => {
+        if (status !== 'ALL' && String(order.status || '') !== status) return false;
+        if (!start) return true;
+        const d = v618OrderDate(order);
+        return !!d && d >= start && d <= now;
+      });
+    }
+
+    function v618NoData(message='No data in this view.') {
+      return `<div class="min-h-[180px] flex items-center justify-center text-center px-4">
+        <div>
+          <div class="text-3xl mb-2">◌</div>
+          <p class="text-sm font-bold text-slate-600">${v6EscapeHtml(message)}</p>
+          <p class="text-xs text-slate-400 mt-1">Try another date range or sync latest Sheet orders.</p>
+        </div>
+      </div>`;
+    }
+
+    function v618SortedEntries(map) {
+      return Array.from(map.entries())
+        .filter(([,v]) => Number(v) > 0)
+        .sort((a,b) => b[1] - a[1]);
+    }
+
+    function v618DonutHtml(map, centerTitle='Total', itemWord='orders') {
+      let entries = v618SortedEntries(map);
+      if (!entries.length) return v618NoData();
+
+      if (entries.length > 7) {
+        const top = entries.slice(0, 7);
+        const rest = entries.slice(7).reduce((s, [,v]) => s + v, 0);
+        if (rest > 0) top.push(['Others', rest]);
+        entries = top;
+      }
+
+      const total = entries.reduce((s, [,v]) => s + v, 0);
+      let cursor = 0;
+      const segments = entries.map(([, value], idx) => {
+        const start = cursor;
+        cursor += (value / total) * 100;
+        return `${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`;
+      });
+
+      const legend = entries.map(([label, value], idx) => {
+        const pct = total ? (value * 100 / total) : 0;
+        return `<div class="flex items-center justify-between gap-3 py-1.5 border-b border-slate-100 last:border-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]}"></span>
+            <span class="text-xs font-semibold text-slate-700 truncate">${v6EscapeHtml(label)}</span>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-xs font-black text-slate-800">${value}</span>
+            <span class="text-[10px] text-slate-400 ml-1">${pct.toFixed(1)}%</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="grid grid-cols-1 sm:grid-cols-[190px_1fr] gap-5 items-center">
+        <div class="relative w-44 h-44 mx-auto rounded-full" style="background:conic-gradient(${segments.join(',')})">
+          <div class="absolute inset-[24px] rounded-full bg-white flex flex-col items-center justify-center text-center shadow-inner">
+            <div class="text-2xl font-black text-slate-900">${total}</div>
+            <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500">${v6EscapeHtml(centerTitle)}</div>
+            <div class="text-[10px] text-slate-400">${v6EscapeHtml(itemWord)}</div>
+          </div>
+        </div>
+        <div class="min-w-0">${legend}</div>
+      </div>`;
+    }
+
+    function v618BarsHtml(map, valueLabel='orders', limit=8) {
+      const entries = v618SortedEntries(map).slice(0, limit);
+      if (!entries.length) return v618NoData();
+
+      const max = Math.max(...entries.map(([,v]) => v), 1);
+      return `<div class="space-y-3">${entries.map(([label, value], idx) => {
+        const width = Math.max(4, (value / max) * 100);
+        return `<div>
+          <div class="flex items-center justify-between gap-3 mb-1">
+            <span class="text-xs font-semibold text-slate-700 truncate" title="${v6EscapeAttr(label)}">${v6EscapeHtml(label)}</span>
+            <span class="text-[11px] font-black text-slate-700 shrink-0">${value} ${v6EscapeHtml(valueLabel)}</span>
+          </div>
+          <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full" style="width:${width.toFixed(1)}%;background:${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]}"></div>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    function v618MonthlySeries(list, maxMonths=12) {
+      const dated = list
+        .map(o => ({ order:o, date:v618OrderDate(o) }))
+        .filter(x => x.date)
+        .sort((a,b) => a.date - b.date);
+
+      if (!dated.length) return [];
+
+      const last = dated[dated.length - 1].date;
+      const firstActual = dated[0].date;
+      const capStart = new Date(last.getFullYear(), last.getMonth() - (maxMonths - 1), 1);
+      const start = firstActual > capStart
+        ? new Date(firstActual.getFullYear(), firstActual.getMonth(), 1)
+        : capStart;
+
+      const counts = new Map();
+      dated.forEach(({date}) => {
+        const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+
+      const series = [];
+      let d = new Date(start.getFullYear(), start.getMonth(), 1);
+      const end = new Date(last.getFullYear(), last.getMonth(), 1);
+
+      while (d <= end && series.length < maxMonths) {
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        series.push({
+          key,
+          label: d.toLocaleDateString('en-IN', {month:'short', year:'2-digit'}),
+          value: counts.get(key) || 0
+        });
+        d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      }
+      return series;
+    }
+
+    function v618LineChartHtml(series) {
+      if (!series.length) return v618NoData();
+
+      // One-month case: a line chart with one dot looks unfinished.
+      // Show a clear single bar with the exact order count instead.
+      if (series.length === 1) {
+        const s = series[0];
+        const maxVal = Math.max(1, s.value);
+        const barHeight = Math.max(24, Math.round((s.value / maxVal) * 145));
+
+        return `<div class="h-[245px] flex items-end justify-center px-6 pb-4">
+          <div class="w-full max-w-[220px] text-center">
+            <div class="text-sm font-black text-slate-800 mb-2">${s.value} Order${s.value === 1 ? '' : 's'}</div>
+            <div class="mx-auto w-20 rounded-t-xl bg-sky-600 shadow-sm" style="height:${barHeight}px"></div>
+            <div class="mt-2 text-xs font-bold text-slate-600">${v6EscapeHtml(s.label)}</div>
+          </div>
+        </div>`;
+      }
+
+      const W = 760, H = 245, L = 44, R = 18, T = 20, B = 42;
+      const innerW = W - L - R, innerH = H - T - B;
+      const maxVal = Math.max(...series.map(x => x.value), 1);
+      const x = i => L + (i * innerW / (series.length - 1));
+      const y = v => T + innerH - (v / maxVal) * innerH;
+      const pts = series.map((s,i) => `${x(i).toFixed(1)},${y(s.value).toFixed(1)}`).join(' ');
+
+      // Integer-only Y-axis ticks: avoids duplicate labels such as 2, 2.
+      const desiredTicks = Math.min(4, maxVal);
+      const step = Math.max(1, Math.ceil(maxVal / Math.max(1, desiredTicks)));
+      const tickValues = [];
+      for (let v = 0; v <= maxVal; v += step) tickValues.push(v);
+      if (tickValues[tickValues.length - 1] !== maxVal) tickValues.push(maxVal);
+
+      const grids = tickValues.map(val => {
+        const yy = y(val);
+        return `<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="${L-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="#94a3b8">${val}</text>`;
+      }).join('');
+
+      const labels = series.map((s,i) => {
+        const show = series.length <= 7 || i % 2 === 0 || i === series.length - 1;
+        return show
+          ? `<text x="${x(i)}" y="${H-14}" text-anchor="middle" font-size="10" fill="#64748b">${v6EscapeHtml(s.label)}</text>`
+          : '';
+      }).join('');
+
+      const dots = series.map((s,i) =>
+        `<circle cx="${x(i)}" cy="${y(s.value)}" r="4" fill="#0284c7" stroke="white" stroke-width="2">
+          <title>${v6EscapeHtml(s.label)}: ${s.value} order(s)</title>
+        </circle>`
+      ).join('');
+
+      return `<svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[620px] h-auto" role="img" aria-label="Monthly order trend">
+        ${grids}
+        <polyline points="${pts}" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        ${dots}
+        ${labels}
+      </svg>`;
+    }
+
+    function v618MiniMonthlyBars(list) {
+      const series = v618MonthlySeries(list, 6);
+      if (!series.length) return v618NoData('No dated orders for this party.');
+
+      const max = Math.max(...series.map(x => x.value), 1);
+      return `<div class="h-[185px] flex items-end gap-2 pt-4">${series.map((s, idx) => {
+        const h = Math.max(8, (s.value / max) * 125);
+        return `<div class="flex-1 min-w-0 flex flex-col items-center justify-end">
+          <span class="text-[10px] font-black text-slate-700 mb-1">${s.value}</span>
+          <div class="w-full max-w-10 rounded-t-lg" style="height:${h}px;background:${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]}"></div>
+          <span class="text-[9px] text-slate-500 mt-1 whitespace-nowrap">${v6EscapeHtml(s.label)}</span>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    function renderAnalytics() {
+      const filtered = v618FilteredOrders();
+      v618CurrentAnalyticsOrders = filtered;
+
+      const partySet = new Set();
+      const salespersonMap = new Map();
+      const categoryMap = new Map();
+      const productMap = new Map();
+      const partyMap = new Map();
+      let lineCount = 0;
+
+      filtered.forEach(order => {
+        const partyKey = String(order.partyId || order.partyName || '').trim();
+        if (partyKey) partySet.add(partyKey);
+
+        v618MapInc(salespersonMap, order.salesperson || 'Unassigned');
+        v618MapInc(partyMap, order.partyName || 'Unknown Party');
+
+        v618Items(order).forEach(item => {
+          lineCount++;
+          v618MapInc(categoryMap, item.category || 'Uncategorized');
+          v618MapInc(productMap, item.itemName || item.category || 'Unknown Product');
+        });
+      });
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+
+      setText('analytics-kpi-orders', filtered.length.toLocaleString());
+      setText('analytics-kpi-parties', partySet.size.toLocaleString());
+      setText('analytics-kpi-lines', lineCount.toLocaleString());
+      setText('analytics-kpi-avg-lines', filtered.length ? (lineCount / filtered.length).toFixed(1) : '0');
+
+      const rangeLabel = document.getElementById('analytics-range')?.selectedOptions?.[0]?.textContent || 'All Time';
+      const statusLabel = document.getElementById('analytics-status')?.selectedOptions?.[0]?.textContent || 'All Statuses';
+      setText('analytics-filter-note', `${filtered.length} order(s) • ${rangeLabel} • ${statusLabel}`);
+
+      const salesEl = document.getElementById('analytics-salesperson-donut');
+      const catEl = document.getElementById('analytics-category-donut');
+      const trendEl = document.getElementById('analytics-monthly-trend');
+      const productsEl = document.getElementById('analytics-top-products');
+      const partiesEl = document.getElementById('analytics-top-parties');
+
+      if (salesEl) salesEl.innerHTML = v618DonutHtml(salespersonMap, 'Orders', 'booked');
+      if (catEl) catEl.innerHTML = v618DonutHtml(categoryMap, 'Lines', 'product lines');
+      if (trendEl) trendEl.innerHTML = v618LineChartHtml(v618MonthlySeries(filtered, 12));
+      if (productsEl) productsEl.innerHTML = v618BarsHtml(productMap, 'lines', 8);
+      if (partiesEl) partiesEl.innerHTML = v618BarsHtml(partyMap, 'orders', 8);
+
+      const partySelect = document.getElementById('analytics-party-select');
+      if (partySelect) {
+        const previous = partySelect.value;
+        const partyEntries = v618SortedEntries(partyMap);
+        partySelect.innerHTML = partyEntries.length
+          ? partyEntries.map(([name, count]) =>
+              `<option value="${v6EscapeAttr(name)}">${v6EscapeHtml(name)} (${count})</option>`
+            ).join('')
+          : '<option value="">No party data</option>';
+
+        if (previous && partyEntries.some(([name]) => name === previous)) {
+          partySelect.value = previous;
+        } else if (partyEntries.length) {
+          partySelect.value = partyEntries[0][0];
+        }
+      }
+
+      renderAnalyticsParty();
+    }
+
+    function renderAnalyticsParty() {
+      const select = document.getElementById('analytics-party-select');
+      const partyName = String(select?.value || '').trim();
+      const partyOrders = partyName
+        ? v618CurrentAnalyticsOrders.filter(o => String(o.partyName || '').trim() === partyName)
+        : [];
+
+      const productMap = new Map();
+      let lines = 0;
+      let lastDate = null;
+
+      partyOrders.forEach(order => {
+        const d = v618OrderDate(order);
+        if (d && (!lastDate || d > lastDate)) lastDate = d;
+
+        v618Items(order).forEach(item => {
+          lines++;
+          v618MapInc(productMap, item.itemName || item.category || 'Unknown Product');
+        });
+      });
+
+      const topProduct = v618SortedEntries(productMap)[0]?.[0] || '—';
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+
+      setText('analytics-party-orders', partyOrders.length.toLocaleString());
+      setText('analytics-party-lines', lines.toLocaleString());
+      setText('analytics-party-top-product', topProduct);
+      setText('analytics-party-last-order', v618DateLabel(lastDate));
+
+      const mixEl = document.getElementById('analytics-party-mix');
+      const monthlyEl = document.getElementById('analytics-party-monthly');
+
+      if (mixEl) mixEl.innerHTML = partyOrders.length
+        ? v618DonutHtml(productMap, 'Lines', 'product lines')
+        : v618NoData('No party selected.');
+
+      if (monthlyEl) monthlyEl.innerHTML = partyOrders.length
+        ? v618MiniMonthlyBars(partyOrders)
+        : v618NoData('No party selected.');
+    }
+
+    // Render analytics whenever its tab is opened.
+    const v618BaseSwitchTab = switchTab;
+    switchTab = function(tabId) {
+      const result = v618BaseSwitchTab(tabId);
+      if (tabId === 'analytics') {
+        requestAnimationFrame(() => renderAnalytics());
+      }
+      return result;
+    };
+
+    // If Sheet sync happens while Analytics is open, refresh charts automatically.
+    const v618BaseSyncOrdersFromCloudCore = syncOrdersFromCloudCore;
+    syncOrdersFromCloudCore = async function(...args) {
+      const result = await v618BaseSyncOrdersFromCloudCore(...args);
+      const analyticsView = document.getElementById('view-analytics');
+      if (analyticsView && !analyticsView.classList.contains('hidden')) {
+        renderAnalytics();
+      }
+      return result;
+    };
+  </script>
+
+
+  <script>
+    /* ================================================================
+       Airen V6.20 - Analytics final visual polish
+       - Party Product Mix uses a compact legend that fits the nested card
+       - Bar-chart grammar: "1 order" / "2 orders", "1 line" / "2 lines"
+       ================================================================ */
+
+    function v620Plural(value, singular, plural) {
+      return `${value} ${Number(value) === 1 ? singular : (plural || singular + 's')}`;
+    }
+
+    function v620CompactDonutHtml(map, centerTitle='Total', itemWord='lines') {
+      let entries = v618SortedEntries(map);
+      if (!entries.length) return v618NoData();
+
+      if (entries.length > 7) {
+        const top = entries.slice(0, 7);
+        const rest = entries.slice(7).reduce((s, [,v]) => s + v, 0);
+        if (rest > 0) top.push(['Others', rest]);
+        entries = top;
+      }
+
+      const total = entries.reduce((s, [,v]) => s + v, 0);
+      let cursor = 0;
+      const segments = entries.map(([, value], idx) => {
+        const start = cursor;
+        cursor += (value / total) * 100;
+        return `${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`;
+      });
+
+      const legend = entries.map(([label, value], idx) => {
+        const pct = total ? (value * 100 / total) : 0;
+        return `<div class="flex items-center justify-between gap-2 py-1.5 border-b border-slate-100 last:border-0">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]}"></span>
+            <span class="text-[11px] font-semibold text-slate-700 truncate" title="${v6EscapeAttr(label)}">${v6EscapeHtml(label)}</span>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[11px] font-black text-slate-800">${value}</span>
+            <span class="text-[10px] text-slate-400 ml-1">${pct.toFixed(1)}%</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="space-y-4">
+        <div class="relative w-40 h-40 mx-auto rounded-full" style="background:conic-gradient(${segments.join(',')})">
+          <div class="absolute inset-[23px] rounded-full bg-white flex flex-col items-center justify-center text-center shadow-inner">
+            <div class="text-2xl font-black text-slate-900">${total}</div>
+            <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500">${v6EscapeHtml(centerTitle)}</div>
+            <div class="text-[10px] text-slate-400">${v6EscapeHtml(itemWord)}</div>
+          </div>
+        </div>
+        <div class="w-full">${legend}</div>
+      </div>`;
+    }
+
+    // Replace the generic bars with grammar-aware labels.
+    v618BarsHtml = function(map, valueLabel='orders', limit=8) {
+      const entries = v618SortedEntries(map).slice(0, limit);
+      if (!entries.length) return v618NoData();
+
+      const max = Math.max(...entries.map(([,v]) => v), 1);
+      const singular = String(valueLabel || '').replace(/s$/i, '') || 'item';
+      const plural = valueLabel || `${singular}s`;
+
+      return `<div class="space-y-3">${entries.map(([label, value], idx) => {
+        const width = Math.max(4, (value / max) * 100);
+        return `<div>
+          <div class="flex items-center justify-between gap-3 mb-1">
+            <span class="text-xs font-semibold text-slate-700 truncate" title="${v6EscapeAttr(label)}">${v6EscapeHtml(label)}</span>
+            <span class="text-[11px] font-black text-slate-700 shrink-0">${v620Plural(value, singular, plural)}</span>
+          </div>
+          <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full" style="width:${width.toFixed(1)}%;background:${V618_CHART_COLORS[idx % V618_CHART_COLORS.length]}"></div>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+    };
+
+    // Patch only Party Analysis rendering; the large dashboard donuts remain unchanged.
+    const v620BaseRenderAnalyticsParty = renderAnalyticsParty;
+    renderAnalyticsParty = function() {
+      v620BaseRenderAnalyticsParty();
+
+      const partyName = String(document.getElementById('analytics-party-select')?.value || '').trim();
+      const partyOrders = partyName
+        ? v618CurrentAnalyticsOrders.filter(o => String(o.partyName || '').trim() === partyName)
+        : [];
+
+      const productMap = new Map();
+      partyOrders.forEach(order => {
+        v618Items(order).forEach(item => {
+          v618MapInc(productMap, item.itemName || item.category || 'Unknown Product');
+        });
+      });
+
+      const mixEl = document.getElementById('analytics-party-mix');
+      if (mixEl) {
+        mixEl.innerHTML = partyOrders.length
+          ? v620CompactDonutHtml(productMap, 'Lines', 'product lines')
+          : v618NoData('No party selected.');
+      }
     };
   </script>
 
