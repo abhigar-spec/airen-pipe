@@ -3791,14 +3791,28 @@
           obj={id,salesperson,partyId,partyName:party.name,partyGst:party.gst||'Unregistered',partyPhone:party.phone||'',partyCity:party.city||'',partyAddress:party.address||'',orderDate,targetDate,status,partyRef,deliverySite,notes,items,expectedRevision:0,revision:1,mutationId,writeMode:'create',createdAt:now,updatedAt:now};
           orders.unshift(obj);op='create';
         }
-        saveOrders();v6QueueOrder(op,obj);renderOrdersList();updateGlobalKPIs();
+        saveOrders();v6QueueOrder(op,obj);
+
+        // V6.16: always reveal the order that was just saved.
+        // Old Order Book search/filter values can otherwise hide a valid new order.
+        const orderSearch = document.getElementById('order-search-input');
+        const statusFilter = document.getElementById('order-status-filter');
+        const salespersonFilter = document.getElementById('order-salesperson-filter');
+        const partyFilter = document.getElementById('order-party-filter');
+        if (orderSearch) orderSearch.value = '';
+        if (statusFilter) statusFilter.value = 'ALL';
+        if (salespersonFilter) salespersonFilter.value = 'ALL';
+        if (partyFilter) partyFilter.value = 'ALL';
+
+        renderOrdersList();
+        updateGlobalKPIs();
 
         // V6.15: this is the ACTUAL final save handler used by the form.
         // Navigate before resetting the form, because resetOrderForm() may throw.
         switchTab('orders');
         window.scrollTo({top:0,left:0,behavior:'auto'});
 
-        showToast(`${editId?'Updated':'Booked'} ${obj.id}. Cloud verification queued safely.`,'success');
+        showToast(`${editId?'Updated':'Booked'} ${obj.id}. Saved and shown at the top of Order Book.`,'success');
 
         try{
           resetOrderForm();
@@ -5228,6 +5242,130 @@
       if (innerSaveError) {
         console.warn('Order was saved, but a non-critical post-save step failed.', innerSaveError);
       }
+    };
+  </script>
+
+
+  <script>
+    /* ================================================================
+       Airen V6.17 - final order visibility + duplicate-ID hardening
+       ================================================================ */
+
+    // Keep the newest/highest-revision copy for any repeated Order ID.
+    // This protects a freshly saved order from being replaced by an older
+    // legacy/local duplicate during save/merge.
+    dedupeOrdersById = function(list) {
+      const out = [];
+      const pos = new Map();
+
+      const stamp = o => {
+        const raw = String((o && (o.updatedAt || o.createdAt || o.orderDate)) || '');
+        const t = Date.parse(raw);
+        return Number.isFinite(t) ? t : 0;
+      };
+
+      (Array.isArray(list) ? list : []).forEach(order => {
+        if (!order) return;
+        const id = String(order.id || '').trim();
+        if (!id) return;
+
+        const clean = { ...order, id };
+        const key = id.toLowerCase();
+
+        if (!pos.has(key)) {
+          pos.set(key, out.length);
+          out.push(clean);
+          return;
+        }
+
+        const i = pos.get(key);
+        const current = out[i];
+        const curRev = Number(current.revision || 0) || 0;
+        const newRev = Number(clean.revision || 0) || 0;
+
+        const replace =
+          newRev > curRev ||
+          (newRev === curRev && stamp(clean) > stamp(current));
+
+        if (replace) out[i] = clean;
+      });
+
+      return out;
+    };
+
+    function v617ClearOrderBookFilters() {
+      const search = document.getElementById('order-search-input');
+      const status = document.getElementById('order-status-filter');
+      const salesperson = document.getElementById('order-salesperson-filter');
+      const party = document.getElementById('order-party-filter');
+
+      if (search) search.value = '';
+      if (status) status.value = 'ALL';
+      if (salesperson) salesperson.value = 'ALL';
+      if (party) party.value = 'ALL';
+    }
+
+    function v617RevealSavedOrder(orderId) {
+      const id = String(orderId || '').trim();
+      if (!id) return;
+
+      v617ClearOrderBookFilters();
+      renderOrdersList();
+      switchTab('orders');
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+      // Verify from in-memory state after the UI transition.
+      const saved = orders.find(o =>
+        String(o.id || '').trim().toLowerCase() === id.toLowerCase()
+      );
+
+      if (!saved) {
+        console.error('Post-save verification failed: saved order missing from in-memory list', id);
+        showToast(`Order ${id} was saved but is not visible locally. Please Sync All Orders before punching another order.`, 'error');
+        return;
+      }
+
+      // A second paint protects against any immediate stale UI repaint.
+      setTimeout(() => {
+        v617ClearOrderBookFilters();
+        renderOrdersList();
+        switchTab('orders');
+      }, 120);
+    }
+
+    // Final wrapper around the effective save chain.
+    const v617BaseHandleSaveOrder = handleSaveOrder;
+    handleSaveOrder = async function(event) {
+      const editIdBefore = String(document.getElementById('edit-order-id')?.value || '').trim();
+      const before = new Map(
+        (Array.isArray(orders) ? orders : []).map(o => [
+          String(o.id || '').trim().toLowerCase(),
+          String(o.mutationId || '') + '|' + String(o.revision || '')
+        ])
+      );
+
+      await v617BaseHandleSaveOrder(event);
+
+      let saved = null;
+
+      if (editIdBefore) {
+        const now = orders.find(o =>
+          String(o.id || '').trim().toLowerCase() === editIdBefore.toLowerCase()
+        );
+        if (now) {
+          const afterSig = String(now.mutationId || '') + '|' + String(now.revision || '');
+          const beforeSig = before.get(editIdBefore.toLowerCase()) || '';
+          if (afterSig !== beforeSig) saved = now;
+        }
+      } else {
+        saved = orders.find(o => {
+          const key = String(o.id || '').trim().toLowerCase();
+          const sig = String(o.mutationId || '') + '|' + String(o.revision || '');
+          return !before.has(key) || before.get(key) !== sig;
+        }) || null;
+      }
+
+      if (saved) v617RevealSavedOrder(saved.id);
     };
   </script>
 
