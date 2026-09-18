@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.20 - Analytics Final Polish RC</title>
+  <title>Airen Pipe V6.21 - Management / Booking View RC</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -6053,6 +6053,227 @@
           ? v620CompactDonutHtml(productMap, 'Lines', 'product lines')
           : v618NoData('No party selected.');
       }
+    };
+  </script>
+
+
+  <script>
+    /* ================================================================
+       Airen V6.21 - Management / Booking View
+       - Staff mode never auto-loads full Sheet order history.
+       - Full synced order history is visible only after Owner PIN unlock.
+       - Owner mode is session-only and resets on page reload.
+       - Booking View shows only orders punched on this device from V6.21 onward.
+       ================================================================ */
+
+    const V621_LOCAL_ORDER_IDS_KEY = 'airen_v621_local_order_ids';
+    let v621OwnerMode = false;
+
+    function v621ReadLocalOrderIds() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(V621_LOCAL_ORDER_IDS_KEY) || '[]');
+        return new Set((Array.isArray(raw) ? raw : []).map(x => String(x || '').trim().toLowerCase()).filter(Boolean));
+      } catch (_) {
+        return new Set();
+      }
+    }
+
+    function v621WriteLocalOrderIds(set) {
+      const ids = Array.from(set || []).filter(Boolean).slice(-3000);
+      localStorage.setItem(V621_LOCAL_ORDER_IDS_KEY, JSON.stringify(ids));
+    }
+
+    function v621MarkLocalOrder(orderId) {
+      const id = String(orderId || '').trim().toLowerCase();
+      if (!id) return;
+      const ids = v621ReadLocalOrderIds();
+      ids.add(id);
+      v621WriteLocalOrderIds(ids);
+    }
+
+    function v621VisibleOrders(source = orders) {
+      const list = Array.isArray(source) ? source : [];
+      if (v621OwnerMode) return list;
+      const ids = v621ReadLocalOrderIds();
+      if (!ids.size) return [];
+      return list.filter(o => ids.has(String(o?.id || '').trim().toLowerCase()));
+    }
+
+    function v621WithVisibleOrders(fn) {
+      const allOrders = orders;
+      orders = v621VisibleOrders(allOrders);
+      try {
+        return fn();
+      } finally {
+        orders = allOrders;
+      }
+    }
+
+    function v621RefreshModeUI() {
+      const syncBtn = document.getElementById('btn-cloud-sync');
+      const settingsSyncBtn = document.getElementById('btn-settings-cloud-sync');
+      const statusEl = document.getElementById('cloud-sync-status');
+      const modeBadge = document.getElementById('v621-owner-mode-badge');
+      const lockBtn = document.getElementById('v621-owner-lock-btn');
+
+      if (syncBtn) {
+        syncBtn.title = v621OwnerMode
+          ? 'Refresh full owner order history from Google Sheet'
+          : 'Owner PIN required to view and sync full order history';
+        const span = syncBtn.querySelector('span:last-child');
+        if (span) span.textContent = v621OwnerMode ? '☁️ Management Sync' : '🔒 Management View';
+        else syncBtn.textContent = v621OwnerMode ? '☁️ Management Sync' : '🔒 Management View';
+      }
+
+      if (settingsSyncBtn) {
+        settingsSyncBtn.textContent = v621OwnerMode ? '☁️ Sync Management View' : '🔒 Unlock & Sync Management View';
+      }
+
+      if (modeBadge) {
+        modeBadge.textContent = v621OwnerMode ? '🔓 Management View' : '🔒 Booking View';
+        modeBadge.className = v621OwnerMode
+          ? 'text-[10px] font-bold px-2.5 py-1 rounded-lg border bg-emerald-50 text-emerald-700 border-emerald-200 whitespace-nowrap'
+          : 'text-[10px] font-bold px-2.5 py-1 rounded-lg border bg-slate-100 text-slate-600 border-slate-200 whitespace-nowrap';
+      }
+
+      if (lockBtn) lockBtn.classList.toggle('hidden', !v621OwnerMode);
+
+      if (statusEl && !v621OwnerMode) {
+        statusEl.textContent = 'Booking View: full Sheet order history is hidden. Master PIN is required to open Management View.';
+      }
+    }
+
+    function v621InjectOwnerControls() {
+      if (document.getElementById('v621-owner-mode-badge')) return;
+      const syncBtn = document.getElementById('btn-cloud-sync');
+      if (!syncBtn || !syncBtn.parentElement) return;
+
+      const badge = document.createElement('span');
+      badge.id = 'v621-owner-mode-badge';
+
+      const lock = document.createElement('button');
+      lock.id = 'v621-owner-lock-btn';
+      lock.type = 'button';
+      lock.textContent = 'Exit Management View';
+      lock.onclick = v621LockOwnerMode;
+      lock.className = 'hidden px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors';
+
+      syncBtn.parentElement.insertBefore(badge, syncBtn);
+      syncBtn.parentElement.insertBefore(lock, syncBtn.nextSibling);
+      v621RefreshModeUI();
+    }
+
+    function v621RenderPrivacyViews() {
+      try { renderOrdersList(); } catch (_) {}
+      try { updateGlobalKPIs(); } catch (_) {}
+      try { renderPartiesList(); } catch (_) {}
+      const analyticsView = document.getElementById('view-analytics');
+      if (analyticsView && !analyticsView.classList.contains('hidden')) {
+        try { renderAnalytics(); } catch (_) {}
+      }
+    }
+
+    function v621LockOwnerMode() {
+      v621OwnerMode = false;
+      try { closeOrderDetailModal(); } catch (_) {}
+      v621RefreshModeUI();
+      v621RenderPrivacyViews();
+      showToast('Management View closed. Full synced order history is hidden.', 'info');
+    }
+
+    // Protect every direct cloud-order read, including the old startup auto-sync.
+    const v621BaseSyncOrdersFromCloudCore = syncOrdersFromCloudCore;
+    syncOrdersFromCloudCore = async function(showSuccessToast = true) {
+      if (!v621OwnerMode) {
+        v621RefreshModeUI();
+        return { skipped: true, reason: 'owner_mode_locked', totalCount: v621VisibleOrders().length };
+      }
+      return await v621BaseSyncOrdersFromCloudCore(showSuccessToast);
+    };
+
+    // Existing Sync All Orders button now doubles as Management View unlock.
+    fetchOrdersFromCloud = function(skipPin = false) {
+      const run = async () => {
+        v621OwnerMode = true;
+        v621RefreshModeUI();
+        v621RenderPrivacyViews();
+        try {
+          const result = await syncOrdersFromCloudCore(true);
+          v621RefreshModeUI();
+          v621RenderPrivacyViews();
+          return result;
+        } catch (e) {
+          // Owner stays unlocked even if internet is down, so cached owner history remains available.
+          v621RefreshModeUI();
+          v621RenderPrivacyViews();
+          return null;
+        }
+      };
+
+      if (v621OwnerMode) return run();
+      if (skipPin) return Promise.resolve({ skipped: true, reason: 'owner_pin_required' });
+      requirePin(run, 'Owner PIN: Unlock Full Synced Order History');
+    };
+
+    // Privacy wrappers: all staff-facing summaries use only staff-visible orders.
+    const v621BaseRenderOrdersList = renderOrdersList;
+    renderOrdersList = function() {
+      return v621WithVisibleOrders(() => v621BaseRenderOrdersList());
+    };
+
+    const v621BaseUpdateGlobalKPIs = updateGlobalKPIs;
+    updateGlobalKPIs = function() {
+      return v621WithVisibleOrders(() => v621BaseUpdateGlobalKPIs());
+    };
+
+    const v621BaseRenderPartiesList = renderPartiesList;
+    renderPartiesList = function() {
+      return v621WithVisibleOrders(() => v621BaseRenderPartiesList());
+    };
+
+    const v621BaseExportOrdersToCSV = exportOrdersToCSV;
+    exportOrdersToCSV = function() {
+      return v621WithVisibleOrders(() => v621BaseExportOrdersToCSV());
+    };
+
+    const v621BaseRenderAnalytics = renderAnalytics;
+    renderAnalytics = function() {
+      return v621WithVisibleOrders(() => v621BaseRenderAnalytics());
+    };
+
+    // Orders punched in Booking View remain visible on that device after they sync.
+    const v621BaseHandleSaveOrder = handleSaveOrder;
+    handleSaveOrder = async function(event) {
+      const ownerAtStart = v621OwnerMode;
+      const before = new Map((Array.isArray(orders) ? orders : []).map(o => [
+        String(o?.id || '').trim().toLowerCase(),
+        String(o?.mutationId || '') + '|' + String(o?.revision || '') + '|' + String(o?.updatedAt || '')
+      ]));
+
+      const result = await v621BaseHandleSaveOrder(event);
+
+      if (!ownerAtStart) {
+        (Array.isArray(orders) ? orders : []).forEach(o => {
+          const id = String(o?.id || '').trim().toLowerCase();
+          if (!id) return;
+          const sig = String(o?.mutationId || '') + '|' + String(o?.revision || '') + '|' + String(o?.updatedAt || '');
+          if (!before.has(id) || before.get(id) !== sig) v621MarkLocalOrder(id);
+        });
+        v621RenderPrivacyViews();
+      }
+
+      return result;
+    };
+
+    // Keep Owner mode session-only and apply privacy after the existing startup sequence.
+    const v621BaseOnload = window.onload;
+    window.onload = async function(...args) {
+      if (typeof v621BaseOnload === 'function') await v621BaseOnload.apply(this, args);
+      v621OwnerMode = false;
+      v621InjectOwnerControls();
+      v621RefreshModeUI();
+      v621RenderPrivacyViews();
+      document.documentElement.dataset.airenBuild = 'V6.21';
     };
   </script>
 
