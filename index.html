@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.21 - RC17 Order Book Alignment Fix</title>
+  <title>Airen Pipe V6.21 - RC19 Offline Foundation</title>
+
+  <!-- RC19 PWA / offline foundation -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#075985">
+  <meta name="application-name" content="Airen Pipe">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Airen Pipe">
+  <link rel="apple-touch-icon" href="./airen-icon-192.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -7724,6 +7733,264 @@
     window.addEventListener('load', () => {
       document.documentElement.dataset.airenBuild='V6.21-RC17';
     });
+  </script>
+
+
+  <!-- RC19: PWA + offline order queue + browser background sync foundation -->
+  <style id="airen-rc19-offline-css">
+    #airen-offline-sync-pill {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 46;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      max-width: calc(100vw - 24px);
+      padding: 7px 11px;
+      border: 1px solid rgba(148,163,184,.45);
+      border-radius: 999px;
+      background: rgba(255,255,255,.96);
+      color: #334155;
+      box-shadow: 0 6px 18px rgba(15,23,42,.12);
+      backdrop-filter: blur(8px);
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .01em;
+      pointer-events: none;
+      user-select: none;
+    }
+    #airen-offline-sync-pill .airen-sync-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 999px;
+      background: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.12);
+    }
+    #airen-offline-sync-pill[data-state="pending"] .airen-sync-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245,158,11,.14);
+    }
+    #airen-offline-sync-pill[data-state="offline"] .airen-sync-dot {
+      background: #64748b;
+      box-shadow: 0 0 0 3px rgba(100,116,139,.14);
+    }
+    #airen-offline-sync-pill[data-state="error"] .airen-sync-dot {
+      background: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220,38,38,.14);
+    }
+    @media (max-width: 767px) {
+      #airen-offline-sync-pill { bottom: 76px; left: 8px; font-size: 10px; min-height: 31px; padding: 6px 9px; }
+    }
+  </style>
+  <script id="airen-rc19-offline-js">
+    (() => {
+      const AIR_RC19_DB = 'airen-offline-sync-v1';
+      const AIR_RC19_STORE = 'orderQueue';
+      const AIR_RC19_SYNC_TAG = 'airen-order-sync';
+
+      function rc19PendingEntries() {
+        try {
+          const raw = localStorage.getItem(typeof ORDER_OUTBOX_KEY !== 'undefined' ? ORDER_OUTBOX_KEY : 'airen_v6_order_outbox');
+          const parsed = JSON.parse(raw || '[]');
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (_) { return []; }
+      }
+
+      function rc19EnsurePill() {
+        let pill = document.getElementById('airen-offline-sync-pill');
+        if (pill) return pill;
+        pill = document.createElement('div');
+        pill.id = 'airen-offline-sync-pill';
+        pill.setAttribute('role', 'status');
+        pill.setAttribute('aria-live', 'polite');
+        pill.innerHTML = '<span class="airen-sync-dot"></span><span class="airen-sync-text">Checking sync…</span>';
+        document.body.appendChild(pill);
+        return pill;
+      }
+
+      function rc19UpdateStatus(forceState) {
+        const pill = rc19EnsurePill();
+        const text = pill.querySelector('.airen-sync-text');
+        const pending = rc19PendingEntries().length;
+        const online = navigator.onLine !== false;
+        let state = forceState || (online ? (pending ? 'pending' : 'synced') : 'offline');
+        let label;
+        if (state === 'error') label = pending ? `Sync retry • ${pending} pending` : 'Sync retry pending';
+        else if (!online) label = pending ? `Offline • ${pending} pending` : 'Offline • Ready';
+        else if (pending) label = `Syncing • ${pending} pending`;
+        else label = 'Synced';
+        pill.dataset.state = state;
+        text.textContent = label;
+        pill.title = pending ? `${pending} order change(s) are safely queued on this device.` : 'All locally queued order changes are cleared.';
+      }
+
+      function rc19OpenDb() {
+        return new Promise((resolve, reject) => {
+          if (!('indexedDB' in window)) return reject(new Error('IndexedDB unavailable'));
+          const req = indexedDB.open(AIR_RC19_DB, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(AIR_RC19_STORE)) db.createObjectStore(AIR_RC19_STORE, { keyPath: 'id' });
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error || new Error('Offline sync DB unavailable'));
+        });
+      }
+
+      async function rc19DbGetAll() {
+        const db = await rc19OpenDb();
+        try {
+          return await new Promise((resolve, reject) => {
+            const tx = db.transaction(AIR_RC19_STORE, 'readonly');
+            const req = tx.objectStore(AIR_RC19_STORE).getAll();
+            req.onsuccess = () => resolve(Array.isArray(req.result) ? req.result : []);
+            req.onerror = () => reject(req.error);
+          });
+        } finally { db.close(); }
+      }
+
+      async function rc19DbPut(entry) {
+        if (!entry || !entry.order || !entry.order.id) return;
+        const db = await rc19OpenDb();
+        try {
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(AIR_RC19_STORE, 'readwrite');
+            tx.objectStore(AIR_RC19_STORE).put({
+              id: String(entry.order.id),
+              op: entry.op || 'create',
+              order: entry.order,
+              webhookUrl: (typeof getGoogleWebhookUrl === 'function' ? getGoogleWebhookUrl() : ''),
+              queuedAt: entry.queuedAt || Date.now(),
+              updatedAt: Date.now()
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error || new Error('Queue write failed'));
+          });
+        } finally { db.close(); }
+      }
+
+      async function rc19DbDelete(id) {
+        const db = await rc19OpenDb();
+        try {
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction(AIR_RC19_STORE, 'readwrite');
+            tx.objectStore(AIR_RC19_STORE).delete(String(id));
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error || new Error('Queue delete failed'));
+          });
+        } finally { db.close(); }
+      }
+
+      async function rc19RegisterBackgroundSync() {
+        if (!('serviceWorker' in navigator)) return false;
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          if (reg.sync && typeof reg.sync.register === 'function') {
+            await reg.sync.register(AIR_RC19_SYNC_TAG);
+            return true;
+          }
+        } catch (err) {
+          console.warn('RC19 background sync registration skipped', err);
+        }
+        return false;
+      }
+
+      async function rc19ReconcileQueue() {
+        try {
+          const pending = rc19PendingEntries();
+          const activeIds = new Set();
+          for (const entry of pending) {
+            if (!entry?.order?.id) continue;
+            activeIds.add(String(entry.order.id));
+            await rc19DbPut(entry);
+          }
+          const stored = await rc19DbGetAll();
+          for (const entry of stored) {
+            if (!activeIds.has(String(entry.id))) await rc19DbDelete(entry.id);
+          }
+          if (pending.length) await rc19RegisterBackgroundSync();
+        } catch (err) {
+          console.warn('RC19 background queue mirror unavailable', err);
+        } finally {
+          rc19UpdateStatus();
+        }
+      }
+
+      async function rc19RegisterServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        try {
+          const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+          await navigator.serviceWorker.ready;
+          if (rc19PendingEntries().length) await rc19RegisterBackgroundSync();
+          return reg;
+        } catch (err) {
+          console.warn('RC19 service worker registration failed', err);
+          rc19UpdateStatus('error');
+        }
+      }
+
+      // Mirror every existing V6 outbox mutation into IndexedDB so the service worker
+      // can attempt delivery even after the page/app is no longer open.
+      const baseQueueOrder = window.v6QueueOrder;
+      if (typeof baseQueueOrder === 'function') {
+        window.v6QueueOrder = function(op, order) {
+          const result = baseQueueOrder.apply(this, arguments);
+          const latest = rc19PendingEntries().find(e => String(e?.order?.id || '') === String(order?.id || '')) || { op, order, queuedAt: Date.now() };
+          rc19DbPut(latest).then(rc19RegisterBackgroundSync).catch(err => console.warn('RC19 mirror queue write failed', err));
+          rc19UpdateStatus();
+          return result;
+        };
+      }
+
+      // Once the normal page-level verifier clears an outbox entry, clear the mirrored
+      // background entry too. The proven V6 conflict/revision logic remains authoritative.
+      const baseFlushOrders = window.v6FlushOrderOutbox;
+      if (typeof baseFlushOrders === 'function') {
+        window.v6FlushOrderOutbox = async function() {
+          try {
+            rc19UpdateStatus();
+            return await baseFlushOrders.apply(this, arguments);
+          } finally {
+            await rc19ReconcileQueue();
+          }
+        };
+      }
+
+      navigator.serviceWorker?.addEventListener?.('message', event => {
+        const type = event.data?.type;
+        if (type === 'AIREN_BACKGROUND_SYNC_ATTEMPT') rc19UpdateStatus();
+        if (type === 'AIREN_BACKGROUND_SYNC_ERROR') rc19UpdateStatus('error');
+      });
+
+      window.addEventListener('online', () => {
+        rc19UpdateStatus();
+        rc19RegisterBackgroundSync();
+        // Existing V6 online handler performs the full verified sync while the page is open.
+      });
+      window.addEventListener('offline', () => rc19UpdateStatus());
+      window.addEventListener('storage', e => {
+        if (e.key === (typeof ORDER_OUTBOX_KEY !== 'undefined' ? ORDER_OUTBOX_KEY : 'airen_v6_order_outbox')) rc19UpdateStatus();
+      });
+
+      window.addEventListener('load', async () => {
+        document.documentElement.dataset.airenBuild = 'V6.21-RC19';
+        rc19EnsurePill();
+        rc19UpdateStatus();
+        await rc19RegisterServiceWorker();
+        await rc19ReconcileQueue();
+      });
+
+      // Expose only tiny diagnostics for testing; app business logic remains unchanged.
+      window.airenOfflineSyncStatus = () => ({
+        online: navigator.onLine !== false,
+        pending: rc19PendingEntries().length,
+        serviceWorker: !!navigator.serviceWorker?.controller
+      });
+    })();
   </script>
 
 </body>
