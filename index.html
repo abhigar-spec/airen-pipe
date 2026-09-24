@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.21 - RC19 Offline Foundation</title>
+  <title>Airen Pipe V6.21 - RC20 Add Row Focus</title>
 
   <!-- RC19 PWA / offline foundation -->
   <link rel="manifest" href="./manifest.webmanifest">
@@ -962,7 +962,7 @@
             <button type="button" onclick="insertQuickPreset('swr_fittings')" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-2.5 py-1.5 rounded-lg border border-amber-200 font-semibold">⚡ SWR</button>
             <button type="button" onclick="insertQuickPreset('water_tank')" class="text-xs bg-cyan-50 hover:bg-cyan-100 text-cyan-800 px-2.5 py-1.5 rounded-lg border border-cyan-300 font-semibold">💧 Tank</button>
             <span class="hidden xl:block w-px h-6 bg-slate-300 mx-1"></span>
-            <button type="button" onclick="addOrderItemRow()" class="text-xs bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm">＋ Blank Row</button>
+            <button type="button" onclick="addBlankOrderItemRowAndFocus()" class="text-xs bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm">＋ Blank Row</button>
             <button type="button" onclick="openProductModal()" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-lg border border-indigo-200 font-bold ml-auto">🔒 New Product</button>
           </div>
 
@@ -994,7 +994,7 @@
               <span>Order Qty: <strong id="summary-total-qty" class="text-brand-700 font-bold">0</strong></span>
               <span class="text-[10px] text-slate-400">Nos / Lengths / Coils are kept separate.</span>
             </div>
-            <button type="button" onclick="addOrderItemRow()" class="text-xs font-bold text-brand-700 hover:text-brand-900">＋ Add another row</button>
+            <button type="button" onclick="addBlankOrderItemRowAndFocus()" class="text-xs font-bold text-brand-700 hover:text-brand-900">＋ Add another row</button>
           </div>
         </div>
 
@@ -7736,6 +7736,36 @@
   </script>
 
 
+
+  <!-- RC20: Add Row jumps directly to the new row Category field -->
+  <script>
+    function addBlankOrderItemRowAndFocus() {
+      const tbody = document.getElementById('order-items-tbody');
+      if (!tbody || typeof addOrderItemRow !== 'function') return;
+
+      addOrderItemRow();
+
+      requestAnimationFrame(() => {
+        const rows = [...tbody.querySelectorAll('tr')];
+        const row = rows[rows.length - 1];
+        const category = row?.querySelector('.item-category');
+        if (!category) return;
+
+        // Make the new row/category visibly become the next working field,
+        // including when the wide order table is horizontally scrolled.
+        try {
+          category.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        } catch (_) {
+          category.scrollIntoView();
+        }
+        setTimeout(() => {
+          try { category.focus({ preventScroll: true }); }
+          catch (_) { category.focus(); }
+        }, 120);
+      });
+    }
+  </script>
+
   <!-- RC19: PWA + offline order queue + browser background sync foundation -->
   <style id="airen-rc19-offline-css">
     #airen-offline-sync-pill {
@@ -7977,7 +8007,7 @@
       });
 
       window.addEventListener('load', async () => {
-        document.documentElement.dataset.airenBuild = 'V6.21-RC19';
+        document.documentElement.dataset.airenBuild = 'V6.21-RC20';
         rc19EnsurePill();
         rc19UpdateStatus();
         await rc19RegisterServiceWorker();
