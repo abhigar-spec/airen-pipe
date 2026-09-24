@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.21 - Management / Booking View RC</title>
+  <title>Airen Pipe V6.21 - Mobile First RC7 UI RC3 Tablet/Mobile Fix</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -156,13 +156,290 @@
         display: none !important;
       }
     }
+  
+
+    /* V6.21 Mobile-First UI RC3 — visual-only layer; phones/tablets <=1100px use mobile navigation */
+    :root {
+      --airen-blue:#0b63f6;
+      --airen-blue-2:#2188f8;
+      --airen-navy:#0d4da2;
+      --airen-orange:#ff7a18;
+      --airen-bg:#f4f8fd;
+      --airen-line:#dbe7f3;
+      --airen-text:#102544;
+    }
+    html { background: var(--airen-bg); }
+    body { background: var(--airen-bg) !important; color:var(--airen-text); }
+    .airen-topbar {
+      background: linear-gradient(135deg,#0d4da2 0%,#0b63f6 58%,#2a8df6 100%);
+      border-bottom:1px solid rgba(255,255,255,.14);
+      box-shadow:0 10px 28px rgba(13,77,162,.18);
+    }
+    .airen-brand-name { letter-spacing:-.02em; }
+    .airen-brand-subtitle { color:rgba(255,255,255,.74) !important; }
+    .airen-desktop-nav {
+      background:rgba(8,55,126,.30);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(10px);
+    }
+    .airen-desktop-nav .nav-tab:hover { background:rgba(255,255,255,.11); }
+    .airen-desktop-nav .nav-tab.bg-brand-600 { background:#fff !important; color:#0b63f6 !important; }
+    .airen-more-menu summary::-webkit-details-marker{display:none}
+    .airen-more-panel{background:#fff;border:1px solid #dbe7f3}
+    .airen-more-panel .nav-tab { color:#334155 !important; background:transparent !important; box-shadow:none !important; }
+    .airen-more-panel .nav-tab:hover { background:#eff6ff !important; color:#1d4ed8 !important; }
+    .airen-more-panel .nav-tab.bg-brand-600 { background:#eff6ff !important; color:#1d4ed8 !important; }
+
+    main.flex-1 { padding-bottom:1.25rem; }
+    main > section.grid.grid-cols-2 > div {
+      border-color:var(--airen-line) !important;
+      box-shadow:0 8px 24px rgba(32,73,124,.06) !important;
+      overflow:hidden;
+      position:relative;
+    }
+    main > section.grid.grid-cols-2 > div:nth-child(1){background:linear-gradient(135deg,#fff 40%,#eef6ff 100%) !important}
+    main > section.grid.grid-cols-2 > div:nth-child(2){background:linear-gradient(135deg,#fff 40%,#fff4e7 100%) !important}
+    main > section.grid.grid-cols-2 > div:nth-child(3){background:linear-gradient(135deg,#fff 40%,#ecfaf4 100%) !important}
+    main > section.grid.grid-cols-2 > div:nth-child(4){background:linear-gradient(135deg,#fff 40%,#f5efff 100%) !important}
+
+    #view-orders > div,
+    #view-new-order .bg-white,
+    #view-parties > div,
+    #view-analytics > div,
+    #view-analytics section > div {
+      border-color:var(--airen-line) !important;
+      box-shadow:0 8px 28px rgba(32,73,124,.055) !important;
+    }
+    #view-orders button.bg-brand-600,
+    #view-new-order button.bg-brand-600,
+    #view-parties button.bg-brand-600 {
+      background:var(--airen-blue) !important;
+    }
+    header button.bg-accent-500 {
+      background:linear-gradient(135deg,#ff8a24,#ff6d00) !important;
+      border-radius:.8rem !important;
+      box-shadow:0 8px 18px rgba(255,109,0,.2);
+    }
+    #view-orders input,#view-orders select,
+    #view-new-order input,#view-new-order select,#view-new-order textarea,
+    #view-parties input,#view-parties select {
+      min-height:44px;
+    }
+
+    .airen-punch-steps {
+      display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;
+      position:sticky;top:4.5rem;z-index:12;
+      background:rgba(244,248,253,.94);backdrop-filter:blur(10px);
+      padding:.35rem 0 .5rem;
+    }
+    .airen-punch-step {
+      min-width:0;display:flex;align-items:center;gap:.45rem;padding:.65rem .7rem;
+      background:#fff;border:1px solid var(--airen-line);border-radius:.9rem;
+      color:#6b7c94;font-size:.72rem;box-shadow:0 4px 12px rgba(32,73,124,.04);
+    }
+    .airen-punch-step span { width:1.45rem;height:1.45rem;display:grid;place-items:center;border-radius:999px;background:#eaf2fb;color:#527095;font-weight:800;flex:none; }
+    .airen-punch-step.active { border-color:#b7d5ff;color:#0b63f6;background:#f1f7ff; }
+    .airen-punch-step.active span { background:#0b63f6;color:#fff; }
+    .airen-punch-step strong { white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+    .airen-mobile-nav,.airen-mobile-more { display:none; }
+
+    @media (max-width:1100px){
+      /* Treat phones + tablets as touch/mobile UI. This also overrides Tailwind md:* display utilities. */
+      .airen-desktop-nav { display:none !important; }
+      .airen-mobile-nav { display:grid !important; }
+      .airen-mobile-more:not(.hidden) { display:flex !important; }
+      body { padding-bottom:76px; }
+      .airen-topbar .max-w-7xl { padding-left:12px !important; padding-right:12px !important; }
+      .airen-topbar .h-16 { height:62px !important; }
+      .airen-topbar .h-16 > .flex.items-center.space-x-3 { min-width:0; flex:1; }
+      .airen-topbar .h-16 > .flex.items-center.space-x-2 { display:none !important; }
+      .airen-topbar .w-10.h-10 { width:36px !important;height:36px !important;border-radius:11px !important;flex:none; }
+      .airen-brand-name { font-size:15px !important; line-height:1.1; max-width:calc(100vw - 92px);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+      .airen-topbar button.bg-accent-500 { padding:.55rem .7rem !important; }
+      main.flex-1 { padding:.75rem !important; padding-bottom:1rem !important; gap: .85rem !important; }
+
+      .airen-mobile-nav {
+        position:fixed;left:0;right:0;bottom:0;z-index:30;height:68px;
+        display:grid;grid-template-columns:repeat(5,1fr);background:#fff;
+        border-top:1px solid #dbe7f3;box-shadow:0 -8px 24px rgba(35,73,122,.10);
+        padding:max(4px,env(safe-area-inset-bottom)) 4px 4px;
+      }
+      .airen-mobile-nav-btn {
+        border:0;background:transparent;color:#72839a;border-radius:12px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:2px;font-size:10px;font-weight:800;min-width:0;
+      }
+      .airen-mobile-nav-btn .airen-nav-icon { font-size:18px;line-height:1; }
+      .airen-mobile-nav-btn.bg-brand-600 { background:#eef6ff !important;color:#0b63f6 !important;box-shadow:none !important; }
+      .airen-mobile-nav-btn.text-white { color:#0b63f6 !important; }
+
+      .airen-mobile-more {
+        display:flex;position:fixed;inset:0;z-index:45;background:rgba(15,35,65,.34);
+        align-items:flex-end;padding:12px;
+      }
+      .airen-mobile-more.hidden{display:none !important}
+      .airen-mobile-more-card {
+        width:100%;background:#fff;border:1px solid #dbe7f3;border-radius:22px;padding:12px 12px 16px;
+        box-shadow:0 24px 70px rgba(19,46,82,.28);
+      }
+      .airen-mobile-more-handle{width:44px;height:4px;border-radius:99px;background:#d4deea;margin:0 auto 10px}
+      .airen-more-action{width:100%;display:grid;grid-template-columns:36px 1fr 18px;align-items:center;gap:10px;text-align:left;padding:12px;border-radius:14px;color:#27415f}
+      .airen-more-action:hover{background:#f2f7fd}
+      .airen-more-action strong{display:block;font-size:13px;color:#102544}
+      .airen-more-action small{display:block;font-size:10px;color:#7a8aa0;margin-top:1px}
+
+      /* KPI cards: compact 2 x 2 */
+      main > section.grid.grid-cols-2 { gap:.6rem !important; }
+      main > section.grid.grid-cols-2 > div { padding:.75rem !important; min-height:86px; align-items:flex-start !important; }
+      main > section.grid.grid-cols-2 > div > div:first-child { padding:.55rem !important;border-radius:.7rem !important; }
+      main > section.grid.grid-cols-2 h3 { font-size:1.35rem !important;line-height:1.15; }
+      main > section.grid.grid-cols-2 p { font-size:9px !important; }
+
+      /* Order book controls: search first, filters and actions remain thumb-friendly */
+      #view-orders > div:first-child { padding:.7rem !important; border-radius:1rem !important; gap:.6rem !important; }
+      #view-orders > div:first-child .flex-1.flex.flex-col { gap:.45rem !important; }
+      #view-orders > div:first-child .flex.items-center.space-x-2 { display:grid !important;grid-template-columns:1fr 1fr;gap:.45rem !important; }
+      #view-orders > div:first-child .flex.items-center.space-x-2 > button { width:100%;justify-content:center;min-height:42px;margin:0 !important;padding:.55rem .5rem !important; }
+      #v621-owner-mode-badge { grid-column:1 / -1; justify-self:start; }
+      #btn-cloud-sync { grid-column:1 / -1; }
+      #v621-owner-lock-btn { grid-column:1 / -1; }
+      #view-orders > div:first-child .flex.items-center.space-x-2 > button:first-child { grid-column:1 / -1; }
+      #view-orders > div:nth-child(2) { border-radius:1rem !important; }
+      #view-orders > div:nth-child(2) > div:first-child { padding:.75rem !important; }
+      #view-orders > div:nth-child(2) > div:first-child > span { display:none; }
+
+      /* Punch Order: actual item table becomes stacked cards instead of horizontal desktop table. */
+      .airen-punch-steps { top:62px;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem;padding:.35rem 0; }
+      .airen-punch-step { padding:.5rem .4rem;font-size:9px;justify-content:center;gap:.25rem; }
+      .airen-punch-step span { width:1.2rem;height:1.2rem;font-size:9px; }
+      #view-new-order form { gap:.75rem !important; }
+      #view-new-order .bg-white { padding:.8rem !important;border-radius:1rem !important; }
+      #view-new-order .quick-pack-bar { overflow-x:auto;flex-wrap:nowrap !important;padding:.55rem !important;scrollbar-width:none; }
+      #view-new-order .quick-pack-bar > * { flex:0 0 auto; }
+      .new-order-table-wrap { margin:0 !important;border:0 !important;overflow:visible !important;background:transparent; }
+      .new-order-table-wrap table { min-width:0 !important;width:100% !important;display:block; }
+      .new-order-table-wrap thead { display:none !important; }
+      .new-order-table-wrap tbody { display:block !important; }
+      .new-order-table-wrap .order-line-row {
+        display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;
+        position:relative;padding:2rem .7rem .75rem !important;margin-bottom:.75rem;
+        border:1px solid #dbe7f3;border-radius:1rem;background:#fff !important;
+        box-shadow:0 6px 20px rgba(31,73,125,.055);
+      }
+      .new-order-table-wrap .order-line-row td { display:block !important;padding:0 !important;width:auto !important;min-width:0; }
+      .new-order-table-wrap .order-line-row td:nth-child(1){position:absolute;left:.75rem;top:.55rem;width:auto !important;font-size:10px;color:#6f8199}
+      .new-order-table-wrap .order-line-row td:nth-child(2),
+      .new-order-table-wrap .order-line-row td:nth-child(3),
+      .new-order-table-wrap .order-line-row td:nth-child(10){grid-column:1 / -1}
+      .new-order-table-wrap .order-line-row td:nth-child(11){position:absolute;right:.55rem;top:.35rem}
+      .new-order-table-wrap .order-line-row td:not(:nth-child(1)):not(:nth-child(11))::before{
+        display:block;margin:0 0 4px;font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.045em;font-weight:800;color:#74869d;
+      }
+      .new-order-table-wrap .order-line-row td:nth-child(2)::before{content:'Category'}
+      .new-order-table-wrap .order-line-row td:nth-child(3)::before{content:'Product / Item'}
+      .new-order-table-wrap .order-line-row td:nth-child(4)::before{content:'Brand'}
+      .new-order-table-wrap .order-line-row td:nth-child(5)::before{content:'Size / Dia'}
+      .new-order-table-wrap .order-line-row td:nth-child(6)::before{content:'Spec / Class'}
+      .new-order-table-wrap .order-line-row td:nth-child(7)::before{content:'Length / Pack'}
+      .new-order-table-wrap .order-line-row td:nth-child(8)::before{content:'Quantity'}
+      .new-order-table-wrap .order-line-row td:nth-child(9)::before{content:'Unit'}
+      .new-order-table-wrap .order-line-row td:nth-child(10)::before{content:'Line Remarks'}
+      .new-order-table-wrap .order-line-row select,
+      .new-order-table-wrap .order-line-row input { width:100% !important;min-height:44px !important;font-size:12px !important; }
+      #view-new-order form > div:last-child .mt-6 { display:grid !important;grid-template-columns:1fr 1.35fr;gap:.55rem !important; }
+      #view-new-order form > div:last-child .mt-6 button { width:100%;min-height:46px;justify-content:center; }
+    }
+
+
+    /* V6.21 RC4 — tablet/mobile order-book containment audit */
+    @media (max-width:1100px){
+      html, body { width:100%; max-width:100%; overflow-x:hidden !important; }
+      .airen-topbar { width:100%; max-width:100%; overflow:hidden; }
+      .airen-topbar > .max-w-7xl { width:100% !important; max-width:100% !important; margin-left:0 !important; margin-right:0 !important; }
+      main.flex-1 { width:100% !important; max-width:100% !important; margin-left:0 !important; margin-right:0 !important; }
+      #view-orders { width:100%; min-width:0; }
+
+      /* Force the order toolbar to stay inside the viewport. */
+      #view-orders > div:first-child {
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) !important;
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        align-items:stretch !important;
+        overflow:hidden !important;
+      }
+      #view-orders > div:first-child > div:first-child {
+        display:grid !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        gap:.5rem !important;
+      }
+      #view-orders > div:first-child > div:first-child > .relative {
+        grid-column:1 / -1;
+        width:100% !important;
+        min-width:0 !important;
+      }
+      #view-orders > div:first-child select,
+      #view-orders > div:first-child input {
+        width:100% !important;
+        max-width:none !important;
+        min-width:0 !important;
+      }
+      #view-orders > div:first-child > div:last-child {
+        display:grid !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        gap:.5rem !important;
+        align-items:stretch !important;
+      }
+      #view-orders > div:first-child > div:last-child > * {
+        min-width:0 !important;
+        margin:0 !important;
+      }
+      #view-orders > div:first-child > div:last-child > button {
+        width:100% !important;
+        min-height:44px;
+        justify-content:center !important;
+        white-space:normal !important;
+        line-height:1.15;
+      }
+      #v621-owner-mode-badge {
+        grid-column:1 / -1 !important;
+        justify-self:start !important;
+        width:auto !important;
+      }
+      #v621-owner-lock-btn { grid-column:1 / -1 !important; }
+
+      /* Recorded-orders card must never inherit overflow from toolbar content. */
+      #view-orders > div:nth-child(2) { width:100%; max-width:100%; min-width:0; overflow:hidden; }
+    }
+
+    @media (max-width:640px){
+      #view-orders > div:first-child > div:first-child {
+        grid-template-columns:minmax(0,1fr) !important;
+      }
+      #view-orders > div:first-child > div:first-child > .relative { grid-column:auto; }
+      #view-orders > div:first-child > div:last-child {
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      }
+      #v621-owner-mode-badge,
+      #btn-cloud-sync,
+      #v621-owner-lock-btn { grid-column:1 / -1 !important; }
+    }
+
   </style>
   <!-- Airen V6.7 NEW ORDER UX RC - Hardened Backend Bind - 2026-09-18 -->
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
   <!-- Header -->
-  <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
+  <header class="airen-topbar text-white sticky top-0 z-40 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
@@ -175,43 +452,31 @@
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="font-bold text-lg tracking-tight text-white">Airen <span class="text-accent-500">Pipe</span></span>
-              <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                Sheet Live Linked
-              </span>
+              <span class="airen-brand-name font-extrabold text-lg tracking-tight text-white">Airen Pipe And Fitting</span>
             </div>
-            <p class="text-xs text-slate-400 hidden sm:block">Airen Pipe Distribution & Order Booking Desk</p>
+            <p class="airen-brand-subtitle text-xs hidden sm:block">Distribution &amp; Order Desk</p>
           </div>
         </div>
-
-        <nav class="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
-          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab active px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+        <nav class="airen-desktop-nav hidden md:flex items-center gap-1 p-1 rounded-2xl">
+          <button onclick="switchTab('orders')" id="tab-orders-btn" class="nav-tab active px-3.5 py-2 rounded-xl text-sm font-semibold transition-all bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
             <span>Order Book</span>
           </button>
-          <button onclick="switchTab('analytics')" id="tab-analytics-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19V9m5 10V5m5 14v-7m5 7V3"/>
-            </svg>
-            <span>Analytics</span>
-          </button>
-          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <button onclick="switchTab('new-order')" id="tab-new-order-btn" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-100 hover:text-white transition-all flex items-center space-x-1.5">
             <span>Punch Order</span>
           </button>
-          <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          <button onclick="switchTab('parties')" id="tab-parties-btn" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-100 hover:text-white transition-all flex items-center space-x-1.5">
             <span id="nav-parties-count">Parties</span>
           </button>
-          <button onclick="switchTab('catalog')" id="tab-catalog-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-            <span>Specs & Catalog</span>
+          <button onclick="switchTab('analytics')" id="tab-analytics-btn" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-100 hover:text-white transition-all flex items-center space-x-1.5">
+            <span>Analytics</span>
           </button>
-          <button onclick="switchTab('settings')" id="tab-settings-btn" class="nav-tab px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/60 transition-all flex items-center space-x-1.5">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <span>Owner PIN & Sync</span>
-          </button>
+          <details class="airen-more-menu relative">
+            <summary class="list-none cursor-pointer px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-100 hover:text-white transition-all">More ▾</summary>
+            <div class="airen-more-panel absolute right-0 mt-2 w-52 p-2 rounded-xl shadow-xl z-50">
+              <button onclick="switchTab('catalog'); this.closest('details').removeAttribute('open')" id="tab-catalog-btn" class="nav-tab w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700">Specs &amp; Catalog</button>
+              <button onclick="switchTab('settings'); this.closest('details').removeAttribute('open')" id="tab-settings-btn" class="nav-tab w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">Management &amp; Sync</button>
+            </div>
+          </details>
         </nav>
 
         <div class="flex items-center space-x-2">
@@ -224,21 +489,31 @@
       </div>
     </div>
   </header>
+  <!-- Mobile Bottom Navigation -->
+  <div class="airen-mobile-nav md:hidden">
+    <button onclick="closeMobileMore();switchTab('orders')" id="m-tab-orders" class="m-nav-tab airen-mobile-nav-btn bg-brand-600 text-white"><span class="airen-nav-icon">▣</span><span>Orders</span></button>
+    <button onclick="closeMobileMore();switchTab('new-order')" id="m-tab-new-order" class="m-nav-tab airen-mobile-nav-btn"><span class="airen-nav-icon">＋</span><span>Punch</span></button>
+    <button onclick="closeMobileMore();switchTab('parties')" id="m-tab-parties" class="m-nav-tab airen-mobile-nav-btn"><span class="airen-nav-icon">♟</span><span>Parties</span></button>
+    <button onclick="closeMobileMore();switchTab('analytics')" id="m-tab-analytics" class="m-nav-tab airen-mobile-nav-btn"><span class="airen-nav-icon">▥</span><span>Analytics</span></button>
+    <button onclick="toggleMobileMore()" id="m-tab-more" class="airen-mobile-nav-btn"><span class="airen-nav-icon">•••</span><span>More</span></button>
+  </div>
 
-  <!-- Mobile Bar -->
-  <div class="md:hidden bg-slate-800 border-b border-slate-700 text-slate-300 text-xs flex justify-around p-1.5 sticky top-16 z-30 shadow-sm">
-    <button onclick="switchTab('orders')" id="m-tab-orders" class="m-nav-tab flex-1 py-1.5 text-center font-medium text-white bg-brand-600 rounded">Orders</button>
-    <button onclick="switchTab('analytics')" id="m-tab-analytics" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Charts</button>
-    <button onclick="switchTab('new-order')" id="m-tab-new-order" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">+ Punch</button>
-    <button onclick="switchTab('parties')" id="m-tab-parties" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Parties</button>
-    <button onclick="switchTab('catalog')" id="m-tab-catalog" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded">Specs</button>
-    <button onclick="switchTab('settings')" id="m-tab-settings" class="m-nav-tab flex-1 py-1.5 text-center font-medium hover:text-white rounded text-emerald-400">Security</button>
+  <div id="airen-mobile-more" class="airen-mobile-more md:hidden hidden" onclick="if(event.target===this) closeMobileMore()">
+    <div class="airen-mobile-more-card">
+      <div class="airen-mobile-more-handle"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div><p class="font-extrabold text-slate-900">More</p><p class="text-[11px] text-slate-500">Catalog and management tools</p></div>
+        <button type="button" onclick="closeMobileMore()" class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 font-bold">×</button>
+      </div>
+      <button onclick="closeMobileMore();switchTab('catalog')" id="m-tab-catalog" class="m-nav-tab airen-more-action"><span>▤</span><span><strong>Specs &amp; Catalog</strong><small>Products and specifications</small></span><b>›</b></button>
+      <button onclick="closeMobileMore();switchTab('settings')" id="m-tab-settings" class="m-nav-tab airen-more-action"><span>🔒</span><span><strong>Management &amp; Sync</strong><small>PIN, sync and protected controls</small></span><b>›</b></button>
+    </div>
   </div>
 
   <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
 
     <!-- KPI Cards -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <section id="global-kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
         <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -332,7 +607,7 @@
       <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
         <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
           <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-            <span>Airen Pipe Recorded Orders</span>
+            <span>Recorded Orders</span>
             <span id="filtered-count-badge" class="bg-brand-100 text-brand-700 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
           </h2>
           <span class="text-xs text-slate-500">Sorted by newest order</span>
@@ -508,6 +783,12 @@
     <div id="view-new-order" class="tab-view hidden space-y-6">
       <form id="orderForm" onsubmit="handleSaveOrder(event)" class="space-y-5">
         <input type="hidden" id="edit-order-id" value="">
+
+        <div class="airen-punch-steps" aria-label="Order entry stages">
+          <div class="airen-punch-step active"><span>1</span><strong>Party &amp; Order</strong></div>
+          <div class="airen-punch-step"><span>2</span><strong>Items</strong></div>
+          <div class="airen-punch-step"><span>3</span><strong>Review &amp; Save</strong></div>
+        </div>
 
         <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 mb-4">
@@ -1168,8 +1449,8 @@
       "Water Tank": ["Overhead Water Tank", "Loft Tank", "Underground Sump Tank"],
       "PVC Agri / Irrigation Fittings": ["Agri Coupler / Socket (Fabricated / Molded)", "Agri Elbow 90°", "Agri Elbow 45°", "Agri Tee (Equal)", "Agri Reducing Tee", "Agri Reducing Bushing / Reducer", "Agri MTA (Male Threaded Adaptor)", "Agri FTA (Female Threaded Adaptor)", "Tail Piece / Flange Spigot", "Agri Flange Set (with Rubber Gasket)", "Service Saddle (Single / Double Strap)", "Service Saddle with Brass Insert", "Agri Ball Valve (Solid Handle)", "Foot Valve / Strainer", "Non Return Valve (NRV)", "Agri End Cap (Plug)", "Agri Cross Tee", "Quick Release Coupling (QRC / Sprinkler)", "Sprinkler Foot Batten / Riser", "Drip Joiner / Grommet / Take-off", "Agri Heavy Solvent Cement", "Other Agri Fitting"],
       "PVC Agri / Column Pipe": ["Agri Delivery Pipe (Plain / Socketed)", "Column Pipe (Submersible Pump)", "Casing Pipe (Shallow / Deep Well)", "Suction Hose Pipe", "Sprinkler Pipe with Latch Clamp"],
-      "CPVC Plumbing Fittings": ["Elbow 90°", "Elbow 45°", "Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee", "Brass Elbow 90° (Female)", "Brass Tee (Female)", "Brass FTA (Female Threaded Adaptor)", "Brass MTA (Male Threaded Adaptor)", "Plastic FTA (Plain)", "Plastic MTA (Plain)", "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing", "Reducer Brass Elbow", "Reducer Brass Tee", "CPVC Ball Valve", "Concealed Valve", "Long Plug", "Tank Nipple", "Pipe Clip / Saddle", "CPVC Solvent Cement", "Other CPVC Fitting"],
-      "UPVC Pressure Fittings": ["Plain Elbow 90°", "Plain Elbow 45°", "Plain Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee", "Brass Elbow 90°", "Brass Tee", "Brass FTA (Female)", "Brass MTA (Male)", "Plain MTA", "Plain FTA", "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing", "UPVC Ball Valve", "Non Return Valve (NRV)", "Flange Set / Tail Piece", "Tank Nipple", "UPVC Solvent Cement", "Other UPVC Fitting"],
+      "CPVC Plumbing Fittings": ["Elbow 90°", "Elbow 45°", "Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee", "Step Over Bend", "Brass Elbow 90° (Female)", "Brass Tee (Female)", "Brass FTA (Female Threaded Adaptor)", "Brass MTA (Male Threaded Adaptor)", "Plastic FTA (Plain)", "Plastic MTA (Plain)", "Reducing Plastic FTA", "Reducing Plastic MTA", "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing", "Reducer Brass Elbow", "Reducer Brass Tee", "Reducing Brass FTA", "Reducing Brass MTA", "CPVC Ball Valve", "Concealed Valve", "Long Plug", "Tank Nipple", "Pipe Clip / Saddle", "CPVC Solvent Cement", "Other CPVC Fitting"],
+      "UPVC Pressure Fittings": ["Plain Elbow 90°", "Plain Elbow 45°", "Plain Tee (Equal)", "Coupler / Socket", "Union", "End Cap", "Cross Tee", "Step Over Bend", "Brass Elbow 90°", "Brass Tee", "Brass FTA (Female)", "Brass MTA (Male)", "Plain MTA", "Plain FTA", "Reducing Plastic FTA", "Reducing Plastic MTA", "Reducer Elbow 90°", "Reducer Tee", "Reducer Coupler / Socket", "Reducer Bushing", "Reducing Brass FTA", "Reducing Brass MTA", "UPVC Ball Valve", "Non Return Valve (NRV)", "Flange Set / Tail Piece", "Tank Nipple", "UPVC Solvent Cement", "Other UPVC Fitting"],
       "PVC SWR Drainage Fittings": ["Bend 87.5° (Plain)", "Bend 87.5° with Door", "Bend 45° (Plain)", "Single Tee (Plain)", "Single Tee with Door", "Single Y (45° Plain)", "Single Y with Door", "Double Y (Plain)", "Double Y with Door", "Cross Tee (Plain)", "Cross Tee with Door", "Nahani Trap (Self Cleaning)", "Nahani Trap with Jali", "P-Trap (with/without vent)", "S-Trap", "Q-Trap", "Multi Floor Trap", "Coupler / Socket", "Reducer (e.g. 110x75)", "Vent Cowl", "Cleaning Pipe / Access Plug", "Aerator", "Pipe Clip / Bracket", "Rubber Ring / Gasket", "Solvent Cement SWR", "Other SWR Fitting"],
       "CPVC Plumbing Pipe": ["Standard CPVC Pipe"],
       "UPVC Pressure Pipe": ["Standard UPVC Pressure Pipe"],
@@ -1921,6 +2202,9 @@
       document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
       const targetView = document.getElementById(`view-${tabId}`);
       if (targetView) targetView.classList.remove('hidden');
+
+      const globalKpis = document.getElementById('global-kpis');
+      if (globalKpis) globalKpis.classList.toggle('hidden', tabId !== 'orders');
 
       document.querySelectorAll('.nav-tab').forEach(btn => {
         btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
@@ -3298,7 +3582,8 @@
     }
     function v6ProductParams(category,itemName){
       const r=v6GetProductRecord(category,itemName);
-      return { brand:r&&r.brand?r.brand:'KASTA', sizes:r&&r.sizes&&r.sizes.length?[...r.sizes]:[...(CATEGORY_SIZES_MAP[category]||['Universal'])], classes:r&&r.classes&&r.classes.length?[...r.classes]:[...(CATEGORY_CLASS_MAP[category]||['None','Standard / Molded'])], length:r&&r.defaultLength?r.defaultLength:(category.includes('CPVC')&&category.includes('Pipe')?'3 Meters (10 ft)':category.includes('HDPE')?'100 Meter Coil':category.includes('Pipe')?'6 Meters (20 ft)':'None / N.A. (Fittings)'), unit:r&&r.defaultUnit?r.defaultUnit:(category.includes('HDPE')?'Coils':category.includes('Pipe')?'Lengths (Pipes)':'Nos (Numbers)') };
+      const rawSizes=r&&r.sizes&&r.sizes.length?[...r.sizes]:[...(CATEGORY_SIZES_MAP[category]||['Universal'])];
+      return { brand:r&&r.brand?r.brand:'KASTA', sizes:v621ProductSizesForItem(category,itemName,rawSizes), classes:r&&r.classes&&r.classes.length?[...r.classes]:[...(CATEGORY_CLASS_MAP[category]||['None','Standard / Molded'])], length:r&&r.defaultLength?r.defaultLength:(category.includes('CPVC')&&category.includes('Pipe')?'3 Meters (10 ft)':category.includes('HDPE')?'100 Meter Coil':category.includes('Pipe')?'6 Meters (20 ft)':'None / N.A. (Fittings)'), unit:r&&r.defaultUnit?r.defaultUnit:(category.includes('HDPE')?'Coils':category.includes('Pipe')?'Lengths (Pipes)':'Nos (Numbers)') };
     }
     function v6QueueProduct(op,product){
       let q=v6ParseJSON(PRODUCT_OUTBOX_KEY,[]); const id=String(product.id||''); q=q.filter(x=>String(x.product&&x.product.id)!==id); q.push({op,product,queuedAt:Date.now(),tries:0}); v6WriteJSON(PRODUCT_OUTBOX_KEY,q);
@@ -4268,6 +4553,103 @@
       }).join('');
     }
 
+
+    // V6.21 RC5: clean plumbing nomenclature + smart reducer-size filtering.
+    // Internal legacy product values are preserved so old orders/product-master records stay compatible.
+    // V6.21 RC7: one canonical visible name per physical product.
+    // Legacy/cloud/custom aliases stay compatible internally but never appear as duplicate rows.
+    function v621ProductDisplayName(name) {
+      let n = String(name || '').trim().replace(/\s+/g, ' ');
+
+      const exact = {
+        'Tee (Equal)': 'Tee',
+        'Plain Tee (Equal)': 'Tee',
+        'Coupler / Socket': 'Coupler',
+        'Socket': 'Coupler',
+        'Brass Elbow 90° (Female)': 'Brass Elbow 90°',
+        'Brass Tee (Female)': 'Brass Tee',
+        'Brass FTA (Female Threaded Adaptor)': 'Brass FTA',
+        'Brass MTA (Male Threaded Adaptor)': 'Brass MTA',
+        'Brass FTA (Female)': 'Brass FTA',
+        'Brass MTA (Male)': 'Brass MTA',
+        'Plastic FTA (Plain)': 'Plastic FTA',
+        'Plastic MTA (Plain)': 'Plastic MTA',
+        'Plain FTA': 'Plastic FTA',
+        'Plain MTA': 'Plastic MTA',
+        'Reducer Bushing': 'Reducing Bush',
+        'Reducing Bushing': 'Reducing Bush',
+        'Reducer Coupler / Socket': 'Reducing Coupler',
+        'Reducing Coupler / Socket': 'Reducing Coupler'
+      };
+      n = exact[n] || n;
+
+      // Generic old "Reducer ..." naming -> one visible "Reducing ..." naming.
+      n = n.replace(/^Reducer\b/i, 'Reducing');
+
+      // Normalize common word-order variants created by old/custom masters.
+      const m = n.match(/^Reducing\s+(FTA|MTA)\s+(Plastic|Brass)$/i);
+      if (m) n = `Reducing ${m[2][0].toUpperCase()}${m[2].slice(1).toLowerCase()} ${m[1].toUpperCase()}`;
+      const m2 = n.match(/^(Plastic|Brass)\s+Reducing\s+(FTA|MTA)$/i);
+      if (m2) n = `Reducing ${m2[1][0].toUpperCase()}${m2[1].slice(1).toLowerCase()} ${m2[2].toUpperCase()}`;
+
+      // Final terminology cleanup.
+      n = n.replace(/^Reducing\s+Bushing$/i, 'Reducing Bush');
+      n = n.replace(/^Reducing\s+Coupler\s*\/\s*Socket$/i, 'Reducing Coupler');
+      n = n.replace(/^Coupler\s*\/\s*Socket$/i, 'Coupler');
+      return n;
+    }
+
+    function v621ProductCanonicalKey(name) {
+      // Canonical key is based on the final visible name, so all aliases collapse.
+      return v6NormalizeName(v621ProductDisplayName(name));
+    }
+
+    function v621IsPairSize(value) {
+      const s = String(value || '');
+      return /\s[x×]\s/i.test(s) || /\d\s*[x×]\s*\d/i.test(s);
+    }
+
+    function v621IsReducingProduct(itemName) {
+      return /\b(?:reducer|reducing|reduction)\b/i.test(String(itemName || ''));
+    }
+
+    function v621ProductSizesForItem(category, itemName, sizes) {
+      const cat = String(category || '').trim();
+      const name = String(itemName || '').trim();
+      const source = Array.from(new Set((Array.isArray(sizes) ? sizes : []).filter(Boolean)));
+      if (!name || !source.length) return source;
+
+      // Every explicitly reducing item gets only A x B size combinations.
+      if (v621IsReducingProduct(name)) {
+        let reduced = source.filter(v621IsPairSize);
+        if (!reduced.length) {
+          reduced = (CATEGORY_SIZES_MAP[cat] || []).filter(v621IsPairSize);
+        }
+        return reduced.length ? reduced : source;
+      }
+
+      // CPVC/UPVC plumbing normal fittings stay clean: no reducing combinations.
+      // "Other" stays unrestricted because its exact geometry is unknown.
+      if ((cat === 'CPVC Plumbing Fittings' || cat === 'UPVC Pressure Fittings') && !/^other\b/i.test(name)) {
+        const normal = source.filter(x => !v621IsPairSize(x));
+        return normal.length ? normal : source;
+      }
+      return source;
+    }
+
+    // De-duplicate known aliases in the visible product dropdown without rewriting old saved data.
+    const v621BaseGetItemsForCategory = getItemsForCategory;
+    getItemsForCategory = function(category) {
+      const items = v621BaseGetItemsForCategory(category);
+      const seen = new Set();
+      return items.filter(name => {
+        const key = v621ProductCanonicalKey(name);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    };
+
     // Final row renderer: new rows start genuinely blank instead of Water Tank/Qty 1.
     createPipeRowHTML = function(item = {}) {
       const hasItem = !!(
@@ -4283,7 +4665,12 @@
       let itemName = hasItem ? String(item.itemName || '').trim() : '';
 
       let items = category ? [...getItemsForCategory(category)] : [];
-      if (itemName && !items.includes(itemName)) items.unshift(itemName);
+      if (itemName) {
+        const itemKey = v621ProductCanonicalKey(itemName);
+        const equivalent = items.find(x => v621ProductCanonicalKey(x) === itemKey);
+        if (equivalent) itemName = equivalent;
+        else if (!items.includes(itemName)) items.unshift(itemName);
+      }
 
       const prm = (category && itemName)
         ? v6ProductParams(category, itemName)
@@ -4317,7 +4704,7 @@
         v69Options(PIPE_CATEGORIES, category);
 
       const itemHtml = category
-        ? `<option value="" ${!itemName ? 'selected' : ''}>-- Select Product --</option>${v69Options(items, itemName)}`
+        ? `<option value="" ${!itemName ? 'selected' : ''}>-- Select Product --</option>${v69Options(items, itemName, v621ProductDisplayName)}`
         : `<option value="" selected>-- Select Product --</option>`;
 
       const brandHtml = v69Options(brands, brand);
@@ -4349,13 +4736,13 @@
             <select ${dependentDisabled} class="item-brand w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold focus:outline-none disabled:bg-slate-100">${brandHtml}</select>
           </td>
           <td class="py-2.5 px-1.5">
-            <select ${dependentDisabled} class="item-size w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${sizeHtml}</select>
+            <select ${dependentDisabled} onchange="v621AdvanceOrderFocus(this)" class="item-size w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${sizeHtml}</select>
           </td>
           <td class="py-2.5 px-1.5">
-            <select ${dependentDisabled} class="item-class w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-semibold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${classHtml}</select>
+            <select ${dependentDisabled} onchange="v621AdvanceOrderFocus(this)" class="item-class w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-semibold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${classHtml}</select>
           </td>
           <td class="py-2.5 px-1.5">
-            <select ${dependentDisabled} class="item-length w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none disabled:bg-slate-100">${lengthHtml}</select>
+            <select ${dependentDisabled} onchange="v621AdvanceOrderFocus(this)" class="item-length w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none disabled:bg-slate-100">${lengthHtml}</select>
           </td>
           <td class="py-2.5 px-1.5">
             <input type="number" min="0.001" step="any" value="${v6EscapeAttr(qty)}" placeholder="Qty" oninput="recalculateFormTotals()" class="item-qty w-full text-sm py-2 px-2 border rounded-xl font-extrabold text-center text-slate-900 focus:ring-2 focus:ring-blue-200 focus:outline-none">
@@ -4395,7 +4782,7 @@
       const names = getItemsForCategory(cat);
       item.innerHTML =
         '<option value="">-- Select Product --</option>' +
-        names.map(x => `<option value="${v6EscapeAttr(x)}">${v6EscapeHtml(x)}</option>`).join('');
+        names.map(x => `<option value="${v6EscapeAttr(x)}">${v6EscapeHtml(v621ProductDisplayName(x))}</option>`).join('');
       item.disabled = false;
 
       dependent.forEach(cl => {
@@ -4409,6 +4796,38 @@
       item.focus();
       recalculateFormTotals();
     };
+
+    function v621SelectableOptionCount(selectEl) {
+      if (!selectEl || selectEl.disabled) return 0;
+      return Array.from(selectEl.options || []).filter(o => String(o.value || '').trim() && String(o.textContent || '').trim() !== '—').length;
+    }
+
+    function v621FocusAfterProduct(row) {
+      if (!row) return;
+      const selectors = ['.item-size', '.item-class', '.item-length'];
+      const preferred = selectors
+        .map(sel => row.querySelector(sel))
+        .find(el => v621SelectableOptionCount(el) > 1);
+      const fallback = selectors
+        .map(sel => row.querySelector(sel))
+        .find(el => v621SelectableOptionCount(el) > 0);
+      (preferred || fallback || row.querySelector('.item-qty'))?.focus();
+    }
+
+    function v621AdvanceOrderFocus(currentEl) {
+      const row = currentEl?.closest('tr');
+      if (!row) return;
+      const chain = ['.item-size', '.item-class', '.item-length', '.item-qty'];
+      const currentIndex = chain.findIndex(sel => row.querySelector(sel) === currentEl);
+      for (let i = currentIndex + 1; i < chain.length; i++) {
+        const next = row.querySelector(chain[i]);
+        if (!next || next.disabled) continue;
+        if (next.matches('select') && v621SelectableOptionCount(next) <= 1) continue;
+        next.focus();
+        return;
+      }
+      row.querySelector('.item-qty')?.focus();
+    }
 
     onItemChange = function(sel) {
       const row = sel.closest('tr');
@@ -4441,8 +4860,7 @@
       set('.item-length', ALL_LENGTHS, prm.length || '', v69LengthLabel);
       set('.item-unit', ALL_UNITS, prm.unit || '', v69UnitLabel);
 
-      const qty = row.querySelector('.item-qty');
-      if (qty && !qty.value) qty.focus();
+      v621FocusAfterProduct(row);
       recalculateFormTotals();
     };
 
@@ -6277,5 +6695,702 @@
     };
   </script>
 
+
+  <script>
+    function toggleMobileMore(){
+      const el=document.getElementById('airen-mobile-more');
+      if(!el) return;
+      el.classList.toggle('hidden');
+      document.body.style.overflow = el.classList.contains('hidden') ? '' : 'hidden';
+    }
+    function closeMobileMore(){
+      const el=document.getElementById('airen-mobile-more');
+      if(el) el.classList.add('hidden');
+      document.body.style.overflow='';
+    }
+  </script>
+
+
+  <script>
+    // V6.21 RC8: hardened product-name canonicalization across dropdowns,
+    // Product Master, local cache, and cloud sync. Old order values remain readable.
+    function v621CanonicalDisplayName(name) {
+      let n = String(name || '').trim().replace(/\s+/g, ' ');
+      if (!n) return '';
+
+      // Common long-form threaded-adaptor wording used by old/custom masters.
+      n = n.replace(/\((?:female\s+threaded\s+adapt(?:or|er)|female)\)/ig, '').trim();
+      n = n.replace(/\((?:male\s+threaded\s+adapt(?:or|er)|male)\)/ig, '').trim();
+      n = n.replace(/\bfemale\s+threaded\s+adapt(?:or|er)\b/ig, 'FTA');
+      n = n.replace(/\bmale\s+threaded\s+adapt(?:or|er)\b/ig, 'MTA');
+
+      const exact = {
+        'Tee (Equal)': 'Tee',
+        'Plain Tee (Equal)': 'Tee',
+        'Equal Tee': 'Tee',
+        'Coupler / Socket': 'Coupler',
+        'Coupler/Socket': 'Coupler',
+        'Socket': 'Coupler',
+        'Brass Elbow 90° (Female)': 'Brass Elbow 90°',
+        'Brass Tee (Female)': 'Brass Tee',
+        'Brass FTA (Female)': 'Brass FTA',
+        'Brass MTA (Male)': 'Brass MTA',
+        'Plastic FTA (Plain)': 'Plastic FTA',
+        'Plastic MTA (Plain)': 'Plastic MTA',
+        'Plain FTA': 'Plastic FTA',
+        'Plain MTA': 'Plastic MTA',
+        'FTA Plain': 'Plastic FTA',
+        'MTA Plain': 'Plastic MTA',
+        'Reducer Bushing': 'Reducing Bush',
+        'Reducing Bushing': 'Reducing Bush',
+        'Reducer Coupler / Socket': 'Reducing Coupler',
+        'Reducing Coupler / Socket': 'Reducing Coupler',
+        'Reducer Coupler': 'Reducing Coupler'
+      };
+      n = exact[n] || n;
+
+      // One terminology: Reducer/Reduction -> Reducing.
+      n = n.replace(/\bReducer\b/ig, 'Reducing').replace(/\bReduction\b/ig, 'Reducing');
+      n = n.replace(/\s+/g, ' ').trim();
+
+      // Normalize word-order variations from manual/custom masters.
+      let m = n.match(/^Reducing\s+(FTA|MTA)\s+(Plastic|Brass)$/i);
+      if (m) n = `Reducing ${m[2][0].toUpperCase()}${m[2].slice(1).toLowerCase()} ${m[1].toUpperCase()}`;
+      m = n.match(/^(Plastic|Brass)\s+Reducing\s+(FTA|MTA)$/i);
+      if (m) n = `Reducing ${m[1][0].toUpperCase()}${m[1].slice(1).toLowerCase()} ${m[2].toUpperCase()}`;
+      m = n.match(/^(FTA|MTA)\s+Reducing\s+(Plastic|Brass)$/i);
+      if (m) n = `Reducing ${m[2][0].toUpperCase()}${m[2].slice(1).toLowerCase()} ${m[1].toUpperCase()}`;
+
+      // Plain FTA/MTA are plastic fittings in this master.
+      n = n.replace(/^Plastic\s+(FTA|MTA)\s+Plain$/i, 'Plastic $1');
+      n = n.replace(/^Plain\s+(FTA|MTA)$/i, 'Plastic $1');
+
+      // Final short, consistent labels.
+      n = n.replace(/^Reducing\s+Bushing$/i, 'Reducing Bush');
+      n = n.replace(/^Reducing\s+Coupler\s*\/\s*Socket$/i, 'Reducing Coupler');
+      n = n.replace(/^Coupler\s*\/\s*Socket$/i, 'Coupler');
+      n = n.replace(/^Brass\s+FTA\s+FTA$/i, 'Brass FTA');
+      n = n.replace(/^Brass\s+MTA\s+MTA$/i, 'Brass MTA');
+      return n.trim();
+    }
+
+    // Replace prior display helper with the hardened one.
+    v621ProductDisplayName = v621CanonicalDisplayName;
+    v621ProductCanonicalKey = function(name) {
+      return v6NormalizeName(v621CanonicalDisplayName(name));
+    };
+    function v621LogicalProductKey(category, name) {
+      return `${v6NormalizeName(category)}::${v621ProductCanonicalKey(name)}`;
+    }
+
+    function v621ChooseNewestProduct(a, b) {
+      if (!a) return b;
+      if (!b) return a;
+      const ar = Number(a.revision || 0), br = Number(b.revision || 0);
+      if (br !== ar) return br > ar ? b : a;
+      const at = Date.parse(a.updatedAt || '') || 0, bt = Date.parse(b.updatedAt || '') || 0;
+      return bt >= at ? b : a;
+    }
+
+    function v621DeduplicateProductMasterRecords() {
+      if (!Array.isArray(productMasterRecords)) return;
+      const byKey = new Map();
+      productMasterRecords.forEach(p => {
+        if (!p || !p.category || !p.name) return;
+        const key = v621LogicalProductKey(p.category, p.name);
+        byKey.set(key, v621ChooseNewestProduct(byKey.get(key), p));
+      });
+      if (byKey.size !== productMasterRecords.length) {
+        productMasterRecords = Array.from(byKey.values());
+        v6SaveProductCache();
+      }
+    }
+
+    // Canonical lookup prevents alias records from behaving like separate products.
+    v6GetProductRecord = function(cat, name) {
+      const key = v621LogicalProductKey(cat, name);
+      let found = null;
+      (productMasterRecords || []).forEach(p => {
+        if (v621LogicalProductKey(p.category, p.name) === key) found = v621ChooseNewestProduct(found, p);
+      });
+      return found;
+    };
+
+    // Product Master list is canonical and unique too, not just the order dropdown.
+    v610ProductsForCategory = function(category) {
+      const cat = String(category || '').trim();
+      if (!cat) return [];
+      const map = new Map();
+
+      (BASE_FITTINGS_CATALOG[cat] || []).forEach(baseName => {
+        const key = v621LogicalProductKey(cat, baseName);
+        const existing = v6GetProductRecord(cat, baseName);
+        const prm = v6ProductParams(cat, baseName);
+        const product = existing || {
+          id: v6StableProductId(cat, baseName), category: cat, name: baseName,
+          brand: prm.brand || 'KASTA', sizes: [...(prm.sizes || [])], classes: [...(prm.classes || [])],
+          defaultLength: prm.length || '', defaultUnit: prm.unit || '', active: true,
+          revision: 0, _virtualBuiltin: true
+        };
+        map.set(key, product);
+      });
+
+      (productMasterRecords || [])
+        .filter(p => String(p.category || '').trim() === cat)
+        .forEach(p => {
+          const key = v621LogicalProductKey(cat, p.name);
+          map.set(key, v621ChooseNewestProduct(map.get(key), p));
+        });
+
+      return Array.from(map.values()).filter(p => p && p.name)
+        .sort((a,b) => v621CanonicalDisplayName(a.name).localeCompare(v621CanonicalDisplayName(b.name)));
+    };
+
+    v610FindExactProduct = function(category, name) {
+      const key = v621LogicalProductKey(category, name);
+      return v610ProductsForCategory(category).find(p => v621LogicalProductKey(p.category, p.name) === key) || null;
+    };
+
+    v610RefreshProductNameSuggestions = function() {
+      const category = document.getElementById('new-prod-category')?.value || '';
+      const list = document.getElementById('new-prod-name-list');
+      if (!list) return;
+      const seen = new Set();
+      list.innerHTML = v610ProductsForCategory(category).map(p => {
+        const visible = v621CanonicalDisplayName(p.name);
+        const key = v621ProductCanonicalKey(visible);
+        if (!visible || seen.has(key)) return '';
+        seen.add(key);
+        const source = p._virtualBuiltin ? 'Existing catalog product' : (p.active === false ? 'Existing product (inactive)' : 'Existing Product Master');
+        return `<option value="${v6EscapeAttr(visible)}" label="${v6EscapeAttr(source)}"></option>`;
+      }).join('');
+    };
+
+    // Owner Product Master table uses the same unique visible product set.
+    renderManageCatalogTable = function() {
+      const select = document.getElementById('manage-category-select');
+      const tbody = document.getElementById('manage-catalog-tbody');
+      if (!select || !tbody) return;
+      const cat = select.value;
+      const products = v610ProductsForCategory(cat);
+      tbody.innerHTML = products.map((p, i) => {
+        const visible = v621CanonicalDisplayName(p.name);
+        const record = v6GetProductRecord(cat, p.name);
+        const active = !record || record.active !== false;
+        const rawName = (record && record.name) || p.name;
+        return `<tr class="${active?'':'opacity-50 bg-slate-50'}"><td class="py-2.5 px-3 text-center text-slate-400">${i+1}</td><td class="py-2.5 px-3"><div class="font-semibold text-slate-800">${v6EscapeHtml(visible)}</div><div class="text-[10px] text-slate-400">${record?'Master override/custom':'Built-in'} • ${active?'Active':'Inactive'}</div></td><td class="py-2.5 px-3 text-center whitespace-nowrap"><button type="button" data-cat="${v6EscapeAttr(cat)}" data-name="${v6EscapeAttr(rawName)}" onclick="v6EditCatalogProduct(this.dataset.cat,this.dataset.name)" class="text-xs bg-blue-50 text-blue-700 font-bold px-2 py-1 rounded-lg mr-1">Edit</button>${active?`<button type="button" data-cat="${v6EscapeAttr(cat)}" data-name="${v6EscapeAttr(rawName)}" onclick="removeCatalogProduct(this.dataset.cat,this.dataset.name)" class="text-xs bg-rose-50 text-rose-700 font-bold px-2 py-1 rounded-lg">Deactivate</button>`:''}</td></tr>`;
+      }).join('') || '<tr><td colspan="3" class="py-4 text-center text-slate-400">No products.</td></tr>';
+    };
+
+    // Save guard: aliases such as Socket/Coupler or Reducer/Reducing cannot create another record.
+    handleSaveCustomProduct = function(event) {
+      event.preventDefault();
+      requirePin(async()=>{
+        const editId = document.getElementById('edit-product-id').value.trim();
+        const category = document.getElementById('new-prod-category').value;
+        const typedName = document.getElementById('new-prod-name').value.trim();
+        if (!typedName) { showToast('Product name is required.','error'); return; }
+        const name = v621CanonicalDisplayName(typedName);
+        const logicalKey = v621LogicalProductKey(category, name);
+        const dup = (productMasterRecords || []).find(p => p.id !== editId && v621LogicalProductKey(p.category,p.name) === logicalKey);
+        if (dup) { showToast(`Same product already exists as "${v621CanonicalDisplayName(dup.name)}" in this category.`, 'error'); return; }
+
+        const old = editId ? productMasterRecords.find(x => x.id === editId) : null;
+        const baseMatch = (BASE_FITTINGS_CATALOG[category] || []).find(n => v621LogicalProductKey(category,n) === logicalKey);
+        const expected = old ? Math.max(1, Number(old.revision || 1) || 1) : 0;
+        const p = {
+          id: editId || (baseMatch ? v6StableProductId(category, baseMatch) : `prd_${Date.now()}_${v6Random(6)}`),
+          category, name,
+          brand: document.getElementById('new-prod-brand').value || 'KASTA',
+          sizes: v6SplitPipe(document.getElementById('new-prod-sizes').value),
+          classes: v6SplitPipe(document.getElementById('new-prod-classes').value),
+          defaultLength: document.getElementById('new-prod-length').value,
+          defaultUnit: document.getElementById('new-prod-unit').value,
+          active: document.getElementById('new-prod-active').checked,
+          updatedAt: new Date().toISOString(), expectedRevision: expected, revision: expected + 1
+        };
+        productMasterRecords = productMasterRecords.filter(x => x.id !== p.id && v621LogicalProductKey(x.category,x.name) !== logicalKey);
+        productMasterRecords.push(p);
+        v6SaveProductCache(); v6QueueProduct('save',p); closeProductModal(); initManageCatalogUI();
+        v6FlushProductOutbox().catch(()=>{});
+        showToast(`Product "${name}" saved to Product Master queue.`,'success');
+      }, 'Authorize Product Master Change');
+    };
+
+    // Cloud sync also collapses aliases to one logical product before they can reach the UI.
+    syncProductsFromMaster = async function(show=false) {
+      try {
+        await v6FlushProductOutbox();
+        const d = await fetchMasterJsonp({action:'getProducts'});
+        if (!d || d.status !== 'success' || !Array.isArray(d.products)) throw new Error((d&&d.message)||'Product actions not installed in Master Sync backend');
+        const byKey = new Map();
+        d.products.map(v6NormalizeProduct).filter(p=>p&&p.id&&p.category&&p.name)
+          .sort((a,b)=>String(a.updatedAt||'').localeCompare(String(b.updatedAt||'')))
+          .forEach(p=>{ const k=v621LogicalProductKey(p.category,p.name); byKey.set(k,v621ChooseNewestProduct(byKey.get(k),p)); });
+        v62PrepareQueue(PRODUCT_OUTBOX_KEY).forEach(e=>{
+          const p=v6NormalizeProduct(e.product); if(!p||!p.category||!p.name) return;
+          const k=v621LogicalProductKey(p.category,p.name); byKey.set(k,v621ChooseNewestProduct(byKey.get(k),p));
+        });
+        productMasterRecords = Array.from(byKey.values());
+        v6SaveProductCache(); initManageCatalogUI();
+        if(show) showToast(`Product Master synced (${productMasterRecords.length} unique logical products/overrides).`,'success');
+      } catch(err) {
+        if(show) showToast('Product Master backend not upgraded yet; local product cache kept.','warning');
+        throw err;
+      }
+    };
+
+    // Clean any aliases already present in this device cache once at startup.
+    const v621Rc8BaseOnload = window.onload;
+    window.onload = async function(...args) {
+      v621DeduplicateProductMasterRecords();
+      if (typeof v621Rc8BaseOnload === 'function') await v621Rc8BaseOnload.apply(this,args);
+      v621DeduplicateProductMasterRecords();
+      try { initManageCatalogUI(); } catch(_) {}
+      document.documentElement.dataset.airenBuild = 'V6.21-RC8';
+    };
+  </script>
+
+
+
+  <script>
+    // V6.21 RC9: consolidated owner-verified plumbing master.
+    // Keeps legacy internal category values for old orders/cloud compatibility,
+    // while showing shorter labels and product-specific dropdowns for new orders.
+
+    const V9_CATEGORY_LABELS = {
+      'Water Tank': 'Water Tank',
+      'CPVC Plumbing Fittings': 'CPVC Fittings',
+      'CPVC Plumbing Pipe': 'CPVC Pipe',
+      'PVC SWR Drainage Fittings': 'SWR Fittings',
+      'PVC SWR Drainage Pipe': 'SWR Pipe',
+      'UPVC Pressure Fittings': 'UPVC Fittings',
+      'UPVC Pressure Pipe': 'UPVC Pipe',
+      'PVC Agri / Irrigation Fittings': 'Agriculture Fittings',
+      'PVC Agri / Column Pipe': 'Agriculture / Column Pipe',
+      'General Hardware / Solvents': 'Other Hardware Items'
+    };
+
+    const V9_VISIBLE_CATEGORIES = [
+      'Water Tank',
+      'CPVC Plumbing Fittings',
+      'CPVC Plumbing Pipe',
+      'PVC SWR Drainage Fittings',
+      'PVC SWR Drainage Pipe',
+      'UPVC Pressure Fittings',
+      'UPVC Pressure Pipe',
+      'PVC Agri / Irrigation Fittings',
+      'PVC Agri / Column Pipe',
+      'General Hardware / Solvents'
+    ];
+
+    function v9CategoryDisplayName(category) {
+      const c = String(category || '').trim();
+      return V9_CATEGORY_LABELS[c] || c;
+    }
+
+    // Hide retired categories from all new-order/master selectors without deleting
+    // their old catalog data, so historical orders remain readable/editable.
+    PIPE_CATEGORIES.splice(0, PIPE_CATEGORIES.length, ...V9_VISIBLE_CATEGORIES);
+
+    const V9_CPVC_PRODUCTS = [
+      'Elbow 90°','Elbow 45°','Tee','Coupler','Union','End Cap','Cross Tee','Step Over Bend',
+      'Brass Elbow 90°','Brass Tee','Brass FTA','Brass MTA','Plastic FTA','Plastic MTA',
+      'Reducing Plastic FTA','Reducing Plastic MTA','Reducing Elbow 90°','Reducing Tee',
+      'Reducing Coupler','Reducing Bush','Reducing Brass Elbow','Reducing Brass Tee',
+      'Reducing Brass FTA','Reducing Brass MTA','CPVC Ball Valve','Concealed Valve','Long Plug',
+      'Tank Nipple','Tank Nipple One Side','NRV','Wall Mixer','Pipe Clip / Saddle',
+      'CPVC Solvent Cement','Other CPVC Fitting'
+    ];
+
+    const V9_SWR_PRODUCTS = [
+      'Bend 87.5°','Bend 87.5° with Door','Bend 45°','Single Tee','Single Tee with Door',
+      'Single Y','Single Y with Door','Double Y','Double Y with Door','Cross Tee','Cross Tee with Door',
+      'Nahani Trap','Nahani Trap with Jali','P-Trap','S-Trap','Q-Trap','Multi Floor Trap',
+      'Coupler','Reducer','Vent Cowl','Cleaning Pipe','Pipe Clip','SWR Solvent Cement','Socket Plug','End Cap'
+    ];
+
+    BASE_FITTINGS_CATALOG['Water Tank'] = ['Water Tank'];
+    BASE_FITTINGS_CATALOG['CPVC Plumbing Fittings'] = [...V9_CPVC_PRODUCTS];
+    BASE_FITTINGS_CATALOG['CPVC Plumbing Pipe'] = ['Standard CPVC Pipe'];
+    BASE_FITTINGS_CATALOG['PVC SWR Drainage Fittings'] = [...V9_SWR_PRODUCTS];
+    BASE_FITTINGS_CATALOG['PVC SWR Drainage Pipe'] = ['SWR Ringfit Pipe','SWR Selfit Pipe'];
+    BASE_FITTINGS_CATALOG['General Hardware / Solvents'] = ['Bombay Nail','Teflon Tape'];
+
+    const V9_CPVC_NORMAL_SIZES = ['1/2"','3/4"','1"','1.25"','1.5"','2"','2.5"','3"','4"'];
+    const V9_REDUCING_SIZES = [
+      '3/4" x 1/2" (20 x 15 mm)',
+      '1" x 1/2" (25 x 15 mm)',
+      '1" x 3/4" (25 x 20 mm)',
+      '1.25" x 1/2" (32 x 15 mm)',
+      '1.25" x 3/4" (32 x 20 mm)',
+      '1.25" x 1" (32 x 25 mm)',
+      '1.5" x 1/2" (40 x 15 mm)',
+      '1.5" x 3/4" (40 x 20 mm)',
+      '1.5" x 1" (40 x 25 mm)',
+      '1.5" x 1.25" (40 x 32 mm)',
+      '2" x 1/2" (50 x 15 mm)',
+      '2" x 3/4" (50 x 20 mm)',
+      '2" x 1" (50 x 25 mm)',
+      '2" x 1.25" (50 x 32 mm)',
+      '2" x 1.5" (50 x 40 mm)'
+    ];
+
+    const V9_SWR_NORMAL_SIZES = ['2.5" (75 mm)','3" (90 mm)','4" (110 mm)','6" (160 mm)'];
+    const V9_SWR_REDUCING_SIZES = [
+      '3" x 2.5" (90 x 75 mm)',
+      '4" x 2.5" (110 x 75 mm)',
+      '4" x 3" (110 x 90 mm)',
+      '6" x 4" (160 x 110 mm)'
+    ];
+    const V9_SWR_PIPE_SIZES = [
+      '1.25" (40 mm)','1.5" (50 mm)','2" (63 mm)','2.5" (75 mm)','3" (90 mm)',
+      '4" (110 mm)','5" (140 mm)','6" (160 mm)','8" (200 mm)','10" (250 mm)','12" (315 mm)'
+    ];
+    const V9_NAHANI_SIZES = [
+      '4" x 2" (110 x 63 mm)','4" x 2.5" (110 x 75 mm)','4" x 3" (110 x 90 mm)',
+      '4" x 4" (110 x 110 mm)','110 x 75 mm (One Piece)','110 x 90 mm (Socket Type)'
+    ];
+    const V9_TRAP_SIZES = ['4" x 4" (110 x 110 mm)','4.5" x 4" (125 x 110 mm)'];
+    const V9_VENT_COWL_SIZES = ['2" (63 mm)','2.5" (75 mm)','3" (90 mm)','4" (110 mm)'];
+    const V9_SOCKET_PLUG_SIZES = ['2.5" (75 mm)','4" (110 mm)'];
+    const V9_END_CAP_SIZES = ['20 mm','25 mm','32 mm','40 mm','50 mm','63 mm','75 mm','90 mm','110 mm','140 mm','160 mm','180 mm','200 mm'];
+    const V9_SWR_SOLVENT_PACKS = ['50 ml','100 ml','250 ml','500 ml','1 Liter','5 Liter'];
+    const V9_WATER_TANK_SIZES = ['200 L','300 L','500 L','750 L','1000 L'];
+
+    CATEGORY_SIZES_MAP['Water Tank'] = [...V9_WATER_TANK_SIZES];
+    CATEGORY_SIZES_MAP['CPVC Plumbing Fittings'] = [...V9_CPVC_NORMAL_SIZES, ...V9_REDUCING_SIZES];
+    CATEGORY_SIZES_MAP['CPVC Plumbing Pipe'] = [...V9_CPVC_NORMAL_SIZES];
+    CATEGORY_SIZES_MAP['PVC SWR Drainage Fittings'] = [...V9_SWR_NORMAL_SIZES, ...V9_SWR_REDUCING_SIZES];
+    CATEGORY_SIZES_MAP['PVC SWR Drainage Pipe'] = [...V9_SWR_PIPE_SIZES];
+    CATEGORY_SIZES_MAP['General Hardware / Solvents'] = ['2"','2.5"','3"','Free Size'];
+
+    CATEGORY_CLASS_MAP['Water Tank'] = ['4 Layer'];
+    CATEGORY_CLASS_MAP['CPVC Plumbing Fittings'] = ['SDR 11','SDR 13.5','SCH 40','SCH 80'];
+    CATEGORY_CLASS_MAP['CPVC Plumbing Pipe'] = ['SDR 11','SDR 13.5','SCH 40','SCH 80'];
+    CATEGORY_CLASS_MAP['PVC SWR Drainage Fittings'] = ['Ring Fit','Self Fit','N/A'];
+    CATEGORY_CLASS_MAP['PVC SWR Drainage Pipe'] = ['Type A (Rainwater)','Type B (Soil / Waste)','2.5 kg/cm² (Drainage)'];
+    CATEGORY_CLASS_MAP['General Hardware / Solvents'] = ['N/A'];
+
+    // Extend canonical naming to cover the owner-approved SWR cleanup as well.
+    const v9Rc8CanonicalDisplayName = v621CanonicalDisplayName;
+    function v9CanonicalDisplayName(name) {
+      let n = v9Rc8CanonicalDisplayName(name);
+      const swrAliases = {
+        'Bend 87.5° (Plain)': 'Bend 87.5°',
+        'Bend 45° (Plain)': 'Bend 45°',
+        'Single Tee (Plain)': 'Single Tee',
+        'Single Y (45° Plain)': 'Single Y',
+        'Double Y (Plain)': 'Double Y',
+        'Cross Tee (Plain)': 'Cross Tee',
+        'Nahani Trap (Self Cleaning)': 'Nahani Trap',
+        'P-Trap (with/without vent)': 'P-Trap',
+        'Reducer (e.g. 110x75)': 'Reducer',
+        'Reducing': 'Reducer',
+        'Cleaning Pipe / Access Plug': 'Cleaning Pipe',
+        'Pipe Clip / Bracket': 'Pipe Clip',
+        'Solvent Cement SWR': 'SWR Solvent Cement'
+      };
+      return swrAliases[n] || n;
+    }
+    v621ProductDisplayName = v9CanonicalDisplayName;
+    v621ProductCanonicalKey = function(name) { return v6NormalizeName(v9CanonicalDisplayName(name)); };
+
+    const V9_SWR_RETIRED = new Set(['aerator','rubber ring / gasket','other swr fitting']);
+    const v9BaseGetItemsForCategory = getItemsForCategory;
+    getItemsForCategory = function(category) {
+      let items = v9BaseGetItemsForCategory(category) || [];
+      const seen = new Set();
+      items = items.filter(raw => {
+        const visible = v9CanonicalDisplayName(raw);
+        const key = v6NormalizeName(visible);
+        if (!key || seen.has(key)) return false;
+        if (category === 'PVC SWR Drainage Fittings' && V9_SWR_RETIRED.has(key)) return false;
+        if (category === 'Water Tank' && key !== 'water tank') return false;
+        if (category === 'General Hardware / Solvents' && key !== 'bombay nail' && key !== 'teflon tape') return false;
+        seen.add(key);
+        return true;
+      });
+      // V6.21 RC10: keep every product dropdown A-Z by the final visible name.
+      // Generic "Other ..." entries stay at the bottom instead of interrupting normal products.
+      items.sort((a, b) => {
+        const av = v9CanonicalDisplayName(a);
+        const bv = v9CanonicalDisplayName(b);
+        const aOther = /^other\b/i.test(av);
+        const bOther = /^other\b/i.test(bv);
+        if (aOther !== bOther) return aOther ? 1 : -1;
+        return av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+      });
+      return items;
+    };
+
+    const V9_SELF_FIT_ONLY = new Set([
+      'nahani trap','nahani trap with jali','p-trap','s-trap','q-trap','multi floor trap',
+      'vent cowl','socket plug','end cap'
+    ]);
+    const V9_FIT_NA = new Set(['pipe clip','swr solvent cement']);
+
+    function v9IsHigherDiaCpvcSize(size) {
+      const s = String(size || '').trim();
+      return /^2\.5"/.test(s) || /^3"/.test(s) || /^4"/.test(s);
+    }
+
+    const v9LegacyProductParams = v6ProductParams;
+    function v9ProductProfile(category, itemName, selectedSize='') {
+      const cat = String(category || '').trim();
+      const visible = v9CanonicalDisplayName(itemName);
+      const key = v6NormalizeName(visible);
+      const legacy = v9LegacyProductParams(cat, itemName) || {};
+      const base = {
+        brand: legacy.brand || 'KASTA', sizes: [...(legacy.sizes || [])], classes: [...(legacy.classes || [])],
+        lengths: [legacy.length || 'None / N.A. (Fittings)'], length: legacy.length || 'None / N.A. (Fittings)',
+        unit: legacy.unit || 'Nos (Numbers)'
+      };
+
+      if (cat === 'Water Tank') {
+        return { ...base, sizes:[...V9_WATER_TANK_SIZES], classes:['4 Layer'], lengths:['None / N.A. (Fittings)'], length:'None / N.A. (Fittings)', unit:'Nos (Numbers)' };
+      }
+
+      if (cat === 'CPVC Plumbing Fittings') {
+        const reducing = v621IsReducingProduct(visible);
+        const sizes = reducing ? [...V9_REDUCING_SIZES] : [...V9_CPVC_NORMAL_SIZES];
+        const chosen = selectedSize || sizes[0] || '';
+        const classes = (!reducing && v9IsHigherDiaCpvcSize(chosen)) ? ['SCH 40','SCH 80'] : ['SDR 11','SDR 13.5'];
+        return { ...base, sizes, classes, lengths:['None / N.A. (Fittings)'], length:'None / N.A. (Fittings)', unit:'Nos (Numbers)' };
+      }
+
+      if (cat === 'CPVC Plumbing Pipe') {
+        const sizes = [...V9_CPVC_NORMAL_SIZES];
+        const chosen = selectedSize || sizes[0] || '';
+        const classes = v9IsHigherDiaCpvcSize(chosen) ? ['SCH 40','SCH 80'] : ['SDR 11','SDR 13.5'];
+        const lengths = (chosen === '3/4"' || chosen === '1"')
+          ? ['3 Meters (10 ft)','5 Meters (16.4 ft)']
+          : ['3 Meters (10 ft)'];
+        return { ...base, sizes, classes, lengths, length:lengths[0], unit:'Lengths (Pipes)' };
+      }
+
+      if (cat === 'PVC SWR Drainage Fittings') {
+        let sizes = [...V9_SWR_NORMAL_SIZES];
+        if (key === 'reducer') sizes = [...V9_SWR_REDUCING_SIZES];
+        else if (key === 'nahani trap' || key === 'nahani trap with jali') sizes = [...V9_NAHANI_SIZES];
+        else if (key === 'p-trap' || key === 's-trap' || key === 'q-trap') sizes = [...V9_TRAP_SIZES];
+        else if (key === 'multi floor trap') sizes = ['110 x 75 mm'];
+        else if (key === 'vent cowl') sizes = [...V9_VENT_COWL_SIZES];
+        else if (key === 'socket plug') sizes = [...V9_SOCKET_PLUG_SIZES];
+        else if (key === 'end cap') sizes = [...V9_END_CAP_SIZES];
+        else if (key === 'swr solvent cement') sizes = [...V9_SWR_SOLVENT_PACKS];
+
+        let classes = ['Ring Fit','Self Fit'];
+        if (V9_SELF_FIT_ONLY.has(key)) classes = ['Self Fit'];
+        else if (V9_FIT_NA.has(key)) classes = ['N/A'];
+
+        return { ...base, sizes, classes, lengths:['None / N.A. (Fittings)'], length:'None / N.A. (Fittings)', unit:'Nos (Numbers)' };
+      }
+
+      if (cat === 'PVC SWR Drainage Pipe') {
+        const lengths = ['3 Meters (10 ft)','6 Meters (20 ft)'];
+        return {
+          ...base,
+          sizes:[...V9_SWR_PIPE_SIZES],
+          classes:['Type A (Rainwater)','Type B (Soil / Waste)','2.5 kg/cm² (Drainage)'],
+          lengths, length:lengths[0], unit:'Lengths (Pipes)'
+        };
+      }
+
+      if (cat === 'UPVC Pressure Fittings') {
+        if (v621IsReducingProduct(visible)) {
+          return { ...base, sizes:[...V9_REDUCING_SIZES] };
+        }
+        return { ...base, sizes:(base.sizes || []).filter(x => !v621IsPairSize(x)) };
+      }
+
+      if (cat === 'General Hardware / Solvents') {
+        if (key === 'bombay nail') return { ...base, sizes:['2"','2.5"','3"'], classes:['N/A'], lengths:['None / N.A. (Fittings)'], length:'None / N.A. (Fittings)', unit:'Nos (Numbers)' };
+        if (key === 'teflon tape') return { ...base, sizes:['Free Size'], classes:['N/A'], lengths:['None / N.A. (Fittings)'], length:'None / N.A. (Fittings)', unit:'Nos (Numbers)' };
+      }
+
+      if (!base.lengths.length) base.lengths = [base.length || 'None / N.A. (Fittings)'];
+      return base;
+    }
+
+    v6ProductParams = function(category, itemName) {
+      return v9ProductProfile(category, itemName, '');
+    };
+
+    function v9SelectOptions(select, values, selected, labelFn) {
+      if (!select) return;
+      const arr = Array.from(new Set((values || []).filter(v => String(v || '').trim())));
+      let value = selected;
+      if (!arr.includes(value)) value = arr[0] || '';
+      select.innerHTML = arr.length ? v69Options(arr, value, labelFn) : '<option value="">—</option>';
+      select.value = value;
+      select.disabled = arr.length <= 1;
+    }
+
+    function v9OnSizeChange(selectEl) {
+      const row = selectEl?.closest('tr');
+      if (!row) return;
+      const cat = String(row.querySelector('.item-category')?.value || '').trim();
+      const itemName = String(row.querySelector('.item-name')?.value || '').trim();
+      const size = String(selectEl.value || '').trim();
+      if (!cat || !itemName) return;
+      const profile = v9ProductProfile(cat, itemName, size);
+      const currentClass = row.querySelector('.item-class')?.value || '';
+      const currentLength = row.querySelector('.item-length')?.value || '';
+      v9SelectOptions(row.querySelector('.item-class'), profile.classes, currentClass);
+      v9SelectOptions(row.querySelector('.item-length'), profile.lengths, currentLength, v69LengthLabel);
+      v621AdvanceOrderFocus(selectEl);
+    }
+
+    // Re-render order rows with product-specific size/class/length choices.
+    createPipeRowHTML = function(item = {}) {
+      const hasItem = !!(item && (String(item.category || '').trim() || String(item.itemName || '').trim() || item.qty !== undefined));
+      let category = hasItem ? String(item.category || '').trim() : '';
+      let itemName = hasItem ? String(item.itemName || '').trim() : '';
+
+      let items = category ? [...getItemsForCategory(category)] : [];
+      if (itemName) {
+        const itemKey = v621ProductCanonicalKey(itemName);
+        const equivalent = items.find(x => v621ProductCanonicalKey(x) === itemKey);
+        if (equivalent) itemName = equivalent;
+        else if (!items.includes(itemName)) items.unshift(itemName);
+      }
+
+      const initialProfile = (category && itemName) ? v9ProductProfile(category, itemName, item.size || '') : {brand:'KASTA',sizes:[],classes:[],lengths:[],length:'',unit:''};
+      let brands = [...PIPE_BRANDS];
+      const brand = hasItem ? (item.brand || initialProfile.brand || 'KASTA') : 'KASTA';
+      if (brand && !brands.includes(brand)) brands.unshift(brand);
+
+      let sizes = [...(initialProfile.sizes || [])];
+      let size = hasItem ? (normalizePipeSizeValue(item.size) || sizes[0] || '') : '';
+      if (size && !sizes.includes(size)) sizes.unshift(size);
+      const profile = (category && itemName) ? v9ProductProfile(category, itemName, size) : initialProfile;
+
+      let classes = [...(profile.classes || [])];
+      let specClass = hasItem ? (item.specClass || classes[0] || '') : '';
+      if (specClass && !classes.includes(specClass)) classes.unshift(specClass);
+
+      let lengths = [...(profile.lengths || [])];
+      let length = hasItem ? (item.length || profile.length || lengths[0] || '') : '';
+      if (length && !lengths.includes(length)) lengths.unshift(length);
+
+      let units = [...ALL_UNITS];
+      const unit = hasItem ? (item.unit || profile.unit || '') : '';
+      if (unit && !units.includes(unit)) units.unshift(unit);
+      const qty = hasItem && item.qty !== undefined ? item.qty : '';
+      const remarks = hasItem ? (item.remarks || '') : '';
+
+      const cats = [...PIPE_CATEGORIES];
+      if (category && !cats.includes(category)) cats.unshift(category); // historical category compatibility
+      const catHtml = `<option value="" ${!category?'selected':''}>-- Select Category --</option>` + v69Options(cats, category, v9CategoryDisplayName);
+      const itemHtml = category
+        ? `<option value="" ${!itemName?'selected':''}>-- Select Product --</option>${v69Options(items,itemName,v9CanonicalDisplayName)}`
+        : '<option value="" selected>-- Select Product --</option>';
+      const dependentDisabled = (!category || !itemName);
+      const sizeDisabled = dependentDisabled || sizes.length <= 1;
+      const classDisabled = dependentDisabled || classes.length <= 1;
+      const lengthDisabled = dependentDisabled || lengths.length <= 1;
+
+      return `
+        <tr class="order-line-row hover:bg-slate-50/80 transition-colors ${hasItem?'':'bg-blue-50/20'}">
+          <td class="py-2.5 px-2 text-center text-slate-400 font-mono row-index">1</td>
+          <td class="py-2.5 px-1.5"><select onchange="onCategoryChange(this)" class="item-category w-full text-[12px] py-2 px-2 bg-blue-50/70 border border-blue-300 rounded-xl font-bold focus:ring-2 focus:ring-blue-200 focus:outline-none">${catHtml}</select></td>
+          <td class="py-2.5 px-1.5"><select onchange="onItemChange(this)" ${category?'':'disabled'} class="item-name w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-semibold text-brand-900 focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400">${itemHtml}</select></td>
+          <td class="py-2.5 px-1.5"><select ${dependentDisabled?'disabled':''} class="item-brand w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold focus:outline-none disabled:bg-slate-100">${v69Options(brands,brand)}</select></td>
+          <td class="py-2.5 px-1.5"><select ${sizeDisabled?'disabled':''} onchange="v9OnSizeChange(this)" class="item-size w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-bold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${size?v69Options(sizes,size):'<option value="" selected>—</option>'}</select></td>
+          <td class="py-2.5 px-1.5"><select ${classDisabled?'disabled':''} onchange="v621AdvanceOrderFocus(this)" class="item-class w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl font-semibold focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100">${specClass?v69Options(classes,specClass):'<option value="" selected>—</option>'}</select></td>
+          <td class="py-2.5 px-1.5"><select ${lengthDisabled?'disabled':''} onchange="v621AdvanceOrderFocus(this)" class="item-length w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none disabled:bg-slate-100">${length?v69Options(lengths,length,v69LengthLabel):'<option value="" selected>—</option>'}</select></td>
+          <td class="py-2.5 px-1.5"><input type="number" min="0.001" step="any" value="${v6EscapeAttr(qty)}" placeholder="Qty" oninput="recalculateFormTotals()" class="item-qty w-full text-sm py-2 px-2 border rounded-xl font-extrabold text-center text-slate-900 focus:ring-2 focus:ring-blue-200 focus:outline-none"></td>
+          <td class="py-2.5 px-1.5"><select ${dependentDisabled?'disabled':''} onchange="recalculateFormTotals()" class="item-unit w-full text-[12px] py-2 px-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none disabled:bg-slate-100">${unit?v69Options(units,unit,v69UnitLabel):'<option value="" selected>—</option>'}</select></td>
+          <td class="py-2.5 px-1.5"><input type="text" value="${v6EscapeAttr(remarks)}" placeholder="Optional note" class="item-remarks w-full text-[12px] py-2 px-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-100 focus:outline-none"></td>
+          <td class="py-2.5 px-1.5 text-center"><button type="button" onclick="removeOrderItemRow(this)" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Delete row">🗑</button></td>
+        </tr>`;
+    };
+
+    onCategoryChange = function(sel) {
+      const row = sel.closest('tr');
+      const cat = String(sel.value || '').trim();
+      const item = row.querySelector('.item-name');
+      const dependent = ['.item-brand','.item-size','.item-class','.item-length','.item-unit'];
+      if (!cat) {
+        item.innerHTML='<option value="">-- Select Product --</option>'; item.disabled=true;
+        dependent.forEach(cl=>{const e=row.querySelector(cl); if(e){e.innerHTML='<option value="">—</option>';e.disabled=true;}});
+        row.querySelector('.item-qty').value=''; recalculateFormTotals(); return;
+      }
+      const names = getItemsForCategory(cat);
+      item.innerHTML='<option value="">-- Select Product --</option>'+names.map(x=>`<option value="${v6EscapeAttr(x)}">${v6EscapeHtml(v9CanonicalDisplayName(x))}</option>`).join('');
+      item.disabled=false;
+      dependent.forEach(cl=>{const e=row.querySelector(cl); if(e){e.innerHTML='<option value="">—</option>';e.disabled=true;}});
+      row.querySelector('.item-qty').value=''; item.focus(); recalculateFormTotals();
+    };
+
+    onItemChange = function(sel) {
+      const row = sel.closest('tr');
+      const cat = String(row.querySelector('.item-category')?.value || '').trim();
+      const itemName = String(sel.value || '').trim();
+      if (!cat || !itemName) return;
+      let profile = v9ProductProfile(cat,itemName,'');
+      const brand = row.querySelector('.item-brand');
+      brand.disabled=false;
+      if (profile.brand && !Array.from(brand.options).some(o=>o.value===profile.brand)) {
+        const o=document.createElement('option');o.value=profile.brand;o.textContent=profile.brand;brand.prepend(o);
+      }
+      brand.value=profile.brand||'KASTA';
+      const sizeSelect=row.querySelector('.item-size');
+      v9SelectOptions(sizeSelect,profile.sizes,(profile.sizes||[])[0]||'');
+      const chosen=sizeSelect?.value||'';
+      profile=v9ProductProfile(cat,itemName,chosen);
+      v9SelectOptions(row.querySelector('.item-class'),profile.classes,(profile.classes||[])[0]||'');
+      v9SelectOptions(row.querySelector('.item-length'),profile.lengths,profile.length||'',v69LengthLabel);
+      const unitSelect=row.querySelector('.item-unit'); unitSelect.disabled=false;
+      if (profile.unit && !Array.from(unitSelect.options).some(o=>o.value===profile.unit)) {
+        const o=document.createElement('option');o.value=profile.unit;o.textContent=v69UnitLabel(profile.unit);unitSelect.prepend(o);
+      }
+      unitSelect.value=profile.unit||'Nos (Numbers)';
+      v621FocusAfterProduct(row); recalculateFormTotals();
+    };
+
+    function v9RelabelCategorySelect(select) {
+      if (!select) return;
+      Array.from(select.options || []).forEach(o => { if (o.value) o.textContent = v9CategoryDisplayName(o.value); });
+    }
+
+    initManageCatalogUI = function() {
+      const select=document.getElementById('manage-category-select');
+      if(!select)return;
+      const cur=select.value;
+      select.innerHTML=PIPE_CATEGORIES.map(c=>`<option value="${v6EscapeAttr(c)}">${v6EscapeHtml(v9CategoryDisplayName(c))}</option>`).join('');
+      if(cur&&PIPE_CATEGORIES.includes(cur))select.value=cur;
+      renderManageCatalogTable();
+    };
+
+    if (typeof openProductModal === 'function') {
+      const v9BaseOpenProductModal = openProductModal;
+      openProductModal = function(...args) {
+        const result = v9BaseOpenProductModal.apply(this,args);
+        v9RelabelCategorySelect(document.getElementById('new-prod-category'));
+        return result;
+      };
+    }
+
+    // Product Master label better reflects SWR fitting use of the class field as Fit Type.
+    const v9BaseSpecLabel = v66ProductSpecLabel;
+    v66ProductSpecLabel = function(category) {
+      if (String(category||'') === 'PVC SWR Drainage Fittings') return 'Fit Type / Variant';
+      return v9BaseSpecLabel(category);
+    };
+
+    // Final UI refresh after all earlier RC onload work has completed.
+    const v9PreviousOnload = window.onload;
+    window.onload = async function(...args) {
+      if (typeof v9PreviousOnload === 'function') await v9PreviousOnload.apply(this,args);
+      try {
+        initManageCatalogUI();
+        v9RelabelCategorySelect(document.getElementById('new-prod-category'));
+        document.querySelectorAll('.item-category').forEach(v9RelabelCategorySelect);
+      } catch(_) {}
+      document.documentElement.dataset.airenBuild = 'V6.21-RC10';
+    };
+  </script>
 </body>
 </html>
