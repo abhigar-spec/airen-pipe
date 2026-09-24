@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airen Pipe V6.21 - Mobile First RC7 UI RC3 Tablet/Mobile Fix</title>
+  <title>Airen Pipe V6.21 - RC17 Order Book Alignment Fix</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -84,6 +84,17 @@
         margin-left: -1.25rem;
         margin-right: -1.25rem;
       }
+    }
+
+    /* RC17: Order Book toolbar alignment. Keep filters readable and owner controls inside the card. */
+    #order-toolbar, #order-toolbar * { box-sizing: border-box; }
+    #order-toolbar-filters > * { min-width: 0; }
+    #order-toolbar-actions > * { flex: 0 0 auto; }
+    @media (max-width: 700px) {
+      #order-toolbar-actions { justify-content: stretch; }
+      #order-toolbar-actions > button,
+      #order-toolbar-actions > #v621-owner-mode-badge { flex: 1 1 calc(50% - .5rem); min-width: 0; text-align: center; justify-content: center; }
+      #order-toolbar-actions > button:last-child { flex-basis: 100%; }
     }
 
     /* Multi-Page Print & PDF Fixes (No blank space on top) */
@@ -582,7 +593,7 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
 
     <!-- KPI Cards -->
-    <section id="global-kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <section id="global-kpis" class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
       <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
         <div class="p-3 bg-brand-50 text-brand-600 rounded-xl">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -613,21 +624,12 @@
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center space-x-3.5">
-        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Quantity by Unit</p>
-          <h3 id="stat-total-pcs" class="text-lg xl:text-xl font-bold text-indigo-700 leading-tight whitespace-normal">0</h3>
-        </div>
-      </div>
     </section>
 
     <!-- Orders View -->
     <div id="view-orders" class="tab-view space-y-4">
-      <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div class="flex-1 flex flex-col sm:flex-row gap-2">
+      <div id="order-toolbar" class="bg-white p-4 rounded-2xl shadow-xs border border-slate-200 flex flex-col gap-3 items-stretch">
+        <div id="order-toolbar-filters" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[minmax(260px,1.6fr)_minmax(150px,.7fr)_minmax(170px,.8fr)_minmax(240px,1.1fr)] gap-2 w-full min-w-0">
           <div class="relative flex-1">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -635,7 +637,7 @@
             <input type="text" id="order-search-input" oninput="renderOrdersList()" placeholder="Search by Salesperson, Party, GST, City, Order #..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition-all">
           </div>
 
-          <select id="order-status-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <select id="order-status-filter" onchange="renderOrdersList()" class="w-full min-w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
             <option value="ALL">All Statuses</option>
             <option value="Confirmed">Confirmed</option>
             <option value="Recorded">Recorded (Draft)</option>
@@ -643,7 +645,7 @@
             <option value="Cancelled">Cancelled</option>
           </select>
 
-          <select id="order-salesperson-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <select id="order-salesperson-filter" onchange="renderOrdersList()" class="w-full min-w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
             <option value="ALL">All Salespersons</option>
             <option value="Sonam Jain">Sonam Jain</option>
             <option value="Adil Beg">Adil Beg</option>
@@ -652,12 +654,12 @@
             <option value="Office Counter">Office Counter</option>
           </select>
 
-          <select id="order-party-filter" onchange="renderOrdersList()" class="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none max-w-xs truncate">
+          <select id="order-party-filter" onchange="renderOrdersList()" class="w-full min-w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none truncate">
             <option value="ALL">All Parties</option>
           </select>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div id="order-toolbar-actions" class="flex flex-wrap items-center justify-end gap-2 w-full min-w-0">
           <button onclick="fetchOrdersFromCloud()" id="btn-cloud-sync" class="px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs flex items-center space-x-1.5" title="Fetch all orders from Google Sheet">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             <span>☁️ Sync All Orders</span>
@@ -7720,7 +7722,7 @@
   <!-- RC16: instant local save; cloud sync stays background-only -->
   <script id="airen-rc16-fast-save-marker">
     window.addEventListener('load', () => {
-      document.documentElement.dataset.airenBuild='V6.21-RC16';
+      document.documentElement.dataset.airenBuild='V6.21-RC17';
     });
   </script>
 
