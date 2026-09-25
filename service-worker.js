@@ -1,5 +1,5 @@
-/* Airen Pipe V6.21 RC20 - Offline/PWA foundation + Add Row focus */
-const AIR_CACHE = 'airen-shell-rc20-v1';
+/* Airen Pipe V6.21 RC21 - Offline/PWA + verification fix */
+const AIR_CACHE = 'airen-shell-rc21-v1';
 const AIR_DB = 'airen-offline-sync-v1';
 const AIR_STORE = 'orderQueue';
 const AIR_SYNC_TAG = 'airen-order-sync';

@@ -4274,13 +4274,14 @@
       }finally{v62ProductFlushBusy=false}
     };
 
-    // Backend does not persist PartyID in legacy Sheet1, so comparison deliberately
-    // excludes partyId while still checking every persisted business field + mutation.
+    // RC21 verification rule: Sheet/API metadata such as revision/mutationId can be
+    // normalized or omitted on read. Verify the complete persisted business payload
+    // separately from transport metadata, while still excluding legacy-only partyId.
     v6OrderComparable=function(o){
       let items=o&&o.items;if(typeof items==='string'){try{items=JSON.parse(items)}catch(_){items=[]}}
       const s=v=>String(v==null?'':v).trim();
       return JSON.stringify({
-        id:s(o&&o.id),revision:Math.max(1,Number(o&&o.revision||1)||1),mutationId:s(o&&o.mutationId),
+        id:s(o&&o.id),
         salesperson:s(o&&o.salesperson),partyName:s(o&&o.partyName),partyGst:s(o&&o.partyGst),partyPhone:s(o&&o.partyPhone),partyCity:s(o&&o.partyCity),partyAddress:s(o&&o.partyAddress),
         orderDate:s(o&&o.orderDate),targetDate:s(o&&o.targetDate),status:s(o&&o.status),partyRef:s(o&&o.partyRef),deliverySite:s(o&&o.deliverySite),notes:s(o&&o.notes),
         items:(Array.isArray(items)?items:[]).map(x=>({category:s(x&&x.category),itemName:s(x&&x.itemName),brand:s(x&&x.brand),size:normalizePipeSizeValue(x&&x.size),specClass:s(x&&x.specClass),length:s(x&&x.length),qty:Number(x&&x.qty||0),unit:s(x&&x.unit),remarks:s(x&&x.remarks)}))
@@ -8007,7 +8008,7 @@
       });
 
       window.addEventListener('load', async () => {
-        document.documentElement.dataset.airenBuild = 'V6.21-RC20';
+        document.documentElement.dataset.airenBuild = 'V6.21-RC21';
         rc19EnsurePill();
         rc19UpdateStatus();
         await rc19RegisterServiceWorker();
