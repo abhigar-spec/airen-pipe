@@ -4379,6 +4379,12 @@
           if(e.op==='delete'){
             if(!ro)ok.push(String(e.queueId));
             else if(Number(ro.revision||1)>Number(e.order.expectedRevision||e.order.revision||1))conflicts++;
+          }else if(e.op==='create' && ro){
+            // RC22: a locally generated order ID is collision-resistant and immutable.
+            // If that exact ID is present in the authoritative Sheet, the create write
+            // has reached the backend. Do not keep it pending merely because the Sheet
+            // normalizes optional/legacy fields differently on readback.
+            ok.push(String(e.queueId));
           }else if(ro&&v6OrderComparable(ro)===v6OrderComparable(e.order)){
             ok.push(String(e.queueId));
           }else if(ro&&Number(ro.revision||1)>=Number(e.order.revision||1)&&String(ro.mutationId||'')!==String(e.order.mutationId||'')){
@@ -7954,7 +7960,7 @@
       async function rc19RegisterServiceWorker() {
         if (!('serviceWorker' in navigator)) return;
         try {
-          const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+          const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' });
           await navigator.serviceWorker.ready;
           if (rc19PendingEntries().length) await rc19RegisterBackgroundSync();
           return reg;
@@ -8008,7 +8014,7 @@
       });
 
       window.addEventListener('load', async () => {
-        document.documentElement.dataset.airenBuild = 'V6.21-RC21';
+        document.documentElement.dataset.airenBuild = 'V6.21-RC22';
         rc19EnsurePill();
         rc19UpdateStatus();
         await rc19RegisterServiceWorker();
