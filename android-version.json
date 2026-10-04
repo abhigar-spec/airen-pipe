@@ -1,8 +1,8 @@
 {
-  "versionCode": 23,
-  "versionName": "1.0-rc23",
-  "apkUrl": "",
-  "sha256": "",
+  "versionCode": 24,
+  "versionName": "1.0-rc24",
+  "apkUrl": "https://raw.githubusercontent.com/abhigar-spec/airen-pipe/main/Airen_RC24_VOICE_ASSISTANT.apk",
+  "sha256": "a3de98bab3a7da082d550c64d33ae3445049d828d9b865d2eab04b40e0445d92",
   "mandatory": false,
-  "notes": "Airen Android RC23: larger launcher logo and reliable in-app update controls."
+  "notes": "RC24: Complete Voice Assistant with Hindi, Hinglish and English voice input and voice analysis."
 }
