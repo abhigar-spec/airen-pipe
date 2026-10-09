@@ -1,8 +1,8 @@
 {
-  "versionCode": 26,
-  "versionName": "1.0-rc26",
-  "apkUrl": "https://raw.githubusercontent.com/abhigar-spec/airen-pipe/main/Airen_RC26_AUDITED_FINAL.apk",
-  "sha256": "3dd0f5bbae0551457003f2f528dab1dff1a6ea8e7d92bcb9a83e5e4bf63c9488",
+  "versionCode": 27,
+  "versionName": "1.0-rc27",
+  "apkUrl": "https://raw.githubusercontent.com/abhigar-spec/airen-pipe/main/Airen_RC27_AUDITED_FINAL.apk",
+  "sha256": "2b28f65685f8d38e76dd2e3a9b1148fb545f1fe39ae05560c738eabb05785113",
   "mandatory": false,
-  "notes": "RC26 audited final: secure login, grouped multi-item orders, password-protected soft delete, role controls, master refresh and sync hardening."
+  "notes": "RC27 final: salesperson privacy isolation, own-order visibility only, identity lock, grouped multi-item orders, secure soft delete and RC26 security features."
 }
