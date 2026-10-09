@@ -1,8 +1,8 @@
 {
-  "versionCode": 25,
-  "versionName": "1.0-rc25",
-  "apkUrl": "https://raw.githubusercontent.com/abhigar-spec/airen-pipe/main/Airen_RC25_AUDITED_FINAL.apk",
-  "sha256": "ae316e3ac3204e49a9e929a5acafc2e4102c455edaec01ba533774523d5ab686",
+  "versionCode": 26,
+  "versionName": "1.0-rc26",
+  "apkUrl": "https://raw.githubusercontent.com/abhigar-spec/airen-pipe/main/Airen_RC26_AUDITED_FINAL.apk",
+  "sha256": "3dd0f5bbae0551457003f2f528dab1dff1a6ea8e7d92bcb9a83e5e4bf63c9488",
   "mandatory": false,
-  "notes": "RC25: Audited voice search fix, improved Hindi/Hinglish matching, safer voice analysis and updater validation."
+  "notes": "RC26 audited final: secure login, grouped multi-item orders, password-protected soft delete, role controls, master refresh and sync hardening."
 }
